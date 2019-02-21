@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>  </title>
+    <style type="text/css">
+     
+    body {
+    	margin:0px;
+    	padding: 0px;
+    }
+    p {
+    	margin:0px;
+    	padding: 0px;
+    }
+    h6, h5 {
+    	margin: 0px; 
+    }
+
+ .gate-pass table>tbody>tr>td{
+ 	border-top: none;
+ 	padding-bottom: 0px;
+ 	padding-left: 0px;
+ }
+ .gatepass-data{
+ 	border-bottom: 1px dashed #b17002;
+ }
+ .gatepass-id{
+ 	font-size: 15px;
+ 	color:#b17002;
+ 	font-weight: 600; 
+ }
+ .strng{
+ 	font-weight: bold;
+ }
+ .gate-pass img{
+ 	margin: 0 auto;
+ 	display: block;
+ }
+ .top-fifteen{
+ 	margin-top: 15px;
+ }
+ .top-thirty{
+ 	margin-top: 30px;
+ }
+ .gate-pass h5{
+ 	color: #b17002;
+ 	font-weight: 600;
+ }
+
+ .court-appeal{
+ 	border-bottom: 1px dashed #333;
+ 	color: #797979;
+
+ }
+ .appeal_court{
+ 	margin-bottom: 15px;
+ }
+ .appeal_court h5{
+ 	color: #000;
+    margin-bottom: 20px;
+ }
+.pf31{
+	border:1px solid #BF360C;
+	margin-bottom: 15px;
+	background: #f9f9f9;
+}
+ .pf31 .header{
+ 	background: #BF360C;
+ 	color: #fff;
+ 	text-align: center;
+ }
+ .pf31 .header h3{
+ 	font-size: 16px;
+ 	margin-top: 0px;
+ }
+ .pf31 .header h6{
+ 	text-align: right;
+ 	font-size: 16px;
+ }
+ .pf31 h4{
+ 	color: #333333;
+ 	padding: 10px 0px;
+ 	border-bottom: 1px solid #bf360c;
+ 	font-size: 16px;
+ }
+ .hfour{
+ 	border-bottom: 3px solid #bf360c;
+ 	padding-bottom: 8px;
+ }
+ .face h5{
+ 	font-size: 16px;
+ 	color:#3E2723; 
+ 	text-align: center;
+ }
+ .face img {
+ 	margin: 0 auto;
+ 	display: block;
+ }
+ .dashed-bottom{
+ 	border-bottom: 1px dashed #b5b5b5;
+ }
+ .bold-italic{
+ 	font-weight: bold;
+ 	font-style: italic;
+ }
+ .signature{
+ 	text-align: right;
+ 	font-weight: bold;
+ 	margin: 2px;
+ }
+  .signature-top{
+ 	border-bottom: 1px solid #ccc;
+ }
+ .devider{
+ 	border-bottom: 2px groove #fff;
+ }
+ .table-condensed thead tr th {
+ 	background: #bf360c;
+    color: #fff;
+ }
+ .text-right {
+ 	float: right;
+ }
+ .dashed-bottom {
+ 	font-weight: normal;
+ }
+	</style>
+ </head>
+
+ <body> 
+
+
+	<table>
+<tr>
+<td align="center">
+	<h3 class="text-center strng">UGANDA  GOVERNMENT  PRISONS</h3>
+<h3 class="text-center strng">NOTIFICATION OF PRISONER’S DEATH</h3>
+</td>
+<td align="right"><div class="strng">Prisons Form 22</div><br>
+<div class="strng"> <span class="dashed-bottom"> {prison_name} </span>Prison</div>	 </td>
+</tr>
+</table>
+
+
+<p class="strng"><span class="strng"> Date of death</span> <span class="dashed-bottom">{check_up_date}</span></p>
+
+<p class="strng"> Cause of death <span class="dashed-bottom"> {death_cause}</span> </p>
+
+<p class="strng"> No. and name of Prisoner. <span class="dashed-bottom"> {prisoner_no} and {fullname} </span> </p>
+
+<p class="strng">C.R.O. No. <span class="dashed-bottom"> {crb_no} </span> </p>
+
+<p class="strng">Sentence <span class="dashed-bottom"> {sentence} </span> </p>
+
+<p class="strng">Offence <span class="dashed-bottom"> {offence} </span> </p>
+
+<p class="strng">Criminal Case No. <span class="dashed-bottom"> {case_file_no} </span> </p>
+
+<p class="strng">Where convicted and date <span class="dashed-bottom"> {place_of_offence} and {date_of_committal} </span> </p>
+
+<p class="strng">Address of next – of – kin <span class="dashed-bottom"> {address_of_kin} </span> </p>
+
+<p class="strng">Deceased’s property as enumerated on the back has been/will be sent  </p>
+
+<p>to <span class="dashed-bottom">  </span> on disposal.</p>
+
+
+<br>
+
+<table>
+<tr>
+<td></td>
+<td align="right">{officer_incharge} </td>
+</tr>
+<tr>
+<td></td>
+<td align="right">Officer in Charge of Prison</td>
+</tr>
+<tr>
+<td></td>
+<td align="right">{prison_name} </td>
+</tr>
+</table>
+     
+<ul>
+<h5 class="strng">Copies to be sent to:-</h5>
+<li>The Commissioner Generalof Prisons (With P.F. 21)</li>
+<li>The Medical Officer</li>
+<li>The Resident District Commissioner (District of Deceased)</li>
+<li>The Inspector General of Police</li>
+</ul>
+
+
+
+
+
+</body>
+
+</html>

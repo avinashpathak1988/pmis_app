@@ -1,0 +1,2 @@
+<?php echo $this->Form->input('country_id',array('div'=>false,'label'=>false,'onChange'=>'showDistricts(this.value)','class'=>'form-control span11','type'=>'select','options'=>$countryList, 'empty'=>array(''=>'-- Select Country --'),'required','id'=>'country_id','default'=>1));?>
+   <?php echo $this->Form->input('other_country',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'text', 'placeholder'=>'Country','required'=>false,'id'=>'other_country','style'=>'display:none;'));?>

@@ -1,0 +1,7 @@
+.right-margin{margin-right: 5px}.error-text{border:1px solid red}.success-text{color:#4F8A10;background-color:#DFF2BF}.error-message{color:red;}
+.total-transaction{
+	float: right;font-size: 1.0rem;font-weight: bold;
+}
+.formal-edu{
+	display: block !important;
+}

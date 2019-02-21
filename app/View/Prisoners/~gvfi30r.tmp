@@ -1,0 +1,659 @@
+<?php
+if(isset($this->data['Prisoner']['date_of_birth']) && $this->data['Prisoner']['date_of_birth'] != ''){
+    $this->request->data['Prisoner']['date_of_birth']=date('d-m-Y',strtotime($this->data['Prisoner']['date_of_birth']));
+}
+//echo '<pre>'; print_r($this->request->data['Prisoner']); exit;
+?>
+<style>
+.row-fluid [class*="span"]
+{
+  margin-left: 0px !important;
+}
+#s2id_nationality_name2
+{
+    margin-top: 15px;
+}
+</style>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="widget-box">
+                <div class="widget-title"> <span class="icon"> <i class="icon-align-justify"></i> </span>
+                    <h5>Add New Prisoner</h5>
+                    <div style="float:right;padding-top: 3px;">
+                        <?php echo $this->Html->link('Prisoners List',array('action'=>'index'),array('escape'=>false,'class'=>'btn btn-success btn-mini')); ?>
+                        &nbsp;&nbsp;
+                    </div>
+                </div>
+                <div class="widget-content nopadding">
+              
+                           
+                                <?php 
+                                echo $this->Form->create('Prisoner',array('class'=>'form-horizontal','enctype'=>'multipart/form-data','url' => '/prisoners/add/'));
+                                if(isset($this->request->data['Prisoner']['id']))
+                                {
+                                    $prisoner_unique_no = $this->request->data['Prisoner']['prisoner_unique_no'];
+                                    echo $this->Form->input('prisoner_unique_no',array(
+                                        'type'=>'hidden',
+                                        'class'=>'prisoner_unique_no',
+                                        'value'=>$prisoner_unique_no
+                                    ));
+                                    $this->Form->control('id', array('value' => ''));
+                                    echo $this->Form->input('exp_photo_name',array(
+                                        'type'=>'hidden',
+                                        'class'=>'exp_photo_name',
+                                        'value'=>$this->request->data['Prisoner']['photo']
+                                    ));
+                                    echo $this->Form->input('is_ext',array(
+                                        'type'=>'hidden',
+                                        'class'=>'is_ext',
+                                        'value'=>1
+                                    ));
+                                }
+                                ?>
+                                <div class="row" style="padding-bottom: 14px;">
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">First Name<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('first_name',array('div'=>false,'label'=>false,'class'=>'form-control span11 alpha nospace','type'=>'text','placeholder'=>'Enter First Name','id'=>'first_name'));?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Middle name<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('middle_name',array('div'=>false,'label'=>false,'class'=>'form-control span11 alpha','type'=>'text','placeholder'=>'Enter Middle name','required'=>false,'id'=>'middle_name'));?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div> 
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Surname<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('last_name',array('div'=>false,'label'=>false,'class'=>'form-control span11 alpha nospace','type'=>'text','placeholder'=>'Enter Surname','required','id'=>'last_name'));?>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Also Known As :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('also_known_as',array('div'=>false,'label'=>false,'class'=>'form-control span11 alpha','type'=>'text','placeholder'=>'Enter Also Known As','required'=>false,'id'=>'also_known_as'));?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div> 
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Father's Name :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('father_name',array('div'=>false,'label'=>false,'class'=>'form-control span11 alpha','type'=>'text','placeholder'=>"Enter Father's Name",'required'=>false,'id'=>'father_name'));?>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Mother's Name :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('mother_name',array('div'=>false,'label'=>false,'class'=>'form-control span11 alpha','type'=>'text','placeholder'=>"Enter Mother's Name",'required'=>false,'id'=>'mother_name'));?>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    <div class="clearfix"></div>  
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Date of Birth<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('date_of_birth',array('div'=>false,'label'=>false,'class'=>'form-control span11 mydate','type'=>'text', 'placeholder'=>'Enter Date of Birth','required','id'=>'date_of_birth'));?>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Place Of Birth<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('place_of_birth',array('div'=>false,'label'=>false,'class'=>'form-control span11 alpha','type'=>'text', 'placeholder'=>'Enter Place Of Birth','required','id'=>'place_of_birth'));?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>   
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Prisoner Type<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('prisoner_type_id',array('div'=>false,'label'=>false,'onChange'=>'showPrisonerSubType(this.value)','class'=>'form-control span11','type'=>'select','options'=>$prisonerTypeList, 'empty'=>array('-- Select Prisoner Type --'),'required','id'=>'prisoner_type_id'));?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Prisoner Sub Type<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('prisoner_sub_type_id',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>'', 'empty'=>array('-- Select Prisoner Sub Type --'),'required', 'id'=>'prisoner_sub_type_id'));?>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                    <div class="clearfix"></div>                                                             
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Sex<?php echo $req; ?> :</label>
+                                            <div class="controls uradioBtn">
+                                                <?php 
+                                                $gender = 1;
+                                                if(isset($this->data['Prisoner']['gender_id']))
+                                                    $gender = $this->data['Prisoner']['gender_id'];
+                                                $options2= $genderList;
+                                                $attributes2 = array(
+                                                    'legend' => false, 
+                                                    'value' => $gender,
+                                                );
+                                                echo $this->Form->radio('gender_id', $options2, $attributes2);
+                                                ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Continent<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <?php 
+                                                echo $this->Form->input('continent_id',array('div'=>false,'label'=>false,'onChange'=>'showCountries(this.value)','class'=>'form-control span11','type'=>'select','options'=>$continentList, 'empty'=>array('0'=>'-- Select Continent --'),'required','id'=>'continent_id'));?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div> 
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Country of origin<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('country_id',array('div'=>false,'label'=>false,'onChange'=>'showDistricts(this.value)','class'=>'form-control span11','type'=>'select','options'=>$countryList, 'empty'=>array(''=>'-- Select Country --'),'required'=>false,'id'=>'country_id','default'=>1));?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Is prisoner have dual citizen?:</label>
+                                            <div class="controls uradioBtn">
+                                                <?php 
+                                                $is_dual_citizen = 0;
+                                                if(isset($this->data['Prisoner']['is_dual_citizen']))
+                                                    $is_dual_citizen = $this->data['Prisoner']['is_dual_citizen'];
+                                                $options2= array('0'=>'No','1'=>'Yes');
+                                                $attributes2 = array(
+                                                    'legend' => false, 
+                                                    'value' => $is_dual_citizen,
+                                                    'onChange'=>'showNationality2(this.value)',
+                                                );
+                                                echo $this->Form->radio('is_dual_citizen', $options2, $attributes2);
+                                                ?>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                     
+                                    <div class="clearfix"></div> 
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Nationality<?php echo $req; ?>:</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('nationality_name',array('div'=>false,'label'=>false,'class'=>'form-control span11 alpha','type'=>'text', 'placeholder'=>'Nationality','required','id'=>'nationality_name', 'readonly'));?>
+
+                                                <?php echo $this->Form->input('nationality_name2',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>$nationalityList, 'empty'=>array('0'=>'-- Select Nationality --'),'required'=>false,'id'=>'nationality_name2'));?>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">District Of Origin:</label>
+                                            <div class="controls" id="district_id_div">
+                                                <?php echo $this->Form->input('district_id',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>$districtList, 'empty'=>array('0'=>'-- Select District Of Origin --'),'required'=>false,'id'=>'district_id'));?>
+                                                <?php echo $this->Form->input('other_district',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'text', 'placeholder'=>'District','required'=>false,'id'=>'other_district','style'=>'display:none;'));?>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    <div class="clearfix"></div> 
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Tribe<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('tribe_id',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>$tribeList, 'empty'=>array('0'=>'-- Select Tribe --'),'required','id'=>'tribe_id'));?>
+                                            </div>
+                                        </div>
+                                    </div>                                                           
+                                    <div class="span6" id="classification_div" style="display: none;">
+                                        <div class="control-group">
+                                            <label class="control-label">Classification<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('classification_id',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>$classificationList, 'empty'=>array('0'=>'-- Select Classification --'),'required'=>false,'id'=>'classification_id', 'readonly'));?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div> 
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Permanent Address :</label>
+                                            <div class="controls">
+                                                <?php echo $this->Form->input('permanent_address',array('div'=>false,'label'=>false,'class'=>'form-control span11 alphanumeric','type'=>'textarea','placeholder'=>'Enter permanent address','id'=>'permanent_address','rows'=>3,'required'=>false));?>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="span6">
+                                        <div class="control-group">
+                                            <label class="control-label">Photo<?php echo $req; ?> :</label>
+                                            <div class="controls">
+                                                <div id="prevImage" class="">
+                                                <?php $is_photo = 0;
+                                                    if(isset($this->request->data["Prisoner"]["photo"]) && !is_array($this->request->data["Prisoner"]["photo"]))
+                                                    {
+                                                        $is_photo = 1;?>
+                                                       <a class="example-image-link" href="<?php echo $this->webroot; ?>app/webroot/files/prisnors/<?php echo $this->request->data["Prisoner"]["photo"];?>" data-lightbox="example-set"> <img src="<?php echo $this->webroot; ?>app/webroot/files/prisnors/<?php echo $this->request->data["Prisoner"]["photo"];?>" alt="" width="150px" height="150px"></a>
+                                                    <?php }?>
+                                                </div>
+                                                <span id="previewPane" class="img_preview_panel">
+                                                    <a class="example-image-link preview_image" href="" data-lightbox="example-set"><img id="img_prev" src="#" class="img_prev" /></a>
+                                                    <span id="x" class="remove_img">[X]</span>
+                                                </span>
+                                                <div class="clear"></div>
+                                                <?php echo $this->Form->input('photo',array('div'=>false,'label'=>false,'class'=>'form-control','type'=>'file','id'=>'photo', 'onchange'=>'readURL(this);', 'required'=>false));?>
+                                                <?php echo $this->Form->input('is_photo',array('div'=>false,'label'=>false,'type'=>'hidden','id'=>'is_photo', 'value'=>$is_photo));?>
+                                            </div>
+                                        </div>
+                                    </div>                 
+                                </div>
+
+                                <div class="form-actions" align="center">
+                                    <?php echo $this->Form->button('Reset', array('type'=>'button', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger', 'formnovalidate'=>true, 'onclick'=>"resetForm('PrisonerAddForm');"))?>
+                                    <?php echo $this->Form->button('Save', array('type'=>'submit', 'div'=>false,'label'=>false, 'class'=>'btn btn-success', 'formnovalidate'=>true))?>
+                                </div>
+                                <?php echo $this->Form->end();?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+function resetForm(formId) { 
+    document.getElementById(formId).reset();
+    $("select").select2("val", "");
+}
+function showNationality2(isdual)
+{
+    if(isdual == 1)
+    {
+        $('#s2id_nationality_name2').show();
+    }
+    else 
+    {
+        $('#s2id_nationality_name2').hide();
+        $('#s2id_nationality_name2').val('');
+    }
+}
+function readURL(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#img_prev')
+            .attr('src', e.target.result)
+            .width(100);
+            $('#img_prev').closest('.preview_image').attr('href', e.target.result);
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+    else {
+      var img = input.value;
+        $('#img_prev').attr('src',img).width(100);
+    }
+    $('#prevImage').hide();
+    $('#img_prev').show();
+    $("#x").show().css("margin-right","10px");
+}
+$(document).ready(function() {
+  $("#x").click(function() {
+    $('#photo').val("");
+    $("#img_prev").attr("src",'');
+    $('#img_prev').hide();
+    $("#x").hide();  
+    $('span.filename').html('');
+    $('#prevImage').show();
+  });
+});
+$(document).ready(function(){
+    $('#country_id').select2('val', '1');
+    $('#continent_id').select2('val', '1');
+    $("#country_id option[value='1']").attr("selected","selected");
+    $("#continent_id option[value='1']").attr("selected","selected");
+        
+});
+$(document).on('change', '#continent_id', function(e){
+
+        var continent_id=$(this).val();
+        
+        
+            $.ajax(
+              {
+                  type: "POST",
+                  url: "<?php echo $this->Html->url(array('controller'=>'Prisoners','action'=>'fetchcountry'));?>",
+                  data: {
+                      continent_id:continent_id,
+                      
+                  },
+                  cache: true,
+                  beforeSend: function()
+                  {  
+                    //$('#delete'+countdata).html('Loading....');
+                  },
+                  success: function (data) {
+                    
+                    $("#countrycont").html(data);
+                    $('#country_id').select2();
+                   
+                  },
+                  error: function (errormessage) {
+                    alert(errormessage.responseText);
+                  }
+              });
+          
+
+   });
+function showCountries(id)
+{
+    var strURL = '<?php echo $this->Html->url(array('controller'=>'prisoners','action'=>'countryList'));?>';
+    $.post(strURL,{"continent_id":id},function(data){  
+        
+        if(data) { 
+            $('#country_id').html(data); 
+            $('#country_id').select2('val', '1');
+        }
+        else
+        {
+            alert("Error...");  
+        }
+    });
+}
+function showDistricts(id) 
+{
+    if(id != 'other')
+    {
+        if(document.getElementById('other_country') != null)
+        {
+            $('#other_country').remove();
+            $('#other_district').hide();
+            $('#other_district').val('');
+            $('#s2id_district_id').show();
+        }
+        
+        var strURL = '<?php echo $this->Html->url(array('controller'=>'Prisoners','action'=>'getDistrict'));?>';
+    
+        $.post(strURL,{"country_id":id},function(data){  
+            
+            if(data) { 
+                $('#district_id').html(data); 
+                
+            }
+            else
+            {
+                alert("Error...");  
+            }
+        });
+    }
+    else 
+    {
+        $('#s2id_country_id').append('<input type="text" name="data[Prisoner][other_country]" placeholder="Country" id="other_country" class="form-control span11 alpha" style="width: 100%; margin-top:10px;">');
+        $('#other_district').show();
+        $('#s2id_district_id').hide();
+    }
+}
+$(document).ready(function () {
+
+    $('#date_of_birth').datepicker({
+        onSelect: function(value, ui) {
+            var prisoner_type_id = $('#prisoner_type_id').val();
+            getPrisonerClass(prisoner_type_id, value);
+        },
+        maxDate: '+0d',
+        yearRange: '1920:2010',
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'dd-mm-yy',
+    });
+  
+    $(document).on('change', '#country_id', function() {
+        var country_id=$(this).val();
+        $('#nationality_name').val('');
+        if(country_id != 'other')
+        {
+            $.ajax(
+            {
+                type: "POST",
+                dataType: "html",
+                url: "<?php echo $this->Html->url(array('controller'=>'prisoners','action'=>'getNationName'));?>",
+                data: {
+                    country_id: country_id,
+                   
+                },
+                cache: true,
+                beforeSend: function()
+                {  
+                  //$('tbody').html('');
+                },
+                error: function ( jqXHR, textStatus, errorThrown) {
+                     alert("errorThrown: " + errorThrown + " textStatus:" + textStatus);
+                },
+                success: function (data) {
+                  $("#nationality_name").val(data);
+                },
+                
+            });
+            $("#nationality_name").attr('readonly','readonly');
+        }
+        else 
+        {
+            $("#nationality_name").removeAttr('readonly');
+        }
+    }); 
+    if($('#continent_id').val() == '' || $('#continent_id').val() == '0') 
+    {
+        $('#continent_id').val('1').trigger('change');
+    }
+    //If continent selected 
+    if($('#continent_id').val() != '')
+    {
+        showCountries($('#continent_id').val());
+    }
+
+    //check if is dual citizen is clicked
+    if ($('#PrisonerIsDualCitizen1:checked').val() == 1)
+    {
+        $('#s2id_nationality_name2').show();
+    }
+    else 
+    {
+        $('#s2id_nationality_name2').hide();
+    }
+}); 
+$(function(){
+     
+    $("#PrisonerAddForm").validate({
+     
+      ignore: "",
+            rules: {  
+                'data[Prisoner][first_name]': {
+                    required: true,
+                },
+                'data[Prisoner][last_name]': {
+                    required: true,
+                },
+                'data[Prisoner][continent_id]': {
+                    required: true,
+                },
+                'data[Prisoner][nationality_name]': {
+                    required: true,
+                },
+                'data[Prisoner][date_of_birth]': {
+                    required: true,
+                    datevalidateformat: true,
+                    check_date_of_birth: true
+                },
+                'data[Prisoner][place_of_birth]': {
+                    required: true,
+                },
+                'data[Prisoner][gender]': {
+                    required: true,
+                },
+                'data[Prisoner][prisoner_type_id]': {
+                    required: true,
+                    valueNotEquals: "0"
+                },
+                'data[Prisoner][prisoner_sub_type_id]': {
+                    required: true,
+                    valueNotEquals: "0"
+                },
+                'data[Prisoner][continent_id]': {
+                    required: true,
+                    valueNotEquals: "0"
+                },
+                'data[Prisoner][country_id]': {
+                    required: true,
+                    valueNotEquals: "0"
+                },
+                'data[Prisoner][tribe_id]': {
+                    required: true,
+                    valueNotEquals: "0"
+                },
+                'data[Prisoner][photo]': {
+                    required: true,
+                },
+                'data[Prisoner][permanent_address]': {
+                    alphanumeric: true,
+                },
+            },
+            messages: {
+                'data[Prisoner][first_name]': {
+                    required: "Please enter first name.",
+                },
+                'data[Prisoner][last_name]': {
+                    required: "Please enter surname.",
+                },
+                'data[Prisoner][continent_id]': {
+                    required: "Please select continent.",
+                },
+                'data[Prisoner][nationality_name]': {
+                    required: "Please enter nationality.",
+                },
+                'data[Prisoner][date_of_birth]': {
+                    required: "Please choose date of birth.",
+                    datevalidateformat: "Wrong Date Format"
+                },
+                'data[Prisoner][place_of_birth]': {
+                    required: "Please enter place of birth.",
+                },
+                'data[Prisoner][gender]': {
+                    required: "Please select gender.",
+                },
+                'data[Prisoner][prisoner_type_id]': {
+                    required: "Please select prisoner type.",
+                    valueNotEquals: "Please select prisoner type.",
+                },
+                'data[Prisoner][prisoner_sub_type_id]': {
+                    required: "Please select prisoner subtype.",
+                    valueNotEquals: "Please select prisoner subtype.",
+                },
+                'data[Prisoner][continent_id]': {
+                    required: "Please select continent.",
+                    valueNotEquals: "Please select continent.",
+                },
+                'data[Prisoner][country_id]': {
+                    required: "Please select country.",
+                    valueNotEquals: "Please select country.",
+                },
+                'data[Prisoner][tribe_id]': {
+                    required: "Please select tribe.",
+                    valueNotEquals: "Please select tribe.",
+                },
+                'data[Prisoner][photo]': {
+                    required: "Please choose photo.",
+                },
+                'data[Prisoner][permanent_address]': {
+                    alphanumeric: "No special characters allowed.",
+                },
+            }, 
+    });
+  });
+
+</script>
+<?php
+$ajaxUrl = $this->Html->url(array('controller'=>'users','action'=>'getDistrict'));
+$userinfoajaxUrl=$this->Html->url(array('controller'=>'prisoners','action'=>'personalInfo'));
+$idinfoajaxUrl=$this->Html->url(array('controller'=>'prisoners','action'=>'prisnorsIdInfo'));
+$getPrisonerSubajaxUrl = $this->Html->url(array('controller'=>'prisoners','action'=>'getPrisonerSubType'));
+$getClassificationUrl  = $this->Html->url(array('controller'=>'app','action'=>'getPrisonerClass'));
+echo $this->Html->scriptBlock("
+   var tabs;
+    jQuery(function($) {
+        tabs = $('.tabscontent').tabbedContent({loop: true}).data('api');
+        // Next and prev actions
+        $('.controls a').on('click', function(e) {
+            var action = $(this).attr('href').replace('#', ''); 
+            tabs[action]();
+            e.preventDefault();
+        });  
+       
+    }); 
+    function getDistrict(){
+        var url = '".$ajaxUrl."';
+        $.post(url, {'state_id':$('#state_id').val()}, function(res) {
+            if (res) {
+                $('#district_id').html(res);
+            }
+        });
+    }
+    //get prisoner sub type list
+    function showPrisonerSubType(){
+        var url = '".$getPrisonerSubajaxUrl."';
+        var prisoner_type_id = $('#prisoner_type_id').val();
+        $.post(url, {'prisoner_type_id':prisoner_type_id}, function(res) {
+            if (res) {
+                $('#prisoner_sub_type_id').html(res);
+                //$('#prisoner_sub_type_id').removeAttr('readonly');
+            }
+            else 
+            {
+                //$('#prisoner_sub_type_id').attr('readonly','readonly');
+            }
+        });
+        var dob = $('#date_of_birth').val();
+        getPrisonerClass(prisoner_type_id,dob);
+    }
+    
+    function getPrisonerClass(prisoner_type_id,dob)
+    {
+        if(prisoner_type_id != '' && dob != '')
+        {
+            if(prisoner_type_id == 2)
+            {
+                $('#classification_id').attr('required','required');
+                var classification_url = '".$getClassificationUrl."';
+                $.post(classification_url, {'dob':dob, 'prisoner_type_id':prisoner_type_id}, function(class_res) {
+                    if (class_res) {
+                        $('#classification_id').val(class_res).trigger('change');
+                    }
+                });
+                $('#classification_div').show();
+            }
+            else 
+            {
+                $('#classification_id').val('').trigger('change');;
+                $('#classification_id').removeAttr('required','');
+                $('#classification_div').hide();
+            }
+        }
+    }
+
+",array('inline'=>false));
+?> 

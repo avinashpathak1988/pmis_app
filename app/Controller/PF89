@@ -1,0 +1,184 @@
+  <!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>  </title>
+    <style type="text/css">
+     
+    body {
+    	margin:0px;
+    	padding: 0px;
+    }
+    p {
+    	margin:0px;
+    	padding: 0px;
+    }
+    h6, h5 {
+    	margin: 0px; 
+    }
+
+ .gate-pass table>tbody>tr>td{
+ 	border-top: none;
+ 	padding-bottom: 0px;
+ 	padding-left: 0px;
+ }
+ .gatepass-data{
+ 	border-bottom: 1px dashed #b17002;
+ }
+ .gatepass-id{
+ 	font-size: 15px;
+ 	color:#b17002;
+ 	font-weight: 600; 
+ }
+ .strng{
+ 	font-weight: bold;
+ }
+ .gate-pass img{
+ 	margin: 0 auto;
+ 	display: block;
+ }
+ .top-fifteen{
+ 	margin-top: 15px;
+ }
+ .top-thirty{
+ 	margin-top: 30px;
+ }
+ .gate-pass h5{
+ 	color: #b17002;
+ 	font-weight: 600;
+ }
+
+ .court-appeal{
+ 	border-bottom: 1px dashed #333;
+ 	color: #797979;
+
+ }
+ .appeal_court{
+ 	margin-bottom: 15px;
+ }
+ .appeal_court h5{
+ 	color: #000;
+    margin-bottom: 20px;
+ }
+.pf31{
+	border:1px solid #BF360C;
+	margin-bottom: 15px;
+	background: #f9f9f9;
+}
+ .pf31 .header{
+ 	background: #BF360C;
+ 	color: #fff;
+ 	text-align: center;
+ }
+ .pf31 .header h3{
+ 	font-size: 16px;
+ 	margin-top: 0px;
+ }
+ .pf31 .header h6{
+ 	text-align: right;
+ 	font-size: 16px;
+ }
+ .pf31 h4{
+ 	color: #333333;
+ 	padding: 10px 0px;
+ 	border-bottom: 1px solid #bf360c;
+ 	font-size: 16px;
+ }
+ .hfour{
+ 	border-bottom: 3px solid #bf360c;
+ 	padding-bottom: 8px;
+ }
+ .face h5{
+ 	font-size: 16px;
+ 	color:#3E2723; 
+ 	text-align: center;
+ }
+ .face img {
+ 	margin: 0 auto;
+ 	display: block;
+ }
+ .dashed-bottom{
+ 	border-bottom: 1px dashed #b5b5b5;
+ }
+ .bold-italic{
+ 	font-weight: bold;
+ 	font-style: italic;
+ }
+ .signature{
+ 	text-align: right;
+ 	font-weight: bold;
+ 	margin: 2px;
+ }
+  .signature-top{
+ 	border-bottom: 1px solid #ccc;
+ }
+ .devider{
+ 	border-bottom: 2px groove #fff;
+ }
+ .table-condensed thead tr th {
+ 	background: #bf360c;
+    color: #fff;
+ }
+ .text-right {
+ 	float: right;
+ }
+ .dashed-bottom {
+ 	font-weight: normal;
+ }
+	</style>
+ </head>
+
+ <body> 
+
+
+	<table>
+<tr>
+<td align="center">
+	
+<h3 class="text-center strng">PUNISHMENT CELL DOCKET</h3>
+<div class="strng" style="float: right;">P.F.89</div>
+</td>
+
+</tr>
+</table>
+
+
+<p class="strng">Prisoner No.<span class="dashed-bottom"> {prisoner_no}</span> </p>
+
+<p class="strng"><span class="strng">Name</span> <span class="dashed-bottom">{fullname}</span></p>
+
+<p class="strng">Offence <span class="dashed-bottom"> {offence} </span> </p>
+
+<p class="strng">Date Offence Commited<span class="dashed-bottom"> {} </span> </p>
+
+<p class="strng">Award <span class="dashed-bottom"> {} </span> </p>
+
+<p class="strng">Punishment Commemces On . <span class="dashed-bottom"> {} </span> </p>
+
+<p class="strng">At<span class="dashed-bottom">{}</span>am/pm </p>
+
+<p class="strng">To<span class="dashed-bottom">{} </span> </p>
+
+<p class="strng">To<span class="dashed-bottom">{} </span> </p>
+
+<p class="strng">At<span class="dashed-bottom">{} </span> </p>
+
+<p class="strng">Full diet<span class="dashed-bottom">{} </span> </p>
+
+<!-- <p class="strng">Deceased’s property as enumerated on the back has been/will be sent  </p> -->
+
+<br>
+     
+<ul>
+<h5 class="strng">OFFICER INCHARGE:-</h5>
+
+</ul>
+
+
+
+
+
+</body>
+
+</html>

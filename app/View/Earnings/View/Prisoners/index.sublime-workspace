@@ -1,0 +1,979 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"Appa",
+				"ApparentReligionList"
+			],
+			[
+				"counry",
+				"country_id"
+			],
+			[
+				"dd-mm-yy",
+				"dd-mm-yyyy"
+			],
+			[
+				"val",
+				"value"
+			],
+			[
+				"Mirat",
+				"MaritalStatus"
+			],
+			[
+				"ma",
+				"margin-top"
+			],
+			[
+				"Ve",
+				"Verified"
+			],
+			[
+				"App",
+				"Approve-Rejected"
+			],
+			[
+				"Review",
+				"Review-Rejected"
+			],
+			[
+				"Re",
+				"Remarks"
+			],
+			[
+				"re",
+				"required"
+			],
+			[
+				"chec",
+				"checkbox"
+			],
+			[
+				"s",
+				"submit"
+			],
+			[
+				"sta",
+				"status"
+			],
+			[
+				"requ",
+				"required"
+			],
+			[
+				"rec",
+				"recursive"
+			],
+			[
+				"priso",
+				"prisoner_id"
+			],
+			[
+				"Se",
+				"Search"
+			],
+			[
+				"pad",
+				"padding-top"
+			],
+			[
+				"Cash",
+				"CashItem"
+			],
+			[
+				"fl",
+				"float"
+			],
+			[
+				"Physica",
+				"PhysicalProperty"
+			],
+			[
+				"is",
+				"isset"
+			],
+			[
+				"permanent",
+				"permanent_address"
+			],
+			[
+				"read",
+				"readonly"
+			],
+			[
+				"dis",
+				"display"
+			],
+			[
+				"ca",
+				"Category"
+			],
+			[
+				"di",
+				"display"
+			],
+			[
+				"PrisonerSe",
+				"PrisonerSentenceAppeal"
+			],
+			[
+				"Sav",
+				"Saving"
+			],
+			[
+				"sele",
+				"select"
+			],
+			[
+				"req",
+				"request"
+			],
+			[
+				"d",
+				"display"
+			],
+			[
+				"onC",
+				"onclick"
+			],
+			[
+				"json",
+				"json_encode"
+			],
+			[
+				"PrisonerS",
+				"PrisonerSentence"
+			],
+			[
+				"PrisonerSentenceC",
+				"PrisonerSentenceCapture"
+			],
+			[
+				"a",
+				"array"
+			],
+			[
+				"sect",
+				"section_of_law"
+			],
+			[
+				"remo",
+				"removeAttr"
+			],
+			[
+				"section",
+				"section_of_law"
+			],
+			[
+				"st",
+				"style\tTag"
+			],
+			[
+				"text",
+				"text-center"
+			],
+			[
+				"arra",
+				"array"
+			],
+			[
+				"op",
+				"option\tTag"
+			],
+			[
+				"fun",
+				"function"
+			],
+			[
+				"print",
+				"print_r"
+			],
+			[
+				"span",
+				"span6"
+			],
+			[
+				"off",
+				"offence_no"
+			],
+			[
+				"arr",
+				"array\t$… = array (…)"
+			],
+			[
+				"onkey",
+				"onkeyup\tAttr"
+			],
+			[
+				"record",
+				"record_staffs"
+			],
+			[
+				"Disa",
+				"Disable"
+			],
+			[
+				"prisoner",
+				"prisoner_transfers"
+			],
+			[
+				"worki",
+				"working_parties"
+			],
+			[
+				"in_",
+				"in_prison_offence_captures"
+			],
+			[
+				"Del",
+				"Delete"
+			],
+			[
+				"fu",
+				"function"
+			],
+			[
+				"pris",
+				"prison_id"
+			],
+			[
+				"UserAccess",
+				"UserAccessControl"
+			],
+			[
+				"save",
+				"saveAccess"
+			],
+			[
+				"User",
+				"UserAccessControl"
+			],
+			[
+				"te",
+				"text-align"
+			],
+			[
+				"yer",
+				"years"
+			],
+			[
+				"ver",
+				"verification_type"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "index.ctp",
+			"settings":
+			{
+				"buffer_size": 25848,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/xampp/htdocs/uganda/app/Controller/PrisonersController.php",
+			"settings":
+			{
+				"buffer_size": 205919,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "listview.ctp",
+			"settings":
+			{
+				"buffer_size": 27478,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "list_ajax.ctp",
+			"settings":
+			{
+				"buffer_size": 10399,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "kin_detail_ajax.ctp",
+			"settings":
+			{
+				"buffer_size": 4886,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 404.0
+	},
+	"console":
+	{
+		"height": 150.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/xampp/htdocs/uganda/app",
+		"/C/xampp/htdocs/uganda/app/Controller",
+		"/C/xampp/htdocs/uganda/app/View",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners"
+	],
+	"file_history":
+	[
+		"/C/xampp/htdocs/uganda/app/Controller/PrisonersController.php",
+		"/C/xampp/htdocs/uganda/app/View/Sites/dashboard.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/kin_detail_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/index_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Elements/sentence-count.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/list_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/child_detail_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/Controller/SitesController.php",
+		"/C/xampp/htdocs/uganda/app/Controller/AppController.php",
+		"/C/xampp/htdocs/uganda/app/Config/core.php",
+		"/C/xampp/htdocs/uganda/app/Model/PrisonerSpecialNeed.php",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/edit.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/sentence_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/appeal_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/special_need_ajax.ctp",
+		"/C/Users/Luminous/Downloads/email.php",
+		"/C/xampp/htdocs/uganda/app/Model/User.php",
+		"/C/xampp/htdocs/uganda/app/Controller/UsersController.php",
+		"/C/xampp/htdocs/uganda/app/Config/email.php",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/id_proof_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Layouts/table.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Properties/physical_property_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/index.ctp",
+		"/C/xampp/htdocs/uganda/app/Model/PrisonerChildDetail.php",
+		"/C/xampp/htdocs/uganda/app/tmp/cache/models/myapp_cake_model_default_uganda_prisoner_child_details",
+		"/C/xampp/htdocs/uganda/app/webroot/theme/css/matrix-style.css",
+		"/C/xampp/htdocs/uganda/app/View/Properties/index_ajax_cash.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/add.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/details.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/Common_header/index.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Elements/topheader.ctp",
+		"//192.168.1.136/ttpermit_betaa/doc/usefull_code.html",
+		"/C/xampp/htdocs/uganda/app/Controller/PropertiesController.php",
+		"/C/xampp/htdocs/uganda/app/View/Properties/property.ctp",
+		"/C/xampp/htdocs/uganda/app/Controller/SecuritiesController.php",
+		"/C/xampp/htdocs/uganda/app/View/Properties/index_ajax.ctp",
+		"//192.168.1.136/ttpermit_betaa/app/View/Hammers/hammer_registration.ctp",
+		"//192.168.1.136/ttpermit_betaa/app/View/Layouts/default.ctp",
+		"//192.168.1.136/ttpermit_betaa/app/View/Elements/header.ctp",
+		"//192.168.1.136/ttpermit_betaa/app/webroot/js/jquery.validate.min.js",
+		"//192.168.1.136/ttpermit_betaa/app/webroot/js/jquery.form.js",
+		"//192.168.1.136/ttpermit/app/webroot/js/jquery.validate.min.js",
+		"/C/xampp/htdocs/uganda/app/Model/Prisoner.php",
+		"/C/xampp/htdocs/uganda/app/Model/PhysicalPropertyItem.php",
+		"/C/xampp/htdocs/uganda/app/Controller/PrisonsController.php",
+		"/C/xampp/htdocs/uganda/app/View/Elements/property-items.ctp",
+		"/D/Itishree/Projects/Uganda/Backup/November/20/Local/app/Controller/PropertiesController.php",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/edit-28dec.ctp",
+		"/D/Itishree/Projects/Uganda/Backup/December/27/220/View/Prisoners/edit.ctp",
+		"/C/xampp/htdocs/uganda/app/Model/PrisonerWard.php",
+		"/C/xampp/htdocs/uganda/app/Model/PrisonerKinDetail.php",
+		"/C/Users/Luminous/Desktop/ugandppd.sql",
+		"/C/xampp/htdocs/uganda/app/View/RecordFood/add.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/listview.ctp",
+		"/C/xampp/htdocs/uganda/app/Model/SectionOfLaw.php",
+		"/C/xampp/htdocs/uganda/app/View/Elements/verify-modal.ctp",
+		"/C/Users/Luminous/Downloads/physical_lockups.sql",
+		"/C/xampp/htdocs/uganda/app/Model/PrisonerSentence.php",
+		"/C/xampp/htdocs/uganda/app/Controller/PrisonersController-22Dec17.php",
+		"/C/xampp/htdocs/uganda/app/Model/Country.php",
+		"/C/xampp/htdocs/uganda/app/Controller/MedicalRecordsController.php",
+		"/C/xampp/htdocs/uganda/app/Model/MedicalCheckupRecord.php",
+		"/C/xampp/htdocs/uganda/app/View/MedicalRecords/add.ctp",
+		"/C/xampp/htdocs/uganda/app/Model/MedicalRecord.php",
+		"/D/Itishree/Help/Mpdf-master/Controller/Component/MpdfComponent.php",
+		"/C/xampp/htdocs/uganda/app/View/Prisonercomplaints/add.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Letterinouts/add.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Letterinouts/index_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/Model/Callinout.php",
+		"/C/xampp/htdocs/uganda/app/Controller/PrisonercomplaintsController.php",
+		"/C/xampp/htdocs/uganda/app/Model/Letterinout.php",
+		"/C/xampp/htdocs/uganda/app/Model/Prisonercomplaint.php",
+		"/C/xampp/htdocs/uganda/app/Model/RecordFood.php",
+		"/C/xampp/htdocs/uganda/app/Model/MedicalDeathRecord.php",
+		"/C/xampp/htdocs/uganda/app/Model/MedicalSeriousIllRecord.php",
+		"/C/xampp/htdocs/uganda/app/Model/MedicalSickRecord.php",
+		"/C/xampp/htdocs/uganda/app/Controller/CourtattendancesController.php",
+		"/C/xampp/htdocs/uganda/app/Controller/LetterinoutsController.php",
+		"/C/xampp/htdocs/uganda/app/View/Prisonercomplaints/index_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Callinouts/add.ctp",
+		"/C/xampp/htdocs/uganda/app/Controller/CallinoutsController.php",
+		"/C/xampp/htdocs/uganda/app/View/Callinouts/index_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Letterinouts/index.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisonercomplaints/index.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Callinouts/index.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Stationjournals/index_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/RecordFood/index.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Courtattendances/courtsschedule_list_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Stages/stages_assign.ctp",
+		"/C/xampp/htdocs/uganda/app/Model/Prison.php",
+		"/C/xampp/htdocs/uganda/app/View/RecordFood/index_ajax.ctp",
+		"/C/Users/Luminous/Desktop/ugandapp.sql",
+		"/C/xampp/htdocs/uganda/app/View/PrisonerTransfers/transfer_final_list_ajax.ctp",
+		"/C/Users/Luminous/Desktop/uganda.sql",
+		"/C/xampp/htdocs/uganda/app/Config/email.php.default",
+		"/C/xampp/htdocs/uganda/app/Controller/SentenceController.php",
+		"/C/xampp/htdocs/uganda/app/View/Earnings/working_party_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/MedicalRecords/medical_checkup_data.ctp",
+		"/C/xampp/htdocs/uganda/app/View/MedicalRecords/show_medical_death_records.ctp",
+		"/C/xampp/htdocs/uganda/app/View/MedicalRecords/show_medical_serious_ill_records.ctp",
+		"/C/xampp/htdocs/uganda/app/View/MedicalRecords/medical_sick_data.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Earnings/working_parties.ctp",
+		"/C/xampp/htdocs/uganda/app/View/MedicalRecords/index_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Sentence/index.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Sentence/index_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/Controller/StagesController.php",
+		"/C/xampp/htdocs/uganda/app/View/Elements/confirmation-modal.ctp",
+		"/D/Itishree/Help/AsyncYesNoConfirm.htm",
+		"/C/xampp/htdocs/uganda/app/Controller/EarningsController.php",
+		"/C/xampp/htdocs/uganda/app/View/Earnings/working_party_prisoner_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Earnings/assign_prionsers.ctp",
+		"/C/xampp/htdocs/uganda/app/Controller/EarningRatesController.php",
+		"/C/xampp/htdocs/uganda/app/Controller/PrisonersController1.php",
+		"/C/xampp/htdocs/uganda/app/View/Properties/credit_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Properties/credit_list.ctp",
+		"/C/Users/Luminous/Documents/abcd.sql",
+		"/C/Users/Luminous/Downloads/uganda(2).sql",
+		"/C/Users/Luminous/Downloads/uganda(4).sql",
+		"/D/Itishree/Projects/Uganda/Backup/December/7/Local/View/Earnings/assign_prionsers.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Layouts/admin.ctp",
+		"/D/Itishree/Projects/Uganda/Backup/December/11/220/View/Layouts/table.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Prisoners/view.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Properties/physical_property_ajax_old.ctp",
+		"/C/xampp/htdocs/uganda/app/View/Properties/physical_property_list.ctp",
+		"/C/xampp/htdocs/uganda/app/View/PrisonerTransfers/index_ajax.ctp",
+		"/C/xampp/htdocs/uganda/app/Model/LodgerStation.php",
+		"/C/xampp/htdocs/uganda/app/Model/WorkingParty.php",
+		"/C/xampp/htdocs/uganda/app/Model/Officer.php"
+	],
+	"find":
+	{
+		"height": 40.0
+	},
+	"find_in_files":
+	{
+		"height": 104.0,
+		"where_history":
+		[
+			"C:\\xampp\\htdocs\\uganda\\app"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"\"Prisoner.habitual_prisoner = 1\"",
+			"age_from",
+			"showData",
+			"ajaxUrl",
+			"present",
+			"classificationList",
+			"approvalStatusList",
+			"prison_id",
+			"g.satyanarayan@lipl.in",
+			"maxlength",
+			"find('list'",
+			"ajaxUrl_appeal",
+			"showDataAppeals",
+			"deleteOffenceCount",
+			"ShowDeleteConfirm",
+			"deleteIdProof",
+			"ShowEditConfirm",
+			"AsyncConfirmYesNo",
+			"ShowConfirmYesNo",
+			"ShowEditConfirm",
+			"District",
+			"dynamic",
+			"    \n",
+			"court",
+			"getSentenceData",
+			"[resident_address]",
+			"[residential_address]",
+			"sentence_id",
+			"appeal_against_sentence",
+			".date_of_committal",
+			"date_of_committal",
+			"sentence_capture",
+			"appeal",
+			"mydate",
+			"date_of_commi",
+			"child",
+			"ShowConfirmYesNo",
+			"type_of_disability",
+			"prisnorsIdInfo",
+			"PrisonerChildDetailEditForm",
+			"physical_address",
+			"loginRegex",
+			"national_id_no",
+			"kin",
+			"PrisonerKinDetail",
+			"relationship",
+			"id_number",
+			"alphanumeric",
+			"showNationality2",
+			"isdual",
+			"nationality_name2",
+			"filesize",
+			"png|jpg|jpeg|gif|PNG|JPG|JPEG|GIF",
+			"filesize",
+			"sername must contain only letters, numbers, ",
+			"'photo",
+			">write('message',",
+			"other_tribe",
+			"tribe_id",
+			"father_name",
+			"tribe_id",
+			"$( other_field ).insertAfter('#",
+			"'other'",
+			"data[Prisoner][permanent_address]",
+			"data[Prisoner][is_photo]",
+			"photo",
+			"date_of",
+			"$('.prisoner_dob').datepicker",
+			"'other'",
+			"document.rea",
+			"date_of_birth",
+			"classifica",
+			"other_country",
+			"country_id",
+			"PrisonerEditForm",
+			"PrisonerIdDetailEditForm",
+			".validate",
+			"[tribe_id]",
+			"permanent_address",
+			"showCommonHeader",
+			"openOtherField",
+			"other_occupation",
+			"marita",
+			"openOtherField",
+			"levelOfEducationList",
+			"occupation_id",
+			"countryList",
+			"component",
+			"url1",
+			"url",
+			"PrisonerEditForm",
+			"extension",
+			"exten",
+			"extensi",
+			"occupation",
+			"apparent_religion_id",
+			"level_of_education_id",
+			"other",
+			"is_dual_citizen",
+			"showNationality2",
+			"nationality_name",
+			"showNationality2",
+			"editPrisoner",
+			"editPrisoner ",
+			"display_nationality2",
+			"nationality_name2",
+			"> 'gender_id'",
+			">'gender_id'",
+			"status_of_women_div",
+			"status_of_women_id",
+			"physicalPropertyAjax",
+			"physicalpropertyal",
+			"sentence-c",
+			"apparent_religion_id",
+			"editPrisoner",
+			"editPrisoner'+editPrisoner",
+			"ajaxUrl_kindetail",
+			"id_proof_details",
+			"editPrisoner",
+			"showDataKin",
+			"editPrisoner",
+			"showDataIdProof",
+			"editPrisoner",
+			"assign_ward",
+			"ajaxUrl_id_proof",
+			"editPrisoner",
+			"commonheader(",
+			"uuid"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "index.ctp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 25848,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10076,
+								10094
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2104.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/C/xampp/htdocs/uganda/app/Controller/PrisonersController.php",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 205919,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15056,
+								15056
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5462.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "listview.ctp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 27478,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								17277,
+								17277
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2428.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "list_ajax.ctp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10399,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10324,
+								10324
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3346.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "kin_detail_ajax.ctp",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 4886,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								740,
+								807
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 216.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 38.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "index.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"prisonerco",
+				"Controller\\PrisonersController.php"
+			],
+			[
+				"prisonerscontroller",
+				"Controller\\PrisonersController.php"
+			],
+			[
+				"table.ct",
+				"View\\Layouts\\table.ctp"
+			],
+			[
+				"table",
+				"View\\Layouts\\table.ctp"
+			],
+			[
+				"prisoners/ed",
+				"View\\Prisoners\\edit.ctp"
+			],
+			[
+				"mas",
+				"webroot\\theme\\css\\matrix-style.css"
+			],
+			[
+				"prisonersc",
+				"Controller\\PrisonersController.php"
+			],
+			[
+				"core",
+				"Config\\core.php"
+			],
+			[
+				"physical_prop",
+				"View\\Properties\\physical_property_ajax.ctp"
+			],
+			[
+				"proper",
+				"Controller\\PropertiesController.php"
+			],
+			[
+				"veri",
+				"View\\Elements\\verify-modal.ctp"
+			],
+			[
+				"country",
+				"Model\\Country.php"
+			],
+			[
+				"medicalch",
+				"Model\\MedicalCheckupRecord.php"
+			],
+			[
+				"prisoners",
+				"Model\\PrisonerSentence.php"
+			],
+			[
+				"medica",
+				"Model\\MedicalRecord.php"
+			],
+			[
+				"app",
+				"Controller\\AppController.php"
+			],
+			[
+				"prop",
+				"Controller\\PropertiesController.php"
+			],
+			[
+				"property",
+				"View\\Elements\\property-items.ctp"
+			],
+			[
+				"data",
+				"Config\\database.php"
+			],
+			[
+				"kin",
+				"View\\Prisoners\\kin_detail_ajax.ctp"
+			],
+			[
+				"index_aj",
+				"View\\Callinouts\\index_ajax.ctp"
+			],
+			[
+				"index_aja",
+				"View\\Sentence\\index_ajax.ctp"
+			],
+			[
+				"index.",
+				"View\\Prisoners\\index.ctp"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"ApparentReligion"
+			]
+		],
+		"width": 620.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 255.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>  </title>
+    
+ </head>
+
+ <body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif;font-size: 14px;line-height: 1.42857143;color: #333;">
+ 	
+<div class="container top-fifteen">
+<div class="ro w" style="margin-right: -15px;margin-left: -15px;box-sizing: border-box;display: block;">
+<div class="c ol-md-4 gate-pass" style="width: 35%;float: left;position: relative;
+    min-height: 1px;padding-right: 15px;padding-left: 15px;box-sizing: border-box;margin-left:200px;"> 
+
+ <table class="table" style="background-color: transparent;border-spacing: 0;
+    border-collapse: collapse;box-sizing: border-box;display: table;border-color: grey;">
+    <tbody>
+   
+    <tr>
+      <td align="left">
+        GATEPASS
+      </td>
+    </tr>    
+    <tr>
+      <td class="text-center" style="border-top: none;padding-bottom: 0px;padding-left: 0px;padding: 8px;line-height: 1.42857143;vertical-align: top;display: table-cell;">
+      <span class="strng" style="font-weight: bold;padding-left:50px;">UGANDA PRISON :</span> <span class="gatepass-id" style="font-size: 15px;color: #b17002;font-weight: 600;box-sizing: border-box;">{prison_name} </span> 
+
+      </td>
+    </tr>                   
+    <tr>
+      <td>
+        <span style="float:left;"><b>GATEPASS NO. :</b> {gatepass_no}</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="float:right;"><b>Date :</b> {gatepass_date}</span>
+      </td>
+        
+      </tr>
+      <tr>
+        <td style="border-top: none;padding-bottom: 0px;padding-left: 0px;padding: 8px;line-height: 1.42857143;vertical-align: top;display: table-cell;">
+        <span class="strng" style="font-weight: bold;">Permission is granted for :</span> <br>
+        <span class="gatepass-data" style="border-bottom: 1px dashed #b17002;box-sizing: border-box;">{permission_for}</span>
+        </td>
+      </tr>
+      <tr>
+        <td style="border-top: none;padding-bottom: 0px;padding-left: 0px;padding: 8px;line-height: 1.42857143;vertical-align: top;display: table-cell;">
+        <span class="strng" style="font-weight: bold;">To leave the team under the  Escort team  :</span> <br>
+        <span class="gatepass-data" style="border-bottom: 1px dashed #b17002;box-sizing: border-box;">{escort}</span>
+        </td>
+      </tr>
+      <tr>
+        <td style="border-top: none;padding-bottom: 0px;padding-left: 0px;padding: 8px;line-height: 1.42857143;vertical-align: top;display: table-cell;">
+        <span class="strng" style="font-weight: bold;">Purpose :</span> <br>
+        <span class="gatepass-data" style="border-bottom: 1px dashed #b17002;box-sizing: border-box;">{purpose}</span>
+        </td>
+      </tr>
+      <tr>
+        <td style="border-top: none;padding-bottom: 0px;padding-left: 0px;padding: 8px;line-height: 1.42857143;vertical-align: top;display: table-cell;">
+        <span class="strng" style="font-weight: bold;">Destination :</span> <br>
+        <span class="gatepass-data" style="border-bottom: 1px dashed #b17002;box-sizing: border-box;">{destination}</span>
+        </td>
+      </tr>
+      <!-- <tr>
+        <td style="border-top: none;padding-bottom: 0px;padding-left: 0px;padding: 8px;line-height: 1.42857143;vertical-align: top;display: table-cell;">
+        <span class="strng" style="font-weight: bold;">SIGN :</span> <br>
+        <span class="gatepass-data" style="border-bottom: 1px dashed #b17002;box-sizing: border-box;">{prison_name}</span>
+        </td>
+      </tr>
+      <tr>
+        <td style="border-top: none;padding-bottom: 0px;padding-left: 0px;padding: 8px;line-height: 1.42857143;vertical-align: top;display: table-cell;">
+        <span class="strng" style="font-weight: bold;">DATE :</span> 
+        <span class="gatepass-data" style="border-bottom: 1px dashed #b17002;box-sizing: border-box;">{gatepass_date}</span>
+        </td>
+      </tr> -->
+      <tr>
+        <td style="border-top: none;padding-bottom: 0px;padding-left: 0px;padding: 8px;line-height: 1.42857143;vertical-align: top;display: table-cell;">
+        <h5 style="color: #b17002;font-weight: 600;font-size: 14px;margin-top: 10px;margin-bottom: 10px;"><br><br>Officer In-Charge {prison_name}.</h5>
+        </td>
+      </tr>	
+    </tbody>
+  </table>
+</div>
+
+
+
+
+
+</div>
+</div>
+
+
+ </body>
+
+</html>

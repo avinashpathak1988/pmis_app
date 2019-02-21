@@ -1,0 +1,18 @@
+<pre class="cake-error"><a href="javascript:void(0);" onclick="document.getElementById('cakeErr595f80cf8ecab-trace').style.display = (document.getElementById('cakeErr595f80cf8ecab-trace').style.display == 'none' ? '' : 'none');"><b>Warning</b> (2)</a>: file_get_contents(http://localhost/testa.pdf): failed to open stream: HTTP request failed! HTTP/1.1 404 Not Found
+ [<b>APP/Controller/ApplicationsController.php</b>, line <b>925</b>]<div id="cakeErr595f80cf8ecab-trace" class="cake-stack-trace" style="display: none;"><a href="javascript:void(0);" onclick="document.getElementById('cakeErr595f80cf8ecab-code').style.display = (document.getElementById('cakeErr595f80cf8ecab-code').style.display == 'none' ? '' : 'none')">Code</a> <a href="javascript:void(0);" onclick="document.getElementById('cakeErr595f80cf8ecab-context').style.display = (document.getElementById('cakeErr595f80cf8ecab-context').style.display == 'none' ? '' : 'none')">Context</a><pre id="cakeErr595f80cf8ecab-code" class="cake-code-dump" style="display: none;"><code><span style="color: #000000"><span style="color: #0000BB">&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">downloadPdf</span><span style="color: #007700">(){</span></span></code>
+<code><span style="color: #000000"><span style="color: #0000BB">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//shell_exec("xvfb-run&nbsp;-a&nbsp;cutycapt&nbsp;--url=http://192.168.1.199/ttpermit_subrat&nbsp;--out=/var/www/html/test.pdf");</span></span></code>
+<span class="code-highlight"><code><span style="color: #000000"><span style="color: #0000BB">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$content&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">file_get_contents</span><span style="color: #007700">(</span><span style="color: #DD0000">"http://localhost/testa.pdf"</span><span style="color: #007700">);</span></span></code></span></pre><pre id="cakeErr595f80cf8ecab-context" class="cake-context" style="display: none;">$http_response_header = array(
+	(int) 0 =&gt; &#039;HTTP/1.1 404 Not Found&#039;,
+	(int) 1 =&gt; &#039;Date: Fri, 07 Jul 2017 12:38:39 GMT&#039;,
+	(int) 2 =&gt; &#039;Server: Apache/2.4.7 (Ubuntu)&#039;,
+	(int) 3 =&gt; &#039;Access-Control-Allow-Origin: *&#039;,
+	(int) 4 =&gt; &#039;Content-Length: 281&#039;,
+	(int) 5 =&gt; &#039;Connection: close&#039;,
+	(int) 6 =&gt; &#039;Content-Type: text/html; charset=iso-8859-1&#039;
+)</pre><pre class="stack-trace">file_get_contents - [internal], line ??
+ApplicationsController::downloadPdf() - APP/Controller/ApplicationsController.php, line 925
+ReflectionMethod::invokeArgs() - [internal], line ??
+Controller::invokeAction() - CORE/Cake/Controller/Controller.php, line 491
+Dispatcher::_invoke() - CORE/Cake/Routing/Dispatcher.php, line 193
+Dispatcher::dispatch() - CORE/Cake/Routing/Dispatcher.php, line 167
+[main] - APP/webroot/index.php, line 111</pre></div></pre>

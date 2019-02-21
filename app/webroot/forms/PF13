@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>  </title>
+
+    <style type="text/css">
+     
+    body {
+    	margin:0px;
+    	padding: 0px;
+    }
+    p {
+    	margin:0px;
+    	padding: 0px;
+    }
+
+ .gate-pass table>tbody>tr>td{
+ 	border-top: none;
+ 	padding-bottom: 0px;
+ 	padding-left: 0px;
+ }
+ .gatepass-data{
+ 	border-bottom: 1px dashed #b17002;
+ }
+ .gatepass-id{
+ 	font-size: 15px;
+ 	color:#b17002;
+ 	font-weight: 600; 
+ }
+ .strng{
+ 	font-weight: bold;
+ }
+ .gate-pass img{
+ 	margin: 0 auto;
+ 	display: block;
+ }
+ .top-fifteen{
+ 	margin-top: 15px;
+ }
+ .top-thirty{
+ 	margin-top: 30px;
+ }
+ .gate-pass h5{
+ 	color: #b17002;
+ 	font-weight: 600;
+ }
+
+ .court-appeal{
+ 	border-bottom: 1px dashed #333;
+ 	color: #797979;
+
+ }
+ .appeal_court{
+ 	margin-bottom: 15px;
+ }
+ .appeal_court h5{
+ 	color: #000;
+    margin-bottom: 20px;
+ }
+.pf31{
+	border:1px solid #BF360C;
+	margin-bottom: 15px;
+	background: #f9f9f9;
+}
+ .pf31 .header{
+ 	background: #BF360C;
+ 	color: #fff;
+ 	text-align: center;
+ }
+ .pf31 .header h3{
+ 	font-size: 16px;
+ 	margin-top: 0px;
+ }
+ .pf31 .header h6{
+ 	text-align: right;
+ 	font-size: 16px;
+ }
+ .pf31 h4{
+ 	color: #333333;
+ 	padding: 10px 0px;
+ 	border-bottom: 1px solid #bf360c;
+ 	font-size: 16px;
+ }
+ .hfour{
+ 	border-bottom: 3px solid #bf360c;
+ 	padding-bottom: 8px;
+ }
+ .face h5{
+ 	font-size: 16px;
+ 	color:#3E2723; 
+ 	text-align: center;
+ }
+ .face img {
+ 	margin: 0 auto;
+ 	display: block;
+ }
+ .dashed-bottom{
+ 	border-bottom: 1px dashed #b5b5b5;
+ }
+ .bold-italic{
+ 	font-weight: bold;
+ 	font-style: italic;
+ }
+ .signature{
+ 	text-align: right;
+ 	font-weight: bold;
+ 	margin: 2px;
+ }
+  .signature-top{
+ 	border-bottom: 1px solid #ccc;
+ }
+ .devider{
+ 	border-bottom: 2px groove #fff;
+ }
+ .table-condensed thead tr th {
+ 	background: #bf360c;
+    color: #fff;
+ }
+ .text-right {
+ 	float: right;
+ }
+	</style>
+ </head>
+
+ <body>
+ 	
+
+
+<div class="container top-fifteen pf31">
+<div class="row header" style="width:100%;color: black;">
+	
+<div  style="width:80%;float: left;">
+<h3 class="strng text-center">UGANDA PRISONS</h3>
+<h3 class="text-center strng">DESCRIPTIVE ROLL OF AN ESCAPED PRISONER</h3>
+</div>
+<div  style="width:20%;float: left;">
+<div class="strng">P.F. 13</div><br>
+<div class="strng"> <span class="dashed-bottom"> {prison_name} </span>Prison</div>	
+</div>
+</div>
+
+<div style="clear:both;"> </div>  
+
+<div class="row">
+<div class="col-md-12" style="padding: 5px 10px;">
+     
+<p><span class="strng">Registered No </span><span class="dashed-bottom">{prisoner_no}</span> </p>
+
+<p><span class="strng">Name of Prisoner </span><span class="dashed-bottom">{fullname}</span> </p>
+
+<p><span class="strng">Age </span><span class="dashed-bottom">{age}</span> </p>
+
+<p><span class="strng">Sex </span><span class="dashed-bottom">{gender_id}</span> </p>
+
+<p><span class="strng">Tribe </span><span class="dashed-bottom">{tribe_id}</span> </p>
+
+<p><span class="strng">Crime </span><span class="dashed-bottom">{crime}</span> </p>
+
+<p><span class="strng">Section of Law. </span><span class="dashed-bottom">{section_law}</span></p>
+
+<p><span class="strng">Sentence </span><span class="dashed-bottom">{sentance}</span></p>
+
+<p><span class="strng">Committing Court and Case File No. </span><span class="dashed-bottom">{case_no}</span></p>
+
+<p><span class="strng">Date of Incarceration </span><span class="dashed-bottom"></span></p>
+
+<p><span class="strng">Date of Escape </span><span class="dashed-bottom">{escape_date}</span> <span class="strng">Time</span> <span class="dashed-bottom">{escape_time}</span>  <span class="strng">Escape From</span> <span class="dashed-bottom">{escape_from}</span> </p>
+
+<p><span class="strng">Place </span><span class="dashed-bottom">{manner_escape}</span> </p>
+
+<p><span class="strng">Resident of </span><span class="dashed-bottom">{resident_address}</span></p>
+
+<p><span class="strng">Occupation </span><span class="dashed-bottom">{occupation_id}</span></p>
+
+<p><span class="strng">Height </span><span class="dashed-bottom">{height_feet} Feet</span></p>
+
+<p><span class="strng">Chest, girth </span><span class="dashed-bottom">{chest}</span></p>
+
+<p><span class="strng">Color </span><span class="dashed-bottom">{color}</span> </p>
+
+<p><span class="strng">Last Address </span><span class="dashed-bottom">{permanent_address}</span></p>
+
+<p><span class="strng">Phone Number </span><span class="dashed-bottom">{phone_number}</span></p>
+
+<p><span class="strng">F.P. Classification and C.R.O.N. </span><span class="dashed-bottom">{classification_id}</span></p>
+
+<p><span class="strng">Marks of Identification</span> <span class="dashed-bottom">{marks}</span></p>
+
+<h5> <span class="strng"> Date at</span> <span class="dashed-bottom">{date_at}</span></h5>
+<h6 class="text-right"><span class="dashed-bottom">{officer_incharge}</span></h6>  <br>
+<h5 class="text-right strng">Officer I/C Prison. </h5>                                                                                                                            
+<div style="clear:both;"> </div>                                               
+</div>
+</div>
+</div>
+</body>
+
+</html>

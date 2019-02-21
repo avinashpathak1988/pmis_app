@@ -1,0 +1,1 @@
+<span style="color: #DF013A;font-size: 13px;align:center;font-weight:bold;"><?php if(isset($msg)){ echo $msg; } ?></span>
