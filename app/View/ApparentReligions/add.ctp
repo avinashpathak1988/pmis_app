@@ -19,7 +19,7 @@
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label">Is Enabled ?</label>
+                        <label class="control-label">Is Enabldfd fdfed ?</label>
                         <div class="controls">
                             <?php echo $this->Form->checkbox('is_enable',array('div'=>false,'label'=>false,'class'=>'form-control','required','options'=>$is_enables,'default'=>1,));?>
                         </div>
@@ -27,6 +27,7 @@
                     <div class="form-actions" align="center">
                         <button type="submit" class="btn btn-success">Save</button>
                     </div>
+
                     <?php echo $this->Form->end();?>
                 </div>
             </div>

@@ -36,6 +36,7 @@ class AppController extends Controller {
     );
 
     public $uses = array('Menu','User','Prisoner','Prison','PrisonerAttendance','PrisonerPaysheet','PurchaseItem','UserAccessControl','Discharge', 'PrisonerSentence','ApprovalProcess','PrisonerPayment','StagePromotion','InPrisonPunishment','CashItem','PhysicalProperty','PropertyTransaction','PrisonerSaving','StageHistory','Notification','LodgerStation', 'PrisonerBailDetail', 'WorkingPartyTransfer','WorkingPartyReject', 'EarningGradePrisoner', 'PrisonerSentenceCount', 'PrisonerSentenceAppeal','District','County','SubCounty','Parish', 'PrisonerOffence', 'PrisonerCaseFile', 'PrisonerAdmission', 'DebtorJudgement','ApplicationToCourt','IncidentManagement');
+
     public function beforeFilter()
     {
         Security::setHash('md5');
@@ -4451,6 +4452,7 @@ class AppController extends Controller {
             ));
         }
         return $result;
+        
     }
     //get AppealCount -- START -- 
     function getAppealCount()
