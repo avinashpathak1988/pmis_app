@@ -37,6 +37,19 @@
                             </div>      
                             <div class="clearfix"></div>                      
                         </div>
+                        <div class="row-fluid">
+                            <div class="span6">
+                                <div class="control-group">
+                                    <label class="control-label">Module<?php echo MANDATORY; ?>:</label>
+                                    <div class="controls">
+                                        <?php echo $this->Form->input('module_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','options'=>$moduleList, 'empty'=>'','required','id'=>'module_id', 'onChange'=>'getModuleResult(this.value)'));?>
+                                        <div class="error-message" id="module_id_error" style="clear: both; display:none;">Module is required !</div>
+                                    </div>
+                                </div>
+                            </div>      
+                                             
+                        </div>
+                        <br>
                         <div id="step1">
                             <div class="form-actions" align="center">
                                 <?php echo $this->Form->button('Continue', array('type'=>'button', 'class'=>'btn btn-success','div'=>false,'label'=>false,'id'=>'continue','formnovalidate'=>true,'onClick'=>'getModules();'))?>
@@ -69,6 +82,11 @@ echo $this->Html->scriptBlock("
         {
             $('#prison_error').show();
         }
+        // $('.module_id').val(val);
+        // if(val == '')
+        // {
+        //     $('#module_id_error').show();
+        // }
     }
     function getUserType(val)
     {
@@ -82,15 +100,28 @@ echo $this->Html->scriptBlock("
         {
             $('#usertype_error').show();
         }
+        // $('.module_id').val(val);
+        // if(val == '')
+        // {
+        //     $('#module_id_error').show();
+        // }
     }
 
+    function getModuleResult(val) {
+      //alert(1);
+      $('#step1').show();
+      $('#submit').hide();
+    }
+    
     function getModules(){
         var url = '".$ajaxUrl."';
         var prison_id = $('#prison_id').val();
         var user_type = $('#user_type').val();
+        var module_id = $('#module_id').val();
         $('#prison_error').hide();
         $('#usertype_error').hide();
-        if(prison_id == '' || user_type == '')
+        $('#module_id_error').hide();
+        if(prison_id == '' || user_type == '' || module_id == '')
         {
             if(prison_id == '')
             {
@@ -100,10 +131,14 @@ echo $this->Html->scriptBlock("
             {
                 $('#usertype_error').show();
             }
+            if(module_id == '')
+            {
+                $('#module_id_error').show();
+            }
         }
         else 
         {
-             $.post(url, {'prison_id':prison_id, 'user_type':user_type}, function(res) {
+             $.post(url, {'prison_id':prison_id, 'user_type':user_type, 'module_id':module_id}, function(res) {
                 if (res) {
                     $('#modules').html(res);
                     $('#step1').hide();

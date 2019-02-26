@@ -1028,6 +1028,43 @@ class EarningsController   extends AppController {
             //$SearchPrisoners = preg_replace($SearchPrisoners1, '', $SearchPrisoners);
             $condition += array("Prisoner.id not in (".$SearchPrisoners.")");
         }
+        //check skilled prisoners -- START -- 
+        $this->loadModel('AssignSkill');
+        $skillList = $this->AssignSkill->find('list', array(
+            'recursive'     => -1,
+            'joins' => array(
+                array(
+                    'table' => 'prisoners',
+                    'alias' => 'Prisoner',
+                    'type' => 'inner',
+                    'conditions'=> array('AssignSkill.prisoner_id = Prisoner.id')
+                ),
+            ), 
+            'fields'        => array(
+                //'Prisoner.id',
+                'AssignSkill.prisoner_id',
+            ),
+            'conditions'    => array(
+                'Prisoner.is_enable'      => 1,
+                'Prisoner.is_trash'       => 0,
+                'AssignSkill.is_trash'       => 0,
+                'Prisoner.prison_id'       => $prison_id
+            ),
+            'order'         => array(
+                'Prisoner.prisoner_no'
+            ),
+            'group' => array('AssignSkill.prisoner_id')
+        ));
+        if(isset($skillList) && !empty($skillList))
+        {
+            $skillPrisoners = implode(',',$skillList);
+            $condition += array("Prisoner.id in (".$skillPrisoners.")");
+        }
+        //check skilled prisoners -- END -- 
+        $condition += array(
+            'Prisoner.prisoner_type_id != '      => Configure::read('DEBTOR'),
+            'Prisoner.prisoner_sub_type_id != '  => Configure::read('CONDEMNED')
+        );
         //echo '<pre>'; print_r($SearchPrisonerList1); 
         $prisonerList = $this->Prisoner->find('list', array(
             'recursive'     => -1,
@@ -1251,7 +1288,7 @@ class EarningsController   extends AppController {
             'limit'         => 20,
         );
         $datas = $this->paginate('WorkingPartyPrisoner');
-        //debug($datas); 
+        // debug($condition); exit();
         $this->set(array(
             'datas'         => $datas,  
             'prison_id'=>$prison_id    
@@ -4470,7 +4507,7 @@ class EarningsController   extends AppController {
             ),
             // 'conditions'    => $condition,
             'order'         => array(
-                'WorkingPartyPrisoner1.modified',
+                'WorkingPartyPrisoner.modified',
             ),
             'limit'         => 20,
         );
@@ -5469,7 +5506,44 @@ class EarningsController   extends AppController {
             //echo $SearchPrisoners;
             $condition += array("Prisoner.id not in (".$SearchPrisoners.")");
         }
-        //echo '<pre>'; print_r($SearchPrisonerList1); 
+        //check skilled prisoners -- START -- 
+        $this->loadModel('AssignSkill');
+        $skillList = $this->AssignSkill->find('list', array(
+            'recursive'     => -1,
+            'joins' => array(
+                array(
+                    'table' => 'prisoners',
+                    'alias' => 'Prisoner',
+                    'type' => 'inner',
+                    'conditions'=> array('AssignSkill.prisoner_id = Prisoner.id')
+                ),
+            ), 
+            'fields'        => array(
+                //'Prisoner.id',
+                'AssignSkill.prisoner_id',
+            ),
+            'conditions'    => array(
+                'Prisoner.is_enable'      => 1,
+                'Prisoner.is_trash'       => 0,
+                'AssignSkill.is_trash'       => 0,
+                'Prisoner.prison_id'       => $prison_id
+            ),
+            'order'         => array(
+                'Prisoner.prisoner_no'
+            ),
+            'group' => array('AssignSkill.prisoner_id')
+        ));
+        if(isset($skillList) && !empty($skillList))
+        {
+            $skillPrisoners = implode(',',$skillList);
+            $condition += array("Prisoner.id in (".$skillPrisoners.")");
+        }
+        //check skilled prisoners -- END -- 
+        $condition += array(
+            'Prisoner.prisoner_type_id != '      => Configure::read('DEBTOR'),
+            'Prisoner.prisoner_sub_type_id != '  => Configure::read('CONDEMNED')
+        );
+       // debug($condition); 
         $dataList = $this->Prisoner->find('list', array(
             'recursive'     => -1,
             'fields'        => array(
@@ -5821,6 +5895,46 @@ class EarningsController   extends AppController {
                 $this->Session->write('message','Working party reject list are '.$status.' failed!');
             }
         }
+        $prisoerno = $this->PrisonerSaving->find('list', array(
+            'fields'=>array(
+                'PrisonerSaving.id',
+                'PrisonerSaving.prisoner_id'
+            ),
+            "joins" => array(
+                array(
+                    "table" => "prisoners",
+                    "alias" => "Prisoner",
+                    "type" => "left",
+                    "conditions" => array(
+                        "PrisonerSaving.prisoner_id = Prisoner.id"
+                    ),
+                ),
+            ),
+           
+            'fields'        => array(
+                'Prisoner.id',
+                'Prisoner.prisoner_no',
+            ),
+            'conditions'=>array(
+                //'PrisonerSaving.is_trash'=> 0,
+            )
+
+        ));
+        $default_status = '';
+        $statusList = '';
+        $statusInfo = $this->getApprovalStatusInfo();
+        if(is_array($statusInfo) && count($statusInfo) > 0)
+        {
+            $default_status = $statusInfo['default_status']; 
+            $statusList = $statusInfo['statusList']; 
+        }
+        $this->set(array(
+            'prisoerno'    => $prisoerno,
+            'statusList'    => $statusList,
+            'default_status'=>$default_status,
+            'sttusListData'=>$statusList
+            // 'approvalStatusList'  => $approvalStatusList
+        ));
     }
 
     function workingPartyRejectList()
@@ -5838,6 +5952,18 @@ class EarningsController   extends AppController {
         else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
         { 
             $condition      += array('WorkingPartyReject.status not in ("Draft","Saved","Review-Rejected")');
+        }
+        if(isset($this->params['named']['prisoner_id']) && $this->params['named']['prisoner_id'] != ''){
+            $prisoner_id = $this->params['named']['prisoner_id'];
+            $condition += array(
+                'WorkingPartyReject.prisoner_id'   => $prisoner_id,
+            );
+        }
+        if(isset($this->params['named']['status']) && $this->params['named']['status'] != ''){
+            $prisoner_id = $this->params['named']['status'];
+            $condition += array(
+                'WorkingPartyReject.status'   => $prisoner_id,
+            );
         }
         
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
@@ -6020,7 +6146,11 @@ class EarningsController   extends AppController {
                     'Prisoner.id',
                     'Prisoner.prisoner_no',
                 ),
-                    'conditions'    => $condition,
+                    'conditions'    => array(
+                        'Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'),
+                        'Prisoner.prisoner_type_id != '      => Configure::read('DEBTOR'),            
+                        'Prisoner.prisoner_sub_type_id != '  => Configure::read('CONDEMNED')
+                    ),
                     'order'         => array(
                     'Prisoner.prisoner_no'
                 ),

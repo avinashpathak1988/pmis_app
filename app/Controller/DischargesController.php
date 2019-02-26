@@ -212,10 +212,37 @@ class DischargesController    extends AppController {
 						$dischargeTypeCondi = array("DischargeType.id IN (5)");
 					}
 				}
-				// ===========================================================================
+				//===========================================================================
 				if(isset($prisonerData['Prisoner']['is_death']) && $prisonerData['Prisoner']['is_death']==1){
 					$dischargeTypeCondi = array("DischargeType.id IN (3)");
 				}
+
+				// condition on reales for pardon========
+
+				$this->loadModel('PrisonerPetition');
+				$relaseonpardon = $this->PrisonerPetition->find("first", array(
+					"conditions"	=> array(
+						"PrisonerPetition.prisoner_id"	=> $prisonerData['Prisoner']['id'],
+						"PrisonerPetition.status"=>'Approved'
+
+					),
+					"order"			=> array(
+						"PrisonerPetition.id"	=> "desc",
+					),
+				));
+
+				// debug($relaseonpardon);
+				
+
+				
+
+				if(isset($relaseonpardon['PrisonerPetition']['petition_result']) && $relaseonpardon['PrisonerPetition']['petition_result']=='Discharge'){
+						$dischargeTypeCondi = array("DischargeType.id IN (14)");
+					}
+				
+
+				
+				//==========================================
 				$dischargetypeList = $this->DischargeType->find('list', array(
 					'recursive'		=> -1,
 					'fields'		=> array(

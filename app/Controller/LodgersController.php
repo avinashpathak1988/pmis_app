@@ -2,7 +2,7 @@
 App::uses('AppController', 'Controller');
 class LodgersController extends AppController {
     public $layout='table';
-    public $uses=array('Prisoner','Prison','PrisonerTransfer','PrisonerAdmissionDetail','PrisonerIdDetail','PrisonerKinDetail','PrisonerSentenceDetail','PrisonerSpecialNeed','PrisonerOffenceDetail','PrisonerOffenceCount','PrisonerRecaptureDetail','PrisonerChildDetail','MedicalDeathRecord','MedicalSeriousIllRecord','MedicalCheckupRecord','MedicalDeathRecord','StagePromotion','StageDemotion','StageReinstatement','InPrisonOffenceCapture','InPrisonPunishment','MedicalSickRecord','Property','PrisonerType','EscortTeam','Gatepass','DisciplinaryProceeding','Lodger','LodgerOut');
+    public $uses=array('Prisoner','Prison','PrisonerTransfer','PrisonerAdmissionDetail','PrisonerIdDetail','PrisonerKinDetail','PrisonerSentenceDetail','PrisonerSpecialNeed','PrisonerOffenceDetail','PrisonerOffenceCount','PrisonerRecaptureDetail','PrisonerChildDetail','MedicalDeathRecord','MedicalSeriousIllRecord','MedicalCheckupRecord','MedicalDeathRecord','StagePromotion','StageDemotion','StageReinstatement','InPrisonOffenceCapture','InPrisonPunishment','MedicalSickRecord','Property','PrisonerType','EscortTeam','Gatepass','DisciplinaryProceeding','Lodger','LodgerOut','PrisonerWardHistory');
 
     // listing for process the Lodger module
     public function index(){
@@ -481,7 +481,7 @@ class LodgersController extends AppController {
                     "Prisoner.prison_id"    => $this->data['prison_id'],
                     'Prisoner.is_enable'            => 1,
                     'Prisoner.is_trash'             => 0,
-                    'Prisoner.present_status'       => 1,
+                    // 'Prisoner.present_status'       => 1,
                     'Prisoner.is_approve'           => 1,
                     'Prisoner.transfer_status !='   => 'Approved'
                 ),
@@ -683,6 +683,30 @@ class LodgersController extends AppController {
             return 'failure';
 
         }
+    }
+
+    public function escapedPrisonerAjax(){
+         $this->layout   = 'ajax';
+         // debug($this->data['prisoner_id']);
+
+         $data = $this->Discharge->find('first', array(
+           
+            'conditions'=>array(
+                'Discharge.prisoner_id'=> $this->data['prisoner_id'],
+                'Discharge.discharge_type_id'=> 5
+            )
+         ));
+
+        
+        
+         // debug($data);
+
+        $this->set(array(
+            'data'=>$data,
+            
+        ));
+
+
     }
 
     public function lodgerOutAdd() {
@@ -1306,38 +1330,47 @@ class LodgersController extends AppController {
                     }
                 }    
             }
+
+            $prisonerData["Prisoner"]["id"] =  $this->Prisoner->id;
+            $prisonerData["Prisoner"]["assigned_ward_id"] =  $lodgerData['Lodger']['ward_id'];
+            $prisonerData["Prisoner"]["assigned_ward_cell_id"] =  $lodgerData['Lodger']['ward_cell_id'];
+            $prisonerData["Prisoner"]["prisoner_no"] =  $prisoner_no."/L";
+            $prisonerData["Prisoner"]["photo"] =  $lodgerData['Lodger']['ward_cell_id'];
+
+            $prisonerData["PrisonerWardHistory"]["prison_id"] = $lodgerData['Lodger']["prison_id"];
+            $prisonerData["PrisonerWardHistory"]["prisoner_id"] = $this->Prisoner->id;
+            $prisonerData["PrisonerWardHistory"]["ward_id"]         = $lodgerData['Lodger']['ward_id'];
+            $prisonerData["PrisonerWardHistory"]["ward_cell_id"]    = $lodgerData['Lodger']['ward_cell_id'];
             
             // =============================================================
-            $this->Prisoner->updateAll(array(
-                "Prisoner.present_status"  =>  0,
-                "Prisoner.modified"        =>  "'".date("Y-m-d H:i:s")."'",
-            ),array(
-                "Prisoner.id"           =>  $prisoner_id,
-            ));
-            $this->Lodger->updateAll(array(
-                "Lodger.new_prisoner_id"  =>  $this->Prisoner->id,
-                "Lodger.modified"         =>  "'".date("Y-m-d H:i:s")."'",
-            ),array(
-                "Lodger.id"                 =>  $lodger_id,
-            ));
-            $this->Prisoner->updateAll(array(
-                "Prisoner.prisoner_no"  =>  "'".$prisoner_no."/L'",
-                "Prisoner.photo"        =>  "'".$prisoner_photo."'",
-                "Prisoner.modified"        =>  "'".date("Y-m-d H:i:s")."'",
-            ),array(
-                "Prisoner.id"           =>  $this->Prisoner->id,
-            ));
+            if($this->Prisoner->saveAll($prisonerData)){
+                if($this->PrisonerWardHistory->saveAll($prisonerData['PrisonerWardHistory'])){
+                    $this->Prisoner->updateAll(array(
+                        "Prisoner.present_status"  =>  0,
+                        "Prisoner.modified"        =>  "'".date("Y-m-d H:i:s")."'",
+                    ),array(
+                        "Prisoner.id"           =>  $prisoner_id,
+                    ));
+                    
+                    $this->Lodger->updateAll(array(
+                        "Lodger.new_prisoner_id"  =>  $this->Prisoner->id,
+                        "Lodger.modified"         =>  "'".date("Y-m-d H:i:s")."'",
+                    ),array(
+                        "Lodger.id"                 =>  $lodger_id,
+                    ));    
 
-            $userData = $this->User->find("first", array(
-                "conditions"    => array(
-                    "User.usertype_id"  => Configure::read('RECEPTIONIST_USERTYPE'),
-                    "User.prison_id"    => $this->Session->read('Auth.User.prison_id'),
-                ),
-            ));
-            
-            if(isset($userData['User']['id']) && $userData['User']['id']!=''){
-                $this->addNotification(array("user_id"=>$userData['User']['id'],"content"=>"Prisoner No ".$prisoner_no." is admitted as lodger, New prisoner no. is ".$prisoner_no."/L","url_link"=>"prisoners/details/".$prisonerData['Prisoner']['uuid']));
-            } 
+                    $userData = $this->User->find("first", array(
+                        "conditions"    => array(
+                            "User.usertype_id"  => Configure::read('RECEPTIONIST_USERTYPE'),
+                            "User.prison_id"    => $this->Session->read('Auth.User.prison_id'),
+                        ),
+                    ));
+                    
+                    if(isset($userData['User']['id']) && $userData['User']['id']!=''){
+                        $this->addNotification(array("user_id"=>$userData['User']['id'],"content"=>"Prisoner No ".$prisoner_no." is admitted as lodger, New prisoner no. is ".$prisoner_no."/L","url_link"=>"prisoners/details/".$prisonerData['Prisoner']['uuid']));
+                    } 
+                }
+            }
         }
         // ===============================================
         return 1;
@@ -1477,7 +1510,7 @@ class LodgersController extends AppController {
                 array(
                     "table" => "lodgers",
                     "alias" => "Lodger",
-                    "type" => "left",
+                    "type"  => "left",
                     "conditions" => array(
                         "LodgerOut.lodger_id = Lodger.id"
                     ),
@@ -1699,6 +1732,37 @@ class LodgersController extends AppController {
             }
         }
         return $result;
+    }
+
+    public function showWard($gender_id, $ward_type='') {
+        $this->autoRender = false;
+        $this->loadModel("Ward");
+        return $this->Ward->find('list', array(
+            'recursive'     => -1,
+            'conditions'    => array(
+                'Ward.gender'       => $gender_id,
+                // 'Ward.prison'       => $this->Session->read('Auth.User.prison_id'),
+                // 'Ward.ward_type'    => $ward_type,
+            ),
+            'fields'        => array(
+                'Ward.id',
+                'Ward.name',
+            ),
+            'order'         => array(
+                'Ward.name'
+            ),
+        )); 
+    }
+
+    public function updateWard() {
+        $this->autoRender = false;
+        $this->loadModel("Ward");
+        // debug($this->data);exit;
+        if($this->Lodger->saveAll($this->data)){
+            echo "SUCC";exit;
+        }else{
+            echo "FAIL";exit;
+        }
     }
 
 }

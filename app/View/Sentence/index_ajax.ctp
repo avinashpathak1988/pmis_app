@@ -120,7 +120,7 @@ foreach($datas as $data){
         $viewDetail .= '<b>EPD: </b>'.date('d-m-Y', strtotime($data['PrisonerSentence']['epd'])).'<hr>';
         ?>
         <td>
-          <a href="javaScript:void(0);" class="pop btn btn-success" pageTitle="Child Details" pageBody="<?php echo $viewDetail;?>">
+          <a href="javaScript:void(0);" class="pop btn btn-success" pageTitle="Senetence Details" pageBody="<?php echo $viewDetail;?>">
               <i class="icon-eye-open"></i>
           </a>
 

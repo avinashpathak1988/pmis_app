@@ -2,8 +2,8 @@
 App::uses('AppController','Controller');
 class BlacklistVisitorController extends AppController{
 
-    public $layout = 'table';
-    public $uses = array('User','Prisoner','BlacklistedVisitor');
+    public $layout='table';
+    public $uses=array('User','Prisoner','BlacklistedVisitor');
 
 	public function index(){
 		 if($this->request->is(array('post','put')))

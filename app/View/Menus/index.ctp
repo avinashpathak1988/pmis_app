@@ -32,7 +32,17 @@ $modelArr = $funcall->getLabelsByModel('Menu');
                             </div>
                         </div>  
 
-                    </div>           
+                    </div>  
+                    <div class="row" style="padding-bottom: 14px;">
+                        <div class="span6">
+                            <div class="control-group">
+                                <label class="control-label"><?php echo isset($modelArr['module_id'])?$modelArr['module_id']:'Module'?> :</label>
+                                <div class="controls">
+                                    <?php echo $this->Form->input('module_id',array('type' => 'select','div'=>false,'label'=>false,'class'=>'span11 pmis_select','id'=>'module_id','empty' => '','options' => $moduleList));?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>              
                     <div class="form-actions" align="center">
                         <?php echo $this->Form->button('Search', array('type'=>'button','class'=>'btn btn-primary','div'=>false,'label'=>false,'onclick'=>'javascript:showData();'))?>
                         <?php echo $this->Form->input('Reset', array('type'=>'reset', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger', 'onclick'=>"resetData('SearchIndexForm')"))?>
@@ -59,6 +69,7 @@ echo $this->Html->scriptBlock("
         var url = '".$ajaxUrl."';
         url = url + '/parent_id:' + $('#parent_id').val();
         url = url + '/name:' + $('#name').val();
+        url = url + '/module_id:' + $('#module_id').val();
         $.post(url, {}, function(res) {
             if (res) {
                 $('#listingDiv').html(res);

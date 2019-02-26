@@ -139,7 +139,7 @@
                                         <label class="control-label">Prisoner Number <?php echo $req; ?>:</label>
                                         <div class="controls">
                                             <?php //debug($prisonerList);
-                                            echo $this->Form->input('prisoner_id',array('div'=>false,'multiple'=>true,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>$prisonerList, 'empty'=>'-- Select Prisoner Number --','required'=>false,'id'=>'prisoner_id_working_party', 'selected'=>$assigned_prisoners, 'hiddenField'=>false));?>
+                                            echo $this->Form->input('prisoner_id',array('div'=>false,'multiple'=>true,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>$prisonerList, 'empty'=>'','title'=>'Please select prisoner number.','id'=>'prisoner_id_working_party', 'selected'=>$assigned_prisoners, 'hiddenField'=>false));?>
                                         </div>
                                     </div>
                                 </div>

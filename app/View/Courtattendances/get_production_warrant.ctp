@@ -134,7 +134,7 @@ foreach($datas as $data){
                             </tr>
 							 <tr>
                                 <td><b>Offence</b></td>
-                                <td><?php echo ($data['Courtattendance']['offence_id']!='') ? $funcall->getOffenceNameListing($data['Courtattendance']['case_no']) : 'N/A';?></td>
+                                <td><?php echo ($data['Courtattendance']['offence_id']!='') ? $funcall->getOffenceNameViewListing($data['Courtattendance']['offence_id']) : 'N/A';?></td>
                             </tr>
 							
 							<tr>

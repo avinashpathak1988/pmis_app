@@ -16,6 +16,7 @@ if(is_array($Prisoner) && count($Prisoner)>0){
             'name'             		=> $name,
             'state_id'		   		=> $state_id,
             'district_id'	   		=> $district_id,
+            'country_id' 			=> $country_id,
             'prison_id'		   		=> $prison_id,
            
             /*'total_sentence'              => $total_sentence,

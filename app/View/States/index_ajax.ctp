@@ -13,7 +13,9 @@ if(is_array($datas) && count($datas)>0){
         'url'                       => array(
             'controller'            => 'states',
             'action'                => 'indexAjax',
-            'statename'             => $statename,      
+            'statename'             => $statename,
+            'geographical_region_id'=> $geographical_region_id,
+           
         )
     ));         
     echo $this->Paginator->prev(__('prev'), array('tag' => 'li'), null, array('tag' => 'li','class' => 'disabled','disabledTag' => 'a'));
@@ -34,12 +36,18 @@ echo $this->Paginator->counter(array(
 <table id="districtTable" class="table table-bordered table-striped table-responsive">
   <thead>
     <tr>
-      <th><?php echo $this->Paginator->sort('Sl no'); ?></th>                
-      <th>
+      <th><?php echo $this->Paginator->sort('Sl no'); ?></th>  
+       <th>
         <?php                 
-          echo $this->Paginator->sort('State.name','Region',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'States','action' => 'indexAjax')));
+          echo $this->Paginator->sort('GeographicalRegion.name','Geographical Region',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'GeographicalRegion','action' => 'indexAjax')));
           ?>
-      </th>
+        </th>
+        <th>
+        <?php                 
+          echo $this->Paginator->sort('State.name','UPS Region',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'States','action' => 'indexAjax')));
+          ?>
+      </th>              
+     
       <th><?php echo $this->Paginator->sort('is_enable'); ?></th>
       <th><?php echo __('Action'); ?></th>
     </tr>
@@ -51,15 +59,17 @@ foreach($datas as $data){
 ?>
     <tr>
       <td><?php echo $rowCnt; ?>&nbsp;</td>
-      <td><?php echo ucwords(h($data['State']['name'])); ?>&nbsp;</td>	 				
+      <td><?php echo $funcall->getName($data['State']['geographical_region_id'],'GeographicalRegion','name'); ?>&nbsp;</td>  
+      <td><?php echo ucwords(h($data['State']['name'])); ?>&nbsp;</td>	
+      				
       <td>
-<?php 
-    if($data['State']['is_enable'] == '1'){
-        echo "<font color=green>Yes</font>"; 
-    }else{
-        echo "<font color=red>No</font>"; 
-    }
-?>
+          <?php 
+              if($data['State']['is_enable'] == '1'){
+                  echo "<font color=green>Yes</font>"; 
+              }else{
+                  echo "<font color=red>No</font>"; 
+              }
+          ?>
       </td>
       <td class="actions">
         <?php echo $this->Form->create('StateEdit',array('url'=>'/states/add','admin'=>false));?> 

@@ -2,7 +2,7 @@
 App::uses('Controller', 'Controller');
 class PrisonersController extends AppController{
     public $layout='table';
-    public $uses=array('User', 'Department', 'Designation', 'Usertype', 'State', 'District', 'Prison', 'Gender', 'Tribe', 'Country','Prisoner','Iddetail','PrisonerIdDetail','PrisonerKinDetail','PrisonerChildDetail','PrisonerAdmissionDetail','PrisonerSentenceDetail','PrisonerSpecialNeed','PrisonerOffenceDetail','PrisonerOffenceCount','PrisonerRecaptureDetail','Offence','SectionOfLaw','Classification','Disability','MaritalStatus','MedicalCheckupRecord','MedicalSickRecord', 'Court', 'Continent', 'LevelOfEducation','ApparentReligion','Height','Build','Face','Eye','Mouth','Speech','Teeth','Lip','Ear','Hair','StatusOfWomen','PrisonerType','SentenceType','SentenceOf','PrisonerSentence','PrisonerSentenceCount','Occupation','Relationship','SpecialCondition','PrisonerSentenceAppeal','PrisonerSubType','StageAssign','StageHistory','Skill','UgForce', 'Ward','PrisonerWard','PrisonerWardHistory','CauseList','DebtorRate', 'Village', 'Courtlevel', 'PrisonerAdmission', 'PrisonerOffence', 'DebtorJudgement','ReturnFromCourt', 'OffenceCategory','PrisonerCaseFile','WardCell', 'BirthDistrict');
+    public $uses=array('User', 'Department', 'Designation', 'Usertype', 'State', 'District', 'Prison', 'Gender', 'Tribe', 'Country','Prisoner','Iddetail','PrisonerIdDetail','PrisonerKinDetail','PrisonerChildDetail','PrisonerAdmissionDetail','PrisonerSentenceDetail','PrisonerSpecialNeed','PrisonerOffenceDetail','PrisonerOffenceCount','PrisonerRecaptureDetail','Offence','SectionOfLaw','Classification','Disability','MaritalStatus','MedicalCheckupRecord','MedicalSickRecord', 'Court', 'Continent', 'LevelOfEducation','ApparentReligion','Height','Build','Face','Eye','Mouth','Speech','Teeth','Lip','Ear','Hair','StatusOfWomen','PrisonerType','SentenceType','SentenceOf','PrisonerSentence','PrisonerSentenceCount','Occupation','Relationship','SpecialCondition','PrisonerSentenceAppeal','PrisonerSubType','StageAssign','StageHistory','Skill','UgForce', 'Ward','PrisonerWard','PrisonerWardHistory','CauseList','DebtorRate', 'Village', 'Courtlevel', 'PrisonerAdmission', 'PrisonerOffence', 'DebtorJudgement','ReturnFromCourt', 'OffenceCategory','PrisonerCaseFile','WardCell', 'BirthDistrict', 'PrisonerPetition');
     public $components = array('Mypdf');
 
     public function beforeFilter()
@@ -1664,10 +1664,15 @@ class PrisonersController extends AppController{
             if(isset($this->data['Prisoner']['date_of_birth']) && $this->data['Prisoner']['date_of_birth'] != ''){
                 $this->request->data['Prisoner']['date_of_birth']=date('Y-m-d',strtotime($this->data['Prisoner']['date_of_birth']));
             }
-            if(isset($this->data['Prisoner']['doa']) && $this->data['Prisoner']['doa'] != ''){
+            if(isset($this->data['Prisoner']['doa']) && $this->data['Prisoner']['doa'] != '' && $this->data['Prisoner']['doa'] != '0000-00-00')
+            {
                 $this->request->data['Prisoner']['doa']=date('Y-m-d',strtotime($this->data['Prisoner']['doa']));
             } 
-            
+            else 
+            {
+                $this->request->data['Prisoner']['doa']= date('d-m-Y');
+            }
+            debug($ex_prisoner_unique_no); exit;
             if($ex_prisoner_unique_no == '')
             {
                 unset($this->request->data['Prisoner']['exp_photo_name']);
@@ -2295,9 +2300,7 @@ class PrisonersController extends AppController{
             ));
             if($this->Session->read('Auth.User.prison_id')!=$prisonerdata['Prisoner']['prison_id'])
             {
-                $this->Session->write('message_type','error');
-                $this->Session->write('message','Not Authorized!');
-                $this->redirect(array('action'=>'../sites/dashboard'));  
+                $this->redirect(array('action'=>'../prisoners/view/'.$puuid));  
             }
             //debug($puuid); exit;
             if(isset($prisonerdata['Prisoner']['id']) && (int)$prisonerdata['Prisoner']['id'] != 0)
@@ -6526,6 +6529,46 @@ class PrisonersController extends AppController{
             }
         }
     }
+    // autofetch case file no starts
+    function getCaseFile($prisoner_id=''){
+        $this->loadModel('PrisonerCaseFile');
+        
+        $condition = array(
+            'PrisonerCaseFile.prisoner_id'    => $prisoner_id
+        );
+          $prisonerCaseFile = $this->PrisonerCaseFile->find('list', array(
+            'recursive'     => -1,
+            'fields'        => array(
+                'PrisonerCaseFile.id',
+                'PrisonerCaseFile.file_no'
+
+            ),
+            'conditions'    => $condition
+        ));
+            return implode(",", $prisonerCaseFile);
+       
+       //  return $prisonerCaseFile['PrisonerCaseFile']['file_no'];
+     }
+     function getOffence($prisoner_id=''){
+        $this->loadModel('PrisonerOffence');
+        
+        $condition = array(
+            'PrisonerOffence.prisoner_id'    => $prisoner_id
+        );
+          $prisonerOffence = $this->PrisonerOffence->find('list', array(
+            'recursive'     => -1,
+            'fields'        => array(
+                'PrisonerOffence.id',
+                'PrisonerOffence.offence_no'
+
+            ),
+            'conditions'    => $condition
+        ));
+            return implode(",", $prisonerOffence);
+       
+       //  return $prisonerCaseFile['PrisonerCaseFile']['file_no'];
+     }
+    // auto fetch case file no ends 
     //save single prisoner sentence 
     function saveSentence($sentenceData, $isExist=0, $is_pd = 0)
     {
@@ -10069,7 +10112,7 @@ class PrisonersController extends AppController{
             $model_name = 'PrisonerSentenceAppeal';
             $tab_name = 'Appeal';
         }
-        if($type == 'recapture_details')
+        if($type == 'recaptured_details')
         {
             $model_name = 'PrisonerRecaptureDetail';
             $tab_name = 'Recapture Detail';
@@ -10078,6 +10121,11 @@ class PrisonersController extends AppController{
         {
             $model_name = 'PrisonerBailDetail';
             $tab_name = 'Bail Detail';
+        }
+        if($type == 'petition_tab')
+        {
+            $model_name = 'PrisonerPetition';
+            $tab_name = 'Petition';
         }
         $default_status = ''; $statusList = '';
         $statusInfo = $this->getApprovalStatusInfo();
@@ -10179,7 +10227,7 @@ class PrisonersController extends AppController{
                             }
                         }
                     }
-                    if($type == 'recapture_details' && $status == 'Approved')
+                    if($type == 'recaptured_details' && $status == 'Approved')
                     {
                         if(count($items) > 0)
                             {
@@ -12485,7 +12533,8 @@ class PrisonersController extends AppController{
                         $fileCnt   = $this->PrisonerCaseFile->find('count', array(
                             'recursive'     => -1,
                             'conditions'    => array(
-                                'PrisonerCaseFile.prisoner_id'  => $prisoner_id
+                                'PrisonerCaseFile.prisoner_id'  => $prisoner_id,
+                                'PrisonerCaseFile.is_trash'     => 0
                             )
                         ));
                         $fileCnt = $fileCnt+1;
@@ -12494,6 +12543,12 @@ class PrisonersController extends AppController{
 
                         $insertCaseData['PrisonerCaseFile']['judicial_officer'] = implode(',',$insertCaseData['PrisonerCaseFile']['judicial_officer']);
 
+                        //if no pay -- START -- 
+                        if(isset($insertCaseData['PrisonerAdmission']['no_pay']) && $insertCaseData['PrisonerAdmission']['no_pay'] == 1)
+                        {
+                            $judgements = array();  
+                        }
+                        //if no pay -- END -- 
                         if(count($judgements) > 0)
                         {
                             for($j = 0; $j<count($judgements); $j++)
@@ -12517,6 +12572,28 @@ class PrisonersController extends AppController{
                         {
                             //debug($insertCaseData); exit;
                             $this->PrisonerCaseFile->saveAll($insertCaseData);
+                            //if no pay -- START -- 
+                            if(isset($insertCaseData['PrisonerAdmission']['no_pay']) && $insertCaseData['PrisonerAdmission']['no_pay'] == 1)
+                            {
+                                //update prisoner lpd
+                                $doa = $insertCaseData['PrisonerAdmission']['created'];
+                                //calculate lpd for debtor 
+                                // lpd = (doa+months)-1
+                                $lpd = date("Y-m-d", strtotime("+6 months", strtotime($doa)));
+                                $lpd = date("Y-m-d", strtotime("-1 day", strtotime($lpd)));
+                                
+                                $prisoner_fields = array(
+                                    'Prisoner.lpd' => "'".$lpd."'"
+                                );
+                                $prisoner_conds = array(
+                                    'Prisoner.id' => $prisoner_id
+                                );
+                                if($this->Prisoner->updateAll($prisoner_fields, $prisoner_conds))
+                                {
+
+                                }
+                            }
+                            //if no pay -- END --
                         }
                         //}
                     }
@@ -12530,7 +12607,8 @@ class PrisonersController extends AppController{
                         $fileCnt   = $this->PrisonerCaseFile->find('count', array(
                             'recursive'     => -1,
                             'conditions'    => array(
-                                'PrisonerCaseFile.prisoner_id'  => $prisoner_id
+                                'PrisonerCaseFile.prisoner_id'  => $prisoner_id,
+                                'PrisonerCaseFile.is_trash'     => 0
                             )
                         ));
                         $fileCnt = $fileCnt+1;
@@ -13192,6 +13270,7 @@ class PrisonersController extends AppController{
             ),
             'limit'         => 20,
         );
+        $petetionresult = array("Petetion Discharge"=>"Petetion Discharge","Commutation of Sentence"=>"Commutation of Sentence");
         $datas = $this->paginate('PrisonerPetition');
         $this->set(array(
             'datas'         =>  $datas,  
@@ -13200,7 +13279,8 @@ class PrisonersController extends AppController{
             'funcall'       =>  $this,
             'editPrisoner'  =>  $editPrisoner,
             'login_user_id' => $this->Session->read('Auth.User.id'),
-            'login_user_type_id' => $this->Session->read('Auth.User.usertype_id')
+            'login_user_type_id' => $this->Session->read('Auth.User.usertype_id'),
+            'petetionresult' => $petetionresult
         ));
     }
     //Add prisoner by gatekeeper 
@@ -13467,7 +13547,7 @@ class PrisonersController extends AppController{
         else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
         { 
             //$condition      += array('PrisonerCaseFile.status not in ("Draft","Saved","Review-Rejected")');
-            $condition += array('0'=>'PrisonerCaseFile.status IN ("Approved","Reviewed") or PrisonerCaseFile.login_user_id='.$login_user_id);
+            $condition += array('0'=>'(PrisonerCaseFile.status IN ("Approved","Reviewed") or PrisonerCaseFile.login_user_id='.$login_user_id.')');
         }
         else if($this->Session->read('Auth.User.usertype_id') != Configure::read('RECEPTIONIST_USERTYPE'))
         {
@@ -13505,6 +13585,7 @@ class PrisonersController extends AppController{
             'limit'         => 20,
         );
         $datas = $this->paginate('PrisonerCaseFile');
+        //debug($datas);
         $this->set(array(
             'datas'         => $datas,  
             'prisoner_id'   => $prisoner_id,
@@ -13632,4 +13713,119 @@ class PrisonersController extends AppController{
         //return json_encode(array('status'=>'success', 'data'=>$sentenceDetail));
     }
     //get Appeal Sentence Details -- END -- 
+    // petetion result start
+    public function petetionResult_partha(){
+        $this->autoRender= false;
+        debug($this->data); exit;
+        if($this->request->is(array('post','put')) && isset($this->data['Petetionresultnew']) && is_array($this->data['Petetionresultnew']) && count($this->data['Petetionresultnew']) >0){
+            debug($this->data['Petetionresultnew']); exit;
+            $db = ConnectionManager::getDataSource('default');
+            $db->begin();       
+            $this->loadModel('PetetionResult');      
+            if($this->PetetionResult->save($this->request->data)){
+                if(isset($this->data['PetetionResult']['id']) && (int)$this->data['PetetionResult']['id'] != 0){
+                    if($this->auditLog('PetetionResult', 'PetetionResult', $this->data['PetetionResult']['id'], 'Update', json_encode($this->data))){
+                        $db->commit(); 
+                        $this->Session->write('message_type','success');
+                        $this->Session->write('message','Saved Successfully !');
+                        // $this->redirect(array('action'=>'index'));                      
+                    }else{
+                        $db->rollback();
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Saving Failed !');
+                    }
+                }else{
+                    if($this->auditLog('PetetionResult', 'PetetionResult', $this->PetetionResult->id, 'Add', json_encode($this->data))){
+                        $db->commit(); 
+                        $this->Session->write('message_type','success');
+                        $this->Session->write('message','Saved Successfully !');
+                        // $this->redirect(array('action'=>'index'));                      
+                    }else{
+                        $db->rollback();
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Saving Failed !');
+                    }
+                }
+            }else{
+                $db->rollback();
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Saving Failed !');
+            }
+    }
+   
+    }
+    function petetionResult()
+    {
+        $this->autoRender = false;
+        if(isset($this->data['id']) && isset($this->data['petition_result']))
+        { 
+            $id = $this->data['id'];
+            $petition_result = $this->data['petition_result'];
+            $petition_result_date = date('Y-m-d');
+            $fields = array(
+                'PrisonerPetition.petition_result'    => "'".$petition_result."'",
+                'PrisonerPetition.petition_result_date'    => "'".$petition_result_date."'",
+            );
+            $conds = array(
+                'PrisonerPetition.id'    => $id,
+            );
+
+            $db = ConnectionManager::getDataSource('default');
+            $db->begin(); 
+            if($this->PrisonerPetition->updateAll($fields, $conds)){ 
+                //Insert audit log 
+                if($this->auditLog('PrisonerPetition','prisoner_petitions',$uuid, 'Update result', json_encode($fields)))
+                {
+                    $db->commit(); 
+                    echo 'SUCC';
+                }
+                else {
+                    $db->rollback();
+                    echo 'FAIL';
+                }
+            }else{
+                $db->rollback();
+                echo 'FAIL';
+            }
+        }else{
+            echo 'FAIL';
+        }
+    }
+    // petetion result end
+    //Commit Appeal -- START -- 
+    function commitAppeal()
+    {
+        $this->autoRender = false;
+        if(isset($this->data['id']))
+        {
+            $id = $this->data['id'];
+            $fields = array(
+                'PrisonerSentenceAppeal.status'    => "'Approved'",
+            );
+            $conds = array(
+                'PrisonerSentenceAppeal.id'    => $id,
+            );
+
+            $db = ConnectionManager::getDataSource('default');
+            $db->begin(); 
+            if($this->PrisonerSentenceAppeal->updateAll($fields, $conds)){ 
+                //Insert audit log 
+                if($this->auditLog('PrisonerSentenceAppeal','prisoner_sentence_appeals',$uuid, 'Commit', json_encode($fields)))
+                {
+                    $db->commit(); 
+                    echo 'SUCC';
+                }
+                else {
+                    $db->rollback();
+                    echo 'FAIL';
+                }
+            }else{
+                $db->rollback();
+                echo 'FAIL';
+            }
+        }else{
+            echo 'FAIL';
+        }
+    }
+    //Commit Appeal -- END -- 
 }

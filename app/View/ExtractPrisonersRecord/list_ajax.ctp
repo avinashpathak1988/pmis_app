@@ -55,6 +55,11 @@ else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERI
   $btnName = Configure::read('APPROVE');
   $isModal = 1;
 }
+else if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE'))
+{
+  $btnName = Configure::read('FINALAPPROVE');
+  $isModal = 1;
+}
 echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal','enctype'=>'multipart/form-data','url' => '/ExtractPrisonersRecord/'));?>
 <?php if($isModal == 1)
 {?>
@@ -118,6 +123,13 @@ echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal',
                   ));
               }
               else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') && ($data[$modelName]['status'] == 'Reviewed'))
+              {
+                echo $this->Form->input('ApprovalProcess.'.$rowCnt.'.fid', array(
+                        'type'=>'checkbox', 'value'=>$credit_id,'hiddenField' => false, 'label'=>false,
+                        'format' => array('before', 'input', 'between', 'label', 'after', 'error' ) 
+                  ));
+              }
+              else if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE') && ($data[$modelName]['status'] == 'Approved'))
               {
                 echo $this->Form->input('ApprovalProcess.'.$rowCnt.'.fid', array(
                         'type'=>'checkbox', 'value'=>$credit_id,'hiddenField' => false, 'label'=>false,

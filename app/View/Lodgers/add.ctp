@@ -29,7 +29,7 @@
                                 <div class="controls" id="prisonerListDiv">
                                     <?php 
                                     //$prisonerList
-                                    echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','options'=>array(), 'empty'=>'','required','id'=>'prisoner_id','title'=>'Please select prisoner name'));?>
+                                    echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','options'=>array(), 'empty'=>'','required','id'=>'prisoner_id','title'=>'Please select prisoner name','onChange'=>'getescapedPrisoner(this.value)'));?>
                                 </div>
                             </div>
                         </div>                           
@@ -73,6 +73,10 @@
                             </div>
                         </div>
                     </div>
+					
+                     <div class="row-fluid escaped_div" id="escaped_div_form">
+                     	
+                     </div>
                     <div class="row-fluid secondDiv" id="prisonerItemForm" >
                         <h5>Prisoner Physical Items</h5>
                         <?php echo $this->element('lodger-prisoner-items');?>
@@ -112,11 +116,13 @@
 </div>
 <?php
     $biometricSearchAjax = $this->Html->url(array('controller'=>'Biometrics','action'=>'dataCheck'));
+    $escapedAjax = $this->Html->url(array('controller'=>'Lodgers','action'=>'escapedPrisonerAjax'));
 ?>
 <?php
 $getPropertyTypeAjax = $this->Html->url(array('controller'=>'Properties','action'=>'getPropertyType'));
 $ajaxPrisonerUrl =  $this->Html->url(array('controller'=>'Dangerous','action'=>'getPrisoner'));
 echo $this->Html->scriptBlock("
+
     
 ",array('inline'=>false));
 ?>
@@ -147,6 +153,17 @@ echo $this->Html->scriptBlock("
                     <?php
                 }
                 ?>
+                
+            });
+        }
+    }
+    function getescapedPrisoner(prisoner_id) 
+    { 
+        if(prisoner_id != '')
+        {
+            var strURL = '<?= $escapedAjax ?>';
+            $.post(strURL,{'prisoner_id':prisoner_id},function(data){
+                $('#escaped_div_form').html(data);
                 
             });
         }
@@ -249,4 +266,5 @@ echo $this->Html->scriptBlock("
         clearTimeout(timer);
     };
 
+  
 </script>

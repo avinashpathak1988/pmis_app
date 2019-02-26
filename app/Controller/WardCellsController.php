@@ -89,13 +89,41 @@ class WardCellsController extends AppController {
             $condition += array("WardCell.cell_name LIKE '%$cell_name%'");
         } 
         $this->paginate = array(
-            'conditions'    => $condition,
-            'order'         =>array(
-                'WardCell.cell_name'
-            ),            
+            'recursive'=> -1,
+            'joins' => array(
+                array(
+                    'table' => 'ward_cells',
+                    'alias' => 'WardCell',
+                    'type' => 'inner',
+                    'conditions'=> array('WardCell.prison_id = Prison.id')
+                ),
+                array(
+                    'table' => 'wards',
+                    'alias' => 'Ward',
+                    'type' => 'inner',
+                    'conditions'=> array('WardCell.ward_id = Ward.id')
+                ),
+            ), 
+            //'conditions'    => $condition,
+            // 'order'         =>array(
+               
+            //     'WardCell.id'  => 'DESC'
+              
+            // ),  
+            // 'fields'  => array(
+            //      'WardCell.ward_id',                   
+            //      'WardCell.cell_name',
+            //      'WardCell.cell_no' 
+            // ),        
+            'group'=>array(
+               'Ward.id'
+
+            ),
             'limit'         => 20,
         );
-        $datas  = $this->paginate('WardCell');
+
+        $datas  = $this->paginate('Prison');
+        debug($datas); exit;
         $this->set(array(
             'ward_id'          => $ward_id,
             'cell_name'        => $cell_name,
@@ -103,6 +131,23 @@ class WardCellsController extends AppController {
             'datas'             => $datas,
         )); 
     }
+
+
+    function getCellDetails($ward_id=''){
+        $this->loadModel('WardCell');
+        $fullname = '';
+        $condition = array(
+            'WardCell.id'    => $ward_id
+        );
+        $cellData = $this->WardCell->find('all', array(
+            'recursive'     => -1,
+            'conditions'    => $condition
+        ));
+        
+         return $cellData;
+    }
+
+
 	public function add() { 
 		$this->loadModel("WardCell"); 
 		$this->loadModel('Ward');

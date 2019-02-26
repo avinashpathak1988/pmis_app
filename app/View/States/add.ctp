@@ -12,15 +12,35 @@
                 <div class="widget-content nopadding">
                     <?php echo $this->Form->create('State',array('class'=>'form-horizontal'));?>
                     <?php echo $this->Form->input('id', array('type'=>'hidden'))?>
-                    <div class="row">     
+                    <div class="row"> 
+                         <div class="span6">
+                            <div class="control-group">
+                                <label class="control-label">Geographical Region<?php echo MANDATORY; ?> :</label>
+                                <div class="controls">
+                                    <?php                                   
+
+                                      echo $this->Form->input('geographical_region_id', array('div'=>false,'label'=>false,'class'=>'span11 pmis_select','id'=>'geographical_region_id','options'=>$georegionList,'required'));
+
+
+                                    ?>
+                                </div>
+                            </div>
+                        </div> 
+
                         <div class="span6">
                             <div class="control-group">
                                 <label class="control-label">Region<?php echo MANDATORY; ?> :</label>
                                 <div class="controls">
-                                    <?php echo $this->Form->input('name',array('div'=>false,'label'=>false,'placeholder'=>'Enter Region','class'=>'form-control','required'));?>
+                                    <?php
+
+                                     echo $this->Form->input('name',array('div'=>false,'label'=>false,'placeholder'=>'Enter Region','class'=>'form-control','required'));
+                                    ?>
                                 </div>
                             </div>
-                        </div>
+                        </div>   
+                        </div>                 
+
+                    <div class="row"> 
                         <div class="span6">
                             <div class="control-group">
                                 <label class="control-label">Is Enabled ?</label>

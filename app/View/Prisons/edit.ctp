@@ -400,9 +400,31 @@ echo $this->Form->input('id',array(
                         <?php }
                         ?>
                         <div class="control-group">
-                        <label class="control-label">Region Area :<?php echo MANDATORY; ?> :</label>
+                        <label class="control-label">Geographical Region :<?php echo MANDATORY; ?> :</label>
                         <div class="controls">
                           <?php
+                              echo $this->Form->input('geographical_region_id',array(
+                                   'type'=>'select',
+                                   'div'=>false,
+                                   'label'=>false,
+                                   'id'=>'geographical_region_id',
+                                   'options'=>$geographical,
+                                   'empty'=>'',
+                                   'class'=>'span11 pmis_select',
+                                   'onchange'=>'javascript:showGeographical(this.value);',
+                                   'required'
+                                 ));
+
+                             ?>
+                        </div>
+                      </div>
+
+                        <div class="control-group">
+                        <label class="control-label">UPS Region :<?php echo MANDATORY; ?> :</label>
+                        <div class="controls">
+                         <?php
+                           if(isset($this->request->data['State']['id']))
+                                      {
                               echo $this->Form->input('state_id',array(
                                    'type'=>'select',
                                    'div'=>false,
@@ -414,7 +436,22 @@ echo $this->Form->input('id',array(
                                    'onchange'=>'javascript:showDistrict(this.value);',
                                    'required'
                                  ));
+                            }
+                            else
+                                      {
+                                   echo $this->Form->input('state_id',array(
+                                   'type'=>'select',
+                                   'div'=>false,
+                                   'label'=>false,
+                                   'id'=>'state_id',
+                                   'options'=>'',
+                                   'empty'=>'',
+                                   'class'=>'span11 pmis_select',
+                                   'onchange'=>'javascript:showDistrict(this.value);',
+                                   'required'
+                                 ));
 
+                                      }
                              ?>
                         </div>
                       </div>
@@ -565,6 +602,15 @@ $(function(){
                 'data[Prison][security_id]': {
                     required: true,
                 },
+                 'data[Prison][geographical_region_id]': {
+                    required: true,
+                },
+                'data[Prison][congestion_id]': {
+                    required: true,
+                },
+                 'data[Prison][physical_address]': {
+                    required: true,
+                },
                 'data[Prison][stationcategory_id]': {
                     required: true,
                 },
@@ -589,6 +635,15 @@ $(function(){
                 'data[Prison][security_id]': {
                     required: "Please select security level.",
                 },
+                'data[Prison][geographical_region_id]': {
+                    required: "Please Choose Geographical Region.",
+                },
+                'data[Prison][congestion_id]': {
+                    required: "Please enter congestion id.",
+                },
+                 'data[Prison][physical_address]': {
+                    required: "Please enter physical address.",
+                },
                 'data[Prison][stationcategory_id]': {
                     required: "Please select category.",
                 },
@@ -608,13 +663,13 @@ $(function(){
                   required: "Please choose Prisons Administrative Region.",
                 },
                 'data[Prison][state_id]':{
-                  required: "Please choose Region.",
+                  required: "Please Choose UPS Region.",
                 },
                 'data[Prison][district_id]':{
-                  required: "Please choose District.",
+                  required: "Please Choose UPS PrisonDistrict.",
                 },
                 'data[Prison][geographical_id]':{
-                  required: "Please choose Geographical District.",
+                  required: "Please Choose Geographical District.",
                 },
                 
         
@@ -624,6 +679,7 @@ $(function(){
   });
 </script>
 <?php 
+$geographicalajaxUrl = $this->Html->url(array('controller'=>'Prisons','action'=>'getgeographicalAjax'));
 $districtajaxUrl = $this->Html->url(array('controller'=>'Prisons','action'=>'getdistrictAjax'));
 $geodistrictajaxUrl = $this->Html->url(array('controller'=>'Prisons','action'=>'getgeodistrictAjax'));
 ?>
@@ -653,6 +709,16 @@ $(document).on('focusout', '#PrisonPhysicalAddress', function(){
           } 
         });
 });
+function showGeographical(id)
+    {
+        var url = '<?php echo $geographicalajaxUrl ?>';
+        url = url + '/geographical_region_id:' + id ;
+        $.post(url, {}, function(res){
+            if (res) {
+                $('#state_id').html(res);
+            }
+        });
+    }
 function showDistrict(id)
     {
         var url = '<?php echo $districtajaxUrl ?>';

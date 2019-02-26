@@ -51,14 +51,7 @@ if(isset($this->request->data['PrisonerTransfer']['transfer_date']) && $this->re
                               
                             </div> 
                             <div class="row-fluid">
-                                <div class="span6">
-                                    <div class="control-group">
-                                        <label class="control-label">National Id Card:</label>
-                                        <div class="controls">
-                                            <?php echo $this->Form->input('national_card',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'text', 'placeholder'=>'ID card','required','title'=>"Please provide ID number"));?>
-                                        </div>
-                                    </div>
-                                </div>
+                              <!-- 
                                 <div class="span6">
                                     <div class="control-group">
                                         <label class="control-label">Profession of Visitor <?php echo $req; ?>:</label>
@@ -66,21 +59,21 @@ if(isset($this->request->data['PrisonerTransfer']['transfer_date']) && $this->re
                                            <?php echo $this->Form->input('profession_visitor',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'text', 'placeholder'=>'Profession of Visitor','required','title'=>"Profession of Visitor"));?>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                             <div id="prisonerDetails">
                                 
                             </div>
 
                             <div class="row-fluid">                                 
-                                <div class="span6">
+                                <!-- <div class="span6">
                                     <div class="control-group">
                                         <label class="control-label">Contact No <?php echo $req; ?>:</label>
                                         <div class="controls">
                                             <?php echo $this->Form->input('Contact',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'text', 'placeholder'=>'Contact No ','required','id'=>'reason','title'=>"Please provide Contact No "));?>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
 
                                 <div class="span6">
                                     <div class="control-group">
@@ -90,10 +83,19 @@ if(isset($this->request->data['PrisonerTransfer']['transfer_date']) && $this->re
                                         </div>
                                     </div>
                                 </div>
+                                <div class="span6">
+                                   <div class="control-group">
+                                        <label class="control-label">Date of Visit <?php echo $req; ?>:</label>
+                                        <div class="controls">
+                                            <?php 
+                                                    echo $this->Form->input('valid_form',array('type'=>'text', 'div'=>false,'label'=>false,'placeholder'=>'Date of Visit','readonly'=>'readonly','class'=>'form-control minCurrentDate span11','required', 'id'=>'escape_date',"title"=>"please provide the date and time of Visit"));?>
+                                        </div>
+                                    </div>
+                                </div>
                                 
                             </div> 
                             <div class="row-fluid">                                
-                                
+                                <!-- 
                                 <div class="span6">
                                     <div class="control-group">
                                         <label class="control-label">ReleationShip <?php echo $req; ?>:</label>
@@ -101,7 +103,7 @@ if(isset($this->request->data['PrisonerTransfer']['transfer_date']) && $this->re
                                             <?php echo $this->Form->input('relationships',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'text', 'placeholder'=>'Relationship','required','title'=>"Please provide ReleationShip"));?>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                                  <!-- <div class="span6">
                                    <div class="control-group">
 
@@ -135,15 +137,7 @@ if(isset($this->request->data['PrisonerTransfer']['transfer_date']) && $this->re
                                         </div>
                                     </div>
                                 </div> -->
-                                <div class="span6">
-                                   <div class="control-group">
-                                        <label class="control-label">Date of Visit <?php echo $req; ?>:</label>
-                                        <div class="controls">
-                                            <?php 
-                                                    echo $this->Form->input('valid_form',array('type'=>'text', 'div'=>false,'label'=>false,'placeholder'=>'Date of Visit','readonly'=>'readonly','class'=>'form-control mydatetimepicker1 span11','required', 'id'=>'escape_date',"title"=>"please provide the date and time of Visit"));?>
-                                        </div>
-                                    </div>
-                                </div>
+                                
                             </div> 
                             <!-- <div class="row-fluid">                                
                                 
@@ -186,6 +180,9 @@ if(isset($this->request->data['PrisonerTransfer']['transfer_date']) && $this->re
                                     </div>
                                 </div>
                             </div> 
+                            <div>Visitor Names</div>
+                        <?php echo $this->element('add-pass-visitor');?>
+
                         </div>
                     </div>
                     <div class="form-actions" align="center">

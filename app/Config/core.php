@@ -536,5 +536,4 @@ Configure::write('PUNISHMENT-WORDTYPE', 2);
 Configure::write('MEDICAL-WORDTYPE', 3);
 Configure::write('NA', 'NA');
 Configure::write('REFUGEE-ID', 4);
-Configure::write('PD-SENTENCE', 3); 
-Configure::write('PD-SEN111111TENCE', 3); 
+Configure::write('PD-SENTENCE', 3);

@@ -15,7 +15,6 @@
                         <?php 
                         if($this->Session->read('Auth.User.usertype_id') == Configure::read("GATEKEEPER_USERTYPE")){
                             echo $this->Html->link('Add New',array('controller'=>'Lodgers','action'=>'add'),array('escape'=>false,'class'=>'btn btn-success btn-mini')); 
-
                         }
                         ?>
                         &nbsp;&nbsp;
@@ -59,6 +58,7 @@
 </div>
 <?php
 $ajaxUrl            = $this->Html->url(array('controller'=>'Lodgers','action'=>'indexAjax'));
+$ajaxConfineUrl            = $this->Html->url(array('controller'=>'Lodgers','action'=>'updateWard'));
 echo $this->Html->scriptBlock("
     function showData(){
         var url   = '".$ajaxUrl."';
@@ -124,4 +124,41 @@ echo $this->Html->scriptBlock("
     $(document).on('click',"#btnsearchcash", function () { // button name
         showData();
     });
+
+    function showCell(id,divId){
+        var strURL = '<?php echo $this->Html->url(array('controller'=>'Prisoners','action'=>'showWardCell'));?>';
+        $.post(strURL,{assigned_ward_id:id},function(data){
+            if(data) { 
+                $('#ward_cell_id'+divId).html(data);
+            }
+        });
+    }
+
+    function updateWard(val,id){
+        var test = val;
+        var id = id;
+        if($("#ward_id"+id).val()==''){
+            dynamicAlertBox("Message", "PLeaes select ward name")
+        }else if($("#ward_cell_id"+id).val()==''){
+            dynamicAlertBox("Message", "PLeaes select cell name")
+        }else{
+            AsyncConfirmYesNo(
+                "Are you sure want to "+val+"?",
+                "Yes",
+                'Cancel',
+                function(){
+                    var url   = '<?php echo $ajaxConfineUrl?>';
+                    $.post(url, {id:id,ward_id:$("#ward_id"+id).val(),'ward_cell_id':$("#ward_cell_id"+id).val()}, function(res) { 
+                        if(res.trim() == 'SUCC'){
+                            $('#myModalWard'+id).modal('hide');
+                            showData();
+                        }
+                    });
+                },
+                function(){
+
+                }
+            );
+        }
+    }
 </script>

@@ -266,9 +266,9 @@ $deathRecord = $funcall->MedicalDeathRecord->find("count", array(
                                                         </div>
                     <div class="form-actions" align="center">
                     <?php echo $this->Form->button('Save', array('type'=>'submit', 'div'=>false,'label'=>false, 'class'=>'btn btn-success right-margin', 'formnovalidate'=>true, 'onclick'=>"javascript:return confirm('Are you sure to save?')"))?>
-                    <?php if(!isset($isCreditEdit) || ($isCreditEdit == 0)){
+                   <!--  <?php if(!isset($isCreditEdit) || ($isCreditEdit == 0)){
                         echo $this->Form->button('Reset', array('type'=>'reset', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger right-margin', 'formnovalidate'=>true, 'onclick'=>"javascript:return confirm('Are you sure you want to reset?')"));
-                     }?>
+                     }?> -->
                     
                     <?php echo $this->Html->link('Cancel','#creditCash',array('escape'=>false,'class'=>'btn btn-danger','data-toggle'=>"collapse")); ?>
                     </div>
@@ -338,7 +338,11 @@ $deathRecord = $funcall->MedicalDeathRecord->find("count", array(
                     <?php if(isset($canDebit) && $canDebit == 0)
                     {?>                                 
                         <div style="float:right;padding-top: 7px;padding-right: 4px;">
-                            <?php echo $this->Html->link('Add Debit','#debitCash',array('escape'=>false,'class'=>'btn btn-success btn-mini','id'=>'addDebit','data-toggle'=>"collapse")); ?>
+                            <?php 
+                            if ($deathRecord==0 || $this->Session->read('Auth.User.usertype_id')=='OFFICERINCHARGE_USERTYPE') {
+                            echo $this->Html->link('Add Debit','#debitCash',array('escape'=>false,'class'=>'btn btn-success btn-mini','id'=>'addDebit','data-toggle'=>"collapse"));
+                            } 
+                            ?>
                         </div>
                     <?php }
                     else {
@@ -362,15 +366,7 @@ $deathRecord = $funcall->MedicalDeathRecord->find("count", array(
                      </div>
             </div>
         </div>
-        <div class="span6">
-             <div class="control-group">
-                <label class="control-label">Currency<?php echo $req; ?> :</label>
-                 <div class="controls">
-                    <?php echo $this->Form->input('currency_id',array('div'=>false,'label'=>false,'class'=>'form-control pmis_select','type'=>'select','options'=>$debitCurrencyList, 'empty'=>array('0'=>'-- Select Currency --'),'required'=>'required', 'style'=>'width:90%', 'onChange'=>'getTotalBalance();'));?>
-                 </div>
-            </div>
-        </div>  
-        <div class="span6">
+         <div class="span6">
              <div class="control-group">
                 <label class="control-label">Source<?php echo $req; ?> :</label>
                  <div class="controls">
@@ -380,6 +376,15 @@ $deathRecord = $funcall->MedicalDeathRecord->find("count", array(
                  </div>
             </div>
         </div>
+        <div class="span6">
+             <div class="control-group">
+                <label class="control-label">Currency<?php echo $req; ?> :</label>
+                 <div class="controls">
+                    <?php echo $this->Form->input('currency_id',array('div'=>false,'label'=>false,'class'=>'form-control pmis_select','type'=>'select','options'=>$debitCurrencyList, 'empty'=>array('0'=>'-- Select Currency --'),'required'=>'required', 'style'=>'width:90%', 'onChange'=>'getTotalBalance();'));?>
+                 </div>
+            </div>
+        </div>  
+       
         <div class="span6">
      <div class="control-group">
                      <label class="control-label">Previous Amount<?php echo $req; ?> :</label>
@@ -445,7 +450,11 @@ $deathRecord = $funcall->MedicalDeathRecord->find("count", array(
                 </div>                        
                 <div class="span6">
                     <div class="control-group">
-                        <label class="control-label">Finger Print<?php echo MANDATORY; ?> :</label>
+                        <label class="control-label">Finger Print:<?php if($this->Session->read('Auth.User.usertype_id')!=4) {
+                            echo $req;
+
+                         }
+                            ?></label>
                         <div class="controls">
                             <?php 
                             echo $this->Form->button('Get Punch', array('type'=>'button', 'div'=>false,'label'=>false, 'class'=>'btn btn-warning','id'=>'link_biometric_button_in1','onclick'=>"start1()"));
@@ -470,9 +479,9 @@ $deathRecord = $funcall->MedicalDeathRecord->find("count", array(
                 </div>
              <div class="form-actions" align="center">
              <?php echo $this->Form->button('Save', array('type'=>'button', 'div'=>false,'label'=>false, 'class'=>'btn btn-success', 'formnovalidate'=>true, 'onclick'=>'saveDebitCash();'))?>
-             <?php if(!isset($isDebitEdit) || ($isDebitEdit == 0)){
+             <!-- <?php if(!isset($isDebitEdit) || ($isDebitEdit == 0)){
                 echo $this->Form->button('Reset', array('type'=>'reset', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger', 'formnovalidate'=>true, 'onclick'=>"javascript:return confirm('Are you sure you want to reset?')"));
-             }?>
+             }?> -->
              <?php echo $this->Html->link('Cancel','#debitCash',array('escape'=>false,'class'=>'btn btn-danger ','data-toggle'=>"collapse")); ?>
                          </div>
                         <?php echo $this->Form->end();?>
@@ -815,6 +824,7 @@ echo $this->Html->scriptBlock("
     }
     $(document).on('click',"#addCredit", function () {
         var collapseClasses = $('#searchCredit').attr('class');
+            //$('#addCredit').val('');
             $('#cashproperty')[0].reset();
         if(collapseClasses.indexOf('in') >= 0){
             $('#searchCredit').removeClass('in');

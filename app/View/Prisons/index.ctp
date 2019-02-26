@@ -20,12 +20,14 @@
               <thead>
                 <tr>
                   <th>SL#</th>
-                  <th>Region Area</th>
+                  <th>Geographical Region</th>
+                   <th>UPS Region</th>
+                  <th>Geographical District</th>                 
                   <th>Name</th>
                   <th>Code</th>
                   <th>Capacity</th>
                   <th>Date Of Opening</th>
-                  <th>Geographical District</th>
+                  
                   <th>Is Enabled ?</th>
                   <th>Actions</th>
                 </tr>
@@ -38,16 +40,19 @@
                           ?>
                           <tr>
                             <td><?php echo $i; ?></td>
-                            <td><?php echo $funcall->getName($data['Prison']['state_id'],"State","name"); ?></td>
+                            <td><?php echo $funcall->getName($data['State']['geographical_region_id'],'GeographicalRegion','name'); ?>&nbsp;</td>
+                             <td><?php echo $funcall->getName($data['Prison']['state_id'],"State","name"); ?></td>
+                            <td><?php echo $data['GeographicalDistrict']['name']; ?></td>
+                           
                             <td><?php echo $data['Prison']['name']; ?></td>
                             <td><?php echo $data['Prison']['code']; ?></td>
                             <td><?php echo $data['Prison']['capacity']; ?></td>
                             <td><?php echo date('d-m-Y',strtotime($data['Prison']['date_of_opening'])); ?></td>
-                            <td><?php echo $data['GeographicalDistrict']['name']; ?></td>
+                           
                             <td>
                                 <?php
                                 if($data['Prison']['is_enable'] == 1){
-                                  echo $this->Html->link("Click To Disable",array(
+                                  echo $this->Html->link("Disable",array(
                                     'controller'=>'prisons',
                                     'action'=>'disable',
                                     $data['Prison']['id']

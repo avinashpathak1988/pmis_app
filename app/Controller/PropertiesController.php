@@ -293,10 +293,13 @@ class PropertiesController   extends AppController {
             if(isset($this->request->data['CashItem']) && count($this->request->data['CashItem'])>0)
             {
                 $this->cashproperty($this->request->data);
+                unset($this->request->data['CashItem']);
             }
             if(isset($this->request->data['DebitCash']) && count($this->request->data['DebitCash'])>0)
             {
                 $this->debitCash($this->request->data);
+                unset($this->request->data['DebitCash']);
+                
             }
          }
         $isCreditEdit = 0;
@@ -325,8 +328,7 @@ class PropertiesController   extends AppController {
                 )
             ));
         }
-         
-
+    
         $this->set(array(
             'prisoner_uuid'         => $prisoner_uuid,
             'prisoner_id'=>$prisoner_id, 
@@ -341,7 +343,7 @@ class PropertiesController   extends AppController {
             'canDebit'          => $canDebit,
             'canCredit'         => $canCredit,
             'isCreditEdit'      => $isCreditEdit,
-            'prisonerKin' => $prisonerKin,
+            'prisonerKin'       => $prisonerKin,
             'current_usertype_id'  => $this->Session->read('Auth.User.usertype_id')
         )); 
 
@@ -1183,8 +1185,12 @@ class PropertiesController   extends AppController {
     }
     //credit cash 
     function cashproperty($data){
+
+        
+
         if (isset($data) && is_array($data) && count($data)>0) 
         {
+            $prisoneruuid = $this->Prisoner->field('uuid', array('Prisoner.id'=>$data['PhysicalProperty']['prisoner_id']));
             //debug($data);exit;
             $data["PhysicalProperty"]["property_type"] = "Cash";
             $data["PhysicalProperty"]["property_date_time"] = date('Y-m-d H:i:s', strtotime($data["PhysicalProperty"]["property_date_time"]));
@@ -1193,7 +1199,7 @@ class PropertiesController   extends AppController {
             foreach ($data['CashItem'] as $key => $value) {
                 $data['CashItem'][$key]['prison_id'] = $this->Session->read('Auth.User.prison_id');
             }
-            //debug($data);exit;
+            // debug($data);exit;
             if($data["PhysicalProperty"]["id"]!=""){
                 $conds = array(
                     'CashItem.physicalproperty_id'    => $data["PhysicalProperty"]["id"],
@@ -1204,6 +1210,9 @@ class PropertiesController   extends AppController {
                 $physicalproperty_id = $this->PhysicalProperty->id;
                 $this->Session->write('message_type','success');
                 $this->Session->write('message','Physically property saved Successfully !');
+                 $this->redirect(array('action'=>'index/'.$prisoneruuid.'#credit'));
+                // $this->redirect(array('action'=>'index/'.$prisoneruuid.'#credit'));
+
             } else {
                 $this->Session->write('message_type','error');
                 $this->Session->write('message','Saving Failed !');

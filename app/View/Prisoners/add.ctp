@@ -209,7 +209,7 @@ if(isset($this->data['Prisoner']['date_of_birth']) && $this->data['Prisoner']['d
                                                             </span>
                                                             <div class="clear"></div>
                                                             <?php echo $this->Form->input('repatriation_order',array('div'=>false,'label'=>false,'class'=>'form-control','type'=>'file','id'=>'repatriation_order', 'onchange'=>'readURL(this, 6);', 'required'=>false));?>
-                                                            <?php echo $this->Form->input('is_photo1',array('div'=>false,'label'=>false,'type'=>'hidden','id'=>'is_photo1', 'value'=>$is_photo4));?>
+                                                            <?php echo $this->Form->input('is_photo4',array('div'=>false,'label'=>false,'type'=>'hidden','id'=>'is_photo4', 'value'=>$is_photo4));?>
                                                                 
                                                                 
                                                         </div>
@@ -515,9 +515,9 @@ if(isset($this->data['Prisoner']['date_of_birth']) && $this->data['Prisoner']['d
                                     </div>
                                      <div class="span6">
                                         <div class="control-group">
-                                            <label class="control-label">Desired District of Release<?php echo $req; ?> :</label>
+                                            <label class="control-label">Desired District of<br>Release<?php echo $req; ?>:</label>
                                             <div class="controls">
-                                           <?php echo $this->Form->input('desired_districts_relese',array('div'=>false,'label'=>false,'class'=>'pmis_select form-control span11','type'=>'select','options'=>$districtList, 'empty'=>'','required'=>false,'id'=>'desired_districts_relese'));?>
+                                           <?php echo $this->Form->input('desired_districts_relese',array('div'=>false,'label'=>false,'class'=>'pmis_select form-control span11','type'=>'select','options'=>$districtList, 'empty'=>'','required'=>'required','id'=>'desired_districts_relese', 'title'=>'Please select Desired District of Release'));?>
                                             </div>
                                         </div>
                                     </div>

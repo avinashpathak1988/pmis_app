@@ -29,6 +29,9 @@
                                     $user_type2 = Configure::read('OFFICERINCHARGE_USERTYPE');
                                     $user_type3 = Configure::read('COMMISSIONERGENERAL_USERTYPE');
                                 }
+                                if($currentController == 'ExtractPrisonersRecord'){
+                                    $user_type4 = Configure::read('COMMISSIONERGENERAL_USERTYPE');
+                                }
                                 if($currentController == 'InPrisonOffenceCapture')
                                 {
                                     $user_type4 = Configure::read('COMMISSIONERGENERAL_USERTYPE');
@@ -67,7 +70,7 @@
                     </div> 
                             
                     <?php 
-                    /*echo $currentController;*/
+                    //echo $currentController;
                     if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') && $currentController=='propertyitems'){ ?>
                             <div class="control-group">
                                 <label class="control-label">Prohibited property <span id="isRemarkValidate" style="display:none;"><?php echo $req; ?></span>:</label>

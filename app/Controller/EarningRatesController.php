@@ -455,7 +455,7 @@ class EarningRatesController   extends AppController {
             $prisonerCondition = array(
                 'Prisoner.is_enable'    => 1,
                 'Prisoner.is_trash'     => 0,
-                 'Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'),
+                'Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'),
                 'StagesAssign.id !=' => array(1,3)//stage I AND II
             );
             //check skilled prisoners -- START -- 

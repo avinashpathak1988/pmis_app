@@ -76,7 +76,12 @@ if(!isset($is_excel)){
             } 
             ?>&nbsp;</td> 
             <td><?php echo $data['PrisonerSentenceAppeal']['type_of_appeallant']; ?></td>
-            <td><?php echo $data['PrisonerSentenceAppeal']['appeal_status']; ?></td>
+            <td>
+              <?php if($data['PrisonerSentenceAppeal']['appeal_status'] != '')
+                echo $data['PrisonerSentenceAppeal']['appeal_status']; 
+              else 
+                echo 'Appeal Result';?>
+            </td>
             <td><?php echo $data['Courtlevel']['name']; ?></td>
             <td><?php echo $data['Court']['name']; ?></td>
             <td><?php if($data['PrisonerSentenceAppeal']['submission_date']!='')echo date('d-m-Y', strtotime($data['PrisonerSentenceAppeal']['submission_date'])); ?></td>
@@ -144,15 +149,13 @@ if(!isset($is_excel)){
                       echo $this->Html->link('Appeal Result',array('action'=>'../Prisoners/edit/'.$data['Prisoner']['uuid'].'/'.$data['PrisonerSentenceAppeal']['id'].'/'.$appeal_result.'#appeal_against_sentence'),array('escape'=>false,'class'=>'btn btn-warning btn-mini'));
                     }
                   }
-                } 
-
-                echo $this->Form->create('PrisonercomplaintEdit',array('url'=>'/prisonercomplaints/add','admin'=>false));?> 
-                  <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['Prisonercomplaint']['id'])); ?>
-                  <?php echo $this->Form->button('Commit',array('class'=>'btn btn-danger','div'=>false, 'onclick'=>"javascript:return confirm('Are you sure want to commit?')")); ?> 
-                  <?php echo $this->Form->end();
-
-
-                ?>
+                } ?>
+                  <?php 
+                  if($data['PrisonerSentenceAppeal']['appeal_status'] == '' && $data['PrisonerSentenceAppeal']['status'] != 'Approved')
+                  {
+                    echo $this->Form->button('Commit', array('type'=>'button', 'div'=>false, 'label'=>false, 'class'=>'btn btn-danger', 'onclick'=>"javascript:commitAppeal('$id');"));
+                  }
+                  ?> 
             </td>
   <?php
 }
@@ -213,9 +216,11 @@ echo $this->Paginator->counter(array(
     }
 //pagination end 
 echo $this->Form->end();
-echo $this->Js->writeBuffer();?>
+echo $this->Js->writeBuffer();
 
+?>
 <script>
+
 $(function(){
   <?php if($btnNameAppeal!=Configure::read('SAVE'))
   {?> 

@@ -15,5 +15,12 @@ class Ward extends AppModel{
             ),
         ),
     );
+    public $hasMany = array(
+        'WardCell' => array(
+            'className'     => 'WardCell',
+            'foreignKey'    => 'ward_id',
+            'conditions' => array('is_trash' => 0)
+        )
+    );
 }
  ?>

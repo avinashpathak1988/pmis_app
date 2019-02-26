@@ -77,7 +77,11 @@ echo $this->Paginator->counter(array(
             <td> <?php echo $funcall->getName($data['Prisoner']['prison_id'],"Prison","name");?></td>
             <td><?php echo $data["Prisoner"]["first_name"];?></td>
             <td><?php echo $data["Prisoner"]["prisoner_no"];?></td>
-            <td><?php echo $data["Prisoner"]["doa"];?></td>
+            <td><?php if ($data["Prisoner"]["doa"]!='0000-00-00') {
+               echo date(Configure::read('UGANDA-DATE-FORMAT'),strtotime($data['Prisoner']['doa']));
+            }else{
+                echo Configure::read('NA');
+            } ?></td>
             <td><?php echo date('d-m-Y', strtotime($data['Prisoner']['date_of_birth'])); ?></td>
             <td>
                <?php $isverify = $funcall->isVerifyAge($data['Prisoner']['id']); 
@@ -180,6 +184,9 @@ echo $this->Paginator->counter(array(
              <td>
                 <?php if ($data["PrisonerAgeVerification"]["photo"] != '') {
                      echo $this->Html->link('View', '../files/prisnors/'.$data["PrisonerAgeVerification"]["photo"], array('escape'=>false,'target'=>'_blank', 'class'=>'btn btn-primary btn-mini'));
+                }
+                else{
+                    echo Configure::read('NA');
                 } ?>
             
                  

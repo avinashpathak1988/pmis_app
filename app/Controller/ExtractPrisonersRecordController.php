@@ -40,7 +40,7 @@ class ExtractPrisonersRecordController extends AppController{
             {
                 $status = 'Saved'; 
                 $remark = '';
-                if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') || ($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE')))
+                if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') || ($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE')) || ($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE')) )
                 {
                     if(isset($this->request->data['ApprovalProcessForm']) && count($this->request->data['ApprovalProcessForm']) > 0)
                     {
@@ -59,7 +59,8 @@ class ExtractPrisonersRecordController extends AppController{
                         if($this->request->data['ApprovalProcessForm']['type']=="Reviewed"){$this->Session->write('message','Reviewed Successfully !');}
                         if($this->request->data['ApprovalProcessForm']['type']=="Review-Rejected" || $this->request->data['ApprovalProcessForm']['type']=="Approve-Rejected"){$this->Session->write('message','Rejected Successfully !');}
                         if($this->request->data['ApprovalProcessForm']['type']=="Approved"){$this->Session->write('message','Approved Successfully !');}
-                        
+                        if($this->request->data['ApprovalProcessForm']['type']=="Final-Approved"){$this->Session->write('message','Approved Successfully !');}
+                        if($this->request->data['ApprovalProcessForm']['type']=="Final-Rejected"){$this->Session->write('message','Rejected Successfully !');}
                     }
                     else{
                         $this->Session->write('message','Forwarded Successfully !');
@@ -80,7 +81,6 @@ class ExtractPrisonersRecordController extends AppController{
         ));
 
     }
-
 
     function addSelectPrisoner(){
 	        $prison_id = $this->Session->read('Auth.User.prison_id');
@@ -165,10 +165,15 @@ class ExtractPrisonersRecordController extends AppController{
         //save Data
         if($this->request->is(array('post','put'))){
 
+
             //earliest_possible_dor
              $data = $this->request->data;
-             $data['ExtractPrisonerRecord']['earliest_possible_dor']=date('Y-m-d',strtotime($data['ExtractPrisonerRecord']['earliest_possible_dor']));
-             $data['OffencePrisonDiscipline'][0]['date']=date('Y-m-d',strtotime($data['OffencePrisonDiscipline'][0]['date']));
+             $data['ExtractPrisonerRecord']['earliest_possible_dor']=isset($data['ExtractPrisonerRecord']['earliest_possible_dor'])?date('Y-m-d',strtotime($data['ExtractPrisonerRecord']['earliest_possible_dor'])):'';
+             $data['ExtractPrisonerRecord']['date_of_granted']=isset($data['ExtractPrisonerRecord']['date_of_granted'])?date('Y-m-d',strtotime($data['ExtractPrisonerRecord']['date_of_granted'])):'';
+             if(isset($data['OffencePrisonDiscipline'][0]['date'])){
+                   $data['OffencePrisonDiscipline'][0]['date']=date('Y-m-d',strtotime($data['OffencePrisonDiscipline'][0]['date']));
+             }
+          
              //debug($data);exit;
              $data['ExtractPrisonerRecord']['prisoner_id'] =$prisoner_id;
              $data['ExtractPrisonerRecord']['prison_id'] =$prison_id;
@@ -177,6 +182,46 @@ class ExtractPrisonersRecordController extends AppController{
 
               if($this->ExtractPrisonerRecord->saveAll($data)){
 
+
+                  if(isset($this->request->data['ApprovalProcess']) && count($this->request->data['ApprovalProcess']) > 0)
+                    {
+                        $status = 'Saved'; 
+                        $remark = '';
+                        if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') || ($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE')) || ($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE')) )
+                        {
+                            if(isset($this->request->data['ApprovalProcessForm']) && count($this->request->data['ApprovalProcessForm']) > 0)
+                            {
+                                $status = $this->request->data['ApprovalProcessForm']['type']; 
+                                $remark = $this->request->data['ApprovalProcessForm']['remark'];
+                            }
+                        }
+                        $items = $this->request->data['ApprovalProcess'];
+                        $status = $this->setApprovalProcess($items, 'ExtractPrisonerRecord', $status, $remark);
+                        if($status == 1)
+                        {
+
+                            $this->Session->write('message_type','success');
+                            if(isset($this->request->data['ApprovalProcessForm']) && count($this->request->data['ApprovalProcessForm']) > 0)
+                            {
+                                if($this->request->data['ApprovalProcessForm']['type']=="Reviewed"){$this->Session->write('message','Reviewed Successfully !');}
+                                if($this->request->data['ApprovalProcessForm']['type']=="Review-Rejected" || $this->request->data['ApprovalProcessForm']['type']=="Approve-Rejected"){$this->Session->write('message','Rejected Successfully !');}
+                                if($this->request->data['ApprovalProcessForm']['type']=="Approved"){$this->Session->write('message','Approved Successfully !');}
+                                if($this->request->data['ApprovalProcessForm']['type']=="Final-Approved"){$this->Session->write('message','Approved Successfully !');}
+                                if($this->request->data['ApprovalProcessForm']['type']=="Final-Rejected"){$this->Session->write('message','Rejected Successfully !');}
+                            }
+                            else{
+                                $this->Session->write('message','Forwarded Successfully !');
+                            }
+                        }
+                        else 
+                        {
+                            $this->Session->write('message_type','error');
+                            $this->Session->write('message','saving failed');
+                        }
+                         $this->redirect(array('action'=>'add',$prisonerId));
+
+                       // $this->redirect(array('action'=>'index'));
+                    }
                 /*$fields = array(
                     'OffencePrisonDiscipline.is_trash'    => 1,
                 );
@@ -225,7 +270,7 @@ class ExtractPrisonersRecordController extends AppController{
 
                     ),
         ));
-         $this->request->data['ExtractPrisonerRecord']['officer_incharge'] = $officerIncharge['User']['name'];
+         $this->request->data['ExtractPrisonerRecord']['officer_incharge'] = isset($officerIncharge['User']['name'])?$officerIncharge['User']['name']:'';
 
          //get prisoner name
         if(isset($extractPrisonerRecord['ExtractPrisonerRecord']['id'])){
@@ -239,7 +284,7 @@ class ExtractPrisonersRecordController extends AppController{
             $offenceData = '';
             
 
-            if($prisonerData['Prisoner']['dor'] != NULL){
+            if($prisonerData['Prisoner']['dor'] != null && $prisonerData['Prisoner']['dor'] != '' ){
                      $this->request->data['ExtractPrisonerRecord']['earliest_possible_dor']=date('d-m-Y',strtotime($prisonerData['Prisoner']['dor']));
             }
 
@@ -540,7 +585,9 @@ class ExtractPrisonersRecordController extends AppController{
             'offencePrisonDiscipline'=>$offencePrisonDiscipline,
             'prisonerSentence'=>$prisonerSentence,
             'inPrisonPunishments'=>$inPrisonPunishments,
-            'prisonerSentencesOld'=>$prisonerSentencesOld
+            'prisonerSentencesOld'=>$prisonerSentencesOld,
+            'reporttitle'=>'Extract Prisoner Record',
+            'id'=>$id
             
         ));
         
@@ -555,15 +602,31 @@ class ExtractPrisonersRecordController extends AppController{
 
         $condition = array();
 
-        $condition  += array('ExtractPrisonerRecord.prison_id' => $prison_id);
-
-        if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
+         if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE'))
             {
-                $condition      += array($modelName.'.status !='=>'Draft');
+                $condition      += array($modelName.'.status in ("Approved","Draft","Review-Rejected","Final-Rejected","Approve-Rejected")');
+                $condition  += array('ExtractPrisonerRecord.prison_id' => $prison_id);
+
             }
-            else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+        else if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
+            {
+                $condition      += array($modelName.'.status in ("Saved","Approve-Rejected")');
+                $condition  += array('ExtractPrisonerRecord.prison_id' => $prison_id);
+
+            }
+        else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
             { 
-                $condition      += array($modelName.'.status not in ("Draft","Saved","Review-Rejected")');
+                $condition      += array($modelName.'.status in ("Reviewed","Final-Rejected")');
+                $condition  += array('ExtractPrisonerRecord.prison_id' => $prison_id);
+
+            }
+        else if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE'))
+            { 
+                $condition      += array($modelName.'.status in ("Approved","Final-Approved")');
+                /*$condition      += array($modelName.'.status not in ("Draft","Saved","Review-Rejected")');*/
+            }else{
+                $condition  += array('ExtractPrisonerRecord.prison_id' => $prison_id);
+                $condition      += array($modelName.'.status in ("Final-Approved")');
             }
         if(isset($this->params['data']['Search']['prisoner_no']) && $this->params['data']['Search']['prisoner_no'] != ''){
             $prisonerNo = $this->params['data']['Search']['prisoner_no'];

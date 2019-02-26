@@ -146,7 +146,7 @@ if(is_array($datas) && count($datas)>0){
                                     {
                                         echo '<span style="color:green;font-weight:bold;background-color:#fff;padding:1px 3px;" class="btn btn-mini">Readmitted after bail</span>';
                                     }
-                                    else if($data['Prisoner']['is_death'] == 0)
+                                    else if($data['Prisoner']['is_death'] == 0 && $data['Prisoner']['is_readmitted'] == 0)
                                         echo $this->Html->link('Re-admit','/prisoners/add/'.$prisoner_unique_no,array('escape'=>false,'class'=>'btn btn-success btn-mini','title'=>'Re admission'));
                                     else
                                         echo '<span style="color:red;font-weight:bold;background-color:#fff;padding:1px 3px;" class="btn btn-mini">Dead</span>';
@@ -189,7 +189,13 @@ if(is_array($datas) && count($datas)>0){
 
                     if($is_escaped == 1)
                     {
-                        echo $this->Html->link('Recaptured','javascript:void(0);' ,array('escape'=>false,'class'=>'btn btn-warning btn-mini','onclick'=>"javascript:void(0);"));
+                        if($escapeCount->recapture_status == 'Saved')
+                        {
+                            echo $this->Html->link('Review Recapture','/prisoners/edit/'.$uuid.'#recaptured_details',array('escape'=>false,'class'=>'btn btn-success btn-mini','title'=>'Review Recapture'));
+                        }
+                        else {
+                            echo $this->Html->link('Recaptured','javascript:void(0);' ,array('escape'=>false,'class'=>'btn btn-warning btn-mini','onclick'=>"javascript:void(0);"));
+                        }
                     }
                     else 
                     {
@@ -202,8 +208,17 @@ if(is_array($datas) && count($datas)>0){
                         else if($data["Prisoner"]["is_verify"] == 1 && $data["Prisoner"]["is_approve"] == 0){
                             echo '<span style="color:red;font-weight:bold;background-color:#fff;padding:1px 3px;">Not approve yet!</span>';
                         }
-                        else if($data["Prisoner"]["is_approve"] == 1){
-                            echo '<span style="color:green;font-weight:bold;background-color:#fff;padding:1px 3px;">Approved !</span>';
+                        else if($data["Prisoner"]["is_approve"] == 1)
+                        { 
+                            if($data["Prisoner"]["present_status"] == 1)
+                                echo '<span style="color:green;font-weight:bold;background-color:#fff;padding:1px 3px;">Approved !</span>';
+                            else 
+                            {
+                                if($data['Prisoner']['is_death'] == 0)
+                                    echo '<span style="color:green;font-weight:bold;background-color:#fff;padding:1px 3px;">Discharged</span>';
+                                else 
+                                    echo '<span style="color:green;font-weight:bold;background-color:#fff;padding:1px 3px;">Dead</span>';
+                            }
                         }
                     }
                     
@@ -221,7 +236,13 @@ if(is_array($datas) && count($datas)>0){
 
                     if($is_escaped == 1)
                     {
-                        echo $this->Html->link('Recaptured','javascript:void(0);' ,array('escape'=>false,'class'=>'btn btn-warning btn-mini','onclick'=>"javascript:void(0);"));
+                        if($escapeCount->recapture_status == 'Reviewed')
+                        {
+                            echo $this->Html->link('Approve Recapture','/prisoners/edit/'.$uuid.'#recaptured_details',array('escape'=>false,'class'=>'btn btn-success btn-mini','title'=>'Approve Recapture'));
+                        }
+                        else {
+                            echo $this->Html->link('Recaptured','javascript:void(0);' ,array('escape'=>false,'class'=>'btn btn-warning btn-mini','onclick'=>"javascript:void(0);"));
+                        }
                     }
                     else
                     {
@@ -237,8 +258,17 @@ if(is_array($datas) && count($datas)>0){
                             }
                             else if($data["Prisoner"]["is_verify"] == 1 && $data["Prisoner"]["is_approve"] == 0 && $data["Prisoner"]["is_reject"] == 0){
                                echo $this->Html->link('Approve','javascript:void(0);' ,array('escape'=>false,'class'=>'btn btn-success','onclick'=>"javascript:verifyPrisonerSetData('".$data["Prisoner"]["id"]."');"));
-                            }else if($data["Prisoner"]["is_approve"] == 1){
-                                echo '<span style="color:green;font-weight:bold;background-color:#fff;padding:1px 3px;">Approved !</span>';
+                            }else if($data["Prisoner"]["is_approve"] == 1)
+                            {
+                                if($data["Prisoner"]["present_status"] == 1)
+                                    echo '<span style="color:green;font-weight:bold;background-color:#fff;padding:1px 3px;">Approved !</span>';
+                                else 
+                                {
+                                    if($data['Prisoner']['is_death'] == 0)
+                                        echo '<span style="color:green;font-weight:bold;background-color:#fff;padding:1px 3px;">Discharged</span>';
+                                    else 
+                                        echo '<span style="color:green;font-weight:bold;background-color:#fff;padding:1px 3px;">Dead</span>';
+                                }
                             }else if($data["Prisoner"]["is_reject"] == 1){
 
                                 echo '<span style="color:red;font-weight:bold;background-color:#fff;padding:1px 3px;">Rejected !</span>';

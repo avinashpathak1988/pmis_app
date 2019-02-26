@@ -22,7 +22,7 @@ else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERI
 
 echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal','enctype'=>'multipart/form-data','url' => '/prisoners/edit/'.$datas[0]['PrisonerRecaptureDetail']['puuid'].'#recaptured_details'));
 
-echo $this->Form->input('data_type',array('type'=>'hidden','value'=> 'recapture_details'));
+echo $this->Form->input('data_type',array('type'=>'hidden','value'=> 'recaptured_details'));
 ?>
 <?php if($isModal == 1)
 {?>

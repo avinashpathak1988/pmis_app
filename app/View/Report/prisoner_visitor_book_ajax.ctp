@@ -15,6 +15,7 @@
             'action'                => 'prisonerVisitorBookAjax',
             'name'             		=> $name,
             'state_id'		   		=> $state_id,
+            'country_id' 			=> $country_id,
             'district_id'	   		=> $district_id,
             'prison_id'		   		=> $prison_id,
            

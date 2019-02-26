@@ -24,7 +24,7 @@ else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERI
   $isModal2 = 1;
 }
 echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal','enctype'=>'multipart/form-data','url' => '/prisoners/edit/'.$datas[0]['PrisonerPetition']['puuid'].'#petition_tab'));
-echo $this->Form->input('data_type',array('type'=>'hidden','value'=> 'prisoner_petition'));
+echo $this->Form->input('data_type',array('type'=>'hidden','value'=> 'petition_tab'));
 ?>
 <?php if($isModal2 == 1)
 {?>
@@ -41,6 +41,64 @@ echo $this->Form->input('data_type',array('type'=>'hidden','value'=> 'prisoner_p
 <style type="text/css">
   #btnYesConfirmYesNo, #btnNoConfirmYesNo{display: inline-block !important;}
 </style>
+ <div style="overflow-x:scroll;">
+            <!-- Modal -->
+              <div id="myPetitionModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Petetion Result</h4>
+                    </div>
+                    <div class="modal-body">
+                      <table class="table">
+                        <div class="modal-body" id="show_details">
+                       <?php  //echo $this->Form->create('Petetionre',array('class'=>'form-horizontal','url'=>'petetionResult', 'enctype'=>'multipart/form-data')); ?>
+                                 <?php //echo $this->Form->end(); ?>
+
+                    <?php  //echo $this->Form->create('Petetionresultnew',array('class'=>'form-horizontal','url'=>'petetionResult', 'enctype'=>'multipart/form-data')); ?>
+                            <?php echo $this->Form->input('petition_id',array('type'=>'hidden', 'id'=>'petition_id')); ?>
+
+                              <div class="span12">
+                                    <div class="control-group ">
+
+                                          <label class="control-label" style="margin-right: 10px">Petetion Result<?php echo $req; ?> </label>
+                                          <div class="controls uradioBtn">
+                                          <?php 
+                                          $petetionresult = array('Discharge'=>'Discharge','Commutation of Sentence'=>'Commutation of Sentence');
+                                          $button = "Discharge";
+                                          $options2= $petetionresult;
+                                          $attributes2 = array(
+                                          'legend' => false, 
+                                          'value' => $button,
+                                          );
+                                          echo $this->Form->radio('petition_result', $options2, $attributes2);
+                                          ?>
+
+                                          </div>
+                                    </div>
+                                </div> 
+                       
+                                <div class="form-actions " align="center" style="background:#fff;">
+                                  <?php echo $this->Form->button('Save',array('type'=>'button', 'div'=>false,'label'=>false, 'class'=>'btn btn-success on', 'onclick'=>"javascript:savePetitionResult($('#petition_id').val());"))?>
+                                </div>
+                                 <?php //echo $this->Form->end(); ?>
+
+
+                          </div> 
+                      </table>
+                
+                   
+                  </div>
+                         
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
 
 <table class="table table-bordered data-table table-responsive">
     <thead>
@@ -63,6 +121,7 @@ echo $this->Form->input('data_type',array('type'=>'hidden','value'=> 'prisoner_p
             <th>High Court File No</th>
             <th>Offence</th>
             <th>Status</th>
+            <th>Petetion Result</th>
 <?php
 if(!isset($is_excel)){
 ?> 
@@ -132,8 +191,9 @@ if(!isset($is_excel)){
             </td>
             <td>
             <?php 
-                echo $data['PrisonerPetition']['petition_case_file_no'];
-                //echo $$offenceNames; ?>
+           
+            echo $funcall->getCaseFile($data['PrisonerPetition']['prisoner_id']);
+                ?>
             </td>
             <td>
                 <?php 
@@ -169,6 +229,19 @@ if(!isset($is_excel)){
               <?php 
             }?>
           </td>
+          <td>
+          <?php if($data['PrisonerPetition']['petition_result'] != '')
+          {
+            echo $data['PrisonerPetition']['petition_result'].'<br>';
+            echo date('d-m-Y', strtotime($data['PrisonerPetition']['petition_result_date']));
+          }
+          else 
+          {
+            if($data['PrisonerPetition']['status'] == 'Approved' && $this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE'))?>
+              <!-- Trigger the modal with a button -->
+              <button type="button" class="btn btn-info mypetitionmodalopen" onclick="javascript:openPetitionResultModal('<?php echo $id;?>');">Set Result</button>
+          <?php }?>
+          </td>
 <?php
         if(!isset($is_excel)){
 ?>         
@@ -184,6 +257,12 @@ if(!isset($is_excel)){
 </table>
 <?php 
 echo $this->Form->end();
+?>
+
+
+
+               
+<?php
 echo $this->Js->writeBuffer();
 //pagination start 
 if(!isset($is_excel)){
@@ -252,8 +331,14 @@ $("#ApprovalProcessFormPetitionAjaxForm").validate({
                
     });
 });
+function openPetitionResultModal(id)
+{
+  $('#myPetitionModal').modal('show');
+  $('#petition_id').val(id);
+}
 $(document).ready(function(){
-  
+    
+    
   $('#verifyBtn').click(function(){
         if($("#ApprovalProcessFormPetitionAjaxForm").valid()){
             if( !confirm('Are you sure to save?')) {
@@ -287,6 +372,11 @@ $(document).ready(function(){
 //Dynamic confirmation modal -- START --
 var btnName2 = '<?php echo $btnName2;?>';
 var isModal2 = '<?php echo $isModal2;?>';
+
+function openMyModal(){
+
+  
+}
 function ShowKinConfirmYesNo() {
     AsyncConfirmYesNo(
             "Are you sure want to "+btnName2+"?",

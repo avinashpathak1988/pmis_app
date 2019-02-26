@@ -55,6 +55,10 @@ $next_date_after_6months = date('d-m-Y',strtotime("+6 months"));
                 </div>
                 
                 <div class="widget-content nopadding">
+
+           
+
+
                     <div class="">
                         <ul class="nav nav-tabs">
                             <li><a href="#personal_info">Personal Details</a></li>
@@ -1670,6 +1674,7 @@ $next_date_after_6months = date('d-m-Y',strtotime("+6 months"));
                                         'default'=> date('d-m-Y')
                                       ));
                                 $isAddCase = $funcall->isAccess('prisoner_admission','is_add');
+                                $isAddCase = 1;
                                 if($isAddCase == 1)
                                 {
                                 //if debtor 
@@ -1935,6 +1940,7 @@ $next_date_after_6months = date('d-m-Y',strtotime("+6 months"));
                             <?php }
                             if($is_petiton > 0){?>
                                 <div id="petition_tab">
+
                                     <div id="pf98">
                                         <?php echo $this->Html->link('PF-98',array('controller'=>'ExtractPrisonersRecord','action'=>'add/'.$prisoner_id),array('escape'=>false,'class'=>'btn btn-success btn-mini')); ?>
                                     </div>
@@ -1960,7 +1966,7 @@ $next_date_after_6months = date('d-m-Y',strtotime("+6 months"));
                                               ));
                                         echo $this->element('petition');
                                         ?>
-                                        <div class="form-actions" align="center">
+                                        <div class="form-actions petition_hide" align="center">
                                             <button type="submit" tabcls="next" id="petitionSaveBtn" class="btn btn-success formSaveBtn">Save</button>
                                         </div>
                                         <?php echo $this->Form->end();?>
@@ -4903,13 +4909,57 @@ echo $this->Html->scriptBlock("
         $.post(url, {}, function(res) {
             if (res) {
                 $('#petition_listview').html(res);
+              
             }
         });
     }
 ",array('inline'=>false));
+
+$commitAppealUrl = $this->Html->url(array('controller'=>'prisoners','action'=>'commitAppeal'));
+$petetionResultUrl = $this->Html->url(array('controller'=>'prisoners','action'=>'petetionResult'));
 //get prisoner's offence count detail list
 $ajaxUrl_appeal = $this->Html->url(array('controller'=>'prisoners','action'=>'appealAjax'));
 echo $this->Html->scriptBlock("
+
+//save petition result -- START -- 
+function savePetitionResult(id)
+{
+    var petition_result = $('#myPetitionModal input[name:petition_result]:checked').val();
+    if(id!='' && petition_result != '')
+    {
+        if(confirm('Are you sure to delete?')){
+            var url = '".$petetionResultUrl."';
+            $.post(url, {'id':id, 'petition_result':petition_result}, function(res) { 
+                if(res == 'SUCC'){
+                    showDataPetition();
+                }else{
+                    alert('Invalid request, please try again!');
+                }
+            });
+        }
+    }
+}
+//save petition result -- END -- 
+//Commit Appeal -- START -- 
+function commitAppeal(id)
+{
+  if(id)
+  {
+      if(confirm('Are you sure to delete?')){
+          var url = '".$commitAppealUrl."';
+          $.post(url, {'id':id}, function(res) { 
+              if(res == 'SUCC'){
+                  showDataAppeals();
+              }else{
+                  alert('Invalid request, please try again!');
+              }
+          });
+      }
+  }
+}
+//Commit Appeal -- END -- 
+
+
    var tabs;
     jQuery(function($) {
          showDataAppeals();

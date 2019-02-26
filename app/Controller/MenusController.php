@@ -32,6 +32,7 @@ class MenusController extends AppController {
 	         	)
          	)
 			);
+
 		// $name = $this->Menu->find('list',array(
 	 //         'fields' => 'Menu.name',
 	 //         'conditions' => array(
@@ -62,8 +63,20 @@ class MenusController extends AppController {
         //     'maxLimit'  => 250,
         //     'limit'     => 250,
         // )); //debug($menuList);
+         $this->loadModel('Module');
+        $moduleList = $this->Module->find('list', array(
+          
+            'conditions'    => array(
+                'Module.status'    => 1,
+            ),
+            'fields'        => array(
+                'Module.id',
+                'Module.name',
+            ),
+        )); 
 		$this->set(array(
-            'Parent'         => $Parent,	
+            'Parent'         => $Parent,    
+            'moduleList'         => $moduleList,	
             //'name'           => $name,	
         ));
 	}
@@ -84,6 +97,11 @@ class MenusController extends AppController {
         $name = $this->params['named']['name'];
         $condition += array("Menu.name LIKE '%$name%'");
      }
+      if(isset($this->params['named']['module_id']) && $this->params['named']['module_id'] != ''){
+        $module = $this->params['named']['module_id'];
+        $condition += array('Menu.module_id' => $module);
+     }
+
 		$this->paginate = array(
 			'conditions' => $condition,
 			'recursive'     => -1,
@@ -102,9 +120,12 @@ class MenusController extends AppController {
           'Menu.name',
           'Menu.url',
           'Menu.order',
+          'Menu.module_id',
           'Menu.is_enable',
       ),
 			'order'=>array(
+
+                'Menu.id'=>'DESC',
 				'BankBranch.name'=>'asc'
 				),
 			'limit'=>20,
@@ -228,10 +249,23 @@ class MenusController extends AppController {
                 'Menu.name',
             ),
         )); 
+        $this->loadModel('Module');
+        $moduleList = $this->Module->find('list', array(
+          
+            'conditions'    => array(
+                'Module.status'    => 1,
+            ),
+            'fields'        => array(
+                'Module.id',
+                'Module.name',
+            ),
+        )); 
+        // debug($moduleList);
         $this->set(array(
             'title'         => 'Add Menu',
             'datas'         => $datas,
             'parentList'    => $parentList,
+            'moduleList'    => $moduleList
         ));
 
 	}

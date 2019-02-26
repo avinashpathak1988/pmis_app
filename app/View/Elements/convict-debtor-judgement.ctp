@@ -213,7 +213,7 @@ if($debtor_case_status != 'Draft')
                 <div class="control-group">
                     <label class="control-label">Creditor Contact No. :</label>
                     <div class="controls">
-                        <?php echo $this->Form->input('creditor_contact_no',array('div'=>false,'label'=>false,'class'=>'form-control span11 alpha','type'=>'text', 'placeholder'=>'Enter Creditors Contact No.','required'=>false,'id'=>'creditor_name','title'=>'Please enter Creditor Contact No.'));?>
+                        <?php echo $this->Form->input('creditor_contact_no',array('div'=>false,'label'=>false,'class'=>'form-control span11 phone','type'=>'text', 'placeholder'=>'Enter Creditors Contact No.','required'=>false,'id'=>'creditor_name','title'=>'Please enter Creditor Contact No.', 'maxlength'=>'15'));?>
                     </div>
                 </div>
             </div>

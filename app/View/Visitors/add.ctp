@@ -675,6 +675,8 @@ $('#visitorPrisonerCashItemsDiv .visitorItemEntry input').on('blur',function(){
 	if(checkData == 'true'){
 		$('#visitorPrisonerCashItemsDiv .visitorItemEntry input').attr('required','required');
 		$('#visitorPrisonerCashItemsDiv .visitorItemEntry select').attr('required','required');
+		$('#visitorPrisonerCashItemsDiv .select2-input').removeAttr('required');
+		
 	}else{
 
 		$('#visitorPrisonerCashItemsDiv .visitorItemEntry input').removeAttr('required');
@@ -688,6 +690,8 @@ $('#visitorPrisonerCashItemsDiv .visitorItemEntry select').on('change',function(
 	if(checkData == 'true'){
 		$('#visitorPrisonerCashItemsDiv .visitorItemEntry input').attr('required','required');
 		$('#visitorPrisonerCashItemsDiv .visitorItemEntry select').attr('required','required');
+		$('#visitorPrisonerCashItemsDiv .select2-input').removeAttr('required');
+
 	}else{
 
 		$('#visitorPrisonerCashItemsDiv .visitorItemEntry input').removeAttr('required');
@@ -702,6 +706,8 @@ $('#visitorPrisonerItemsDiv .visitorItemEntry input').on('blur',function(){
 	if(checkData == 'true'){
 		$('#visitorPrisonerItemsDiv .visitorItemEntry input').attr('required','required');
 		$('#visitorPrisonerItemsDiv .visitorItemEntry select').attr('required','required');
+		$('#visitorPrisonerItemsDiv .select2-input').removeAttr('required');
+
 	}else{
 
 		$('#visitorPrisonerItemsDiv .visitorItemEntry input').removeAttr('required');
@@ -715,6 +721,8 @@ $('#visitorPrisonerItemsDiv .visitorItemEntry select').on('change',function(){
 	if(checkData == 'true'){
 		$('#visitorPrisonerItemsDiv .visitorItemEntry input').attr('required','required');
 		$('#visitorPrisonerItemsDiv .visitorItemEntry select').attr('required','required');
+		$('#visitorPrisonerItemsDiv .select2-input').removeAttr('required');
+
 	}else{
 
 		$('#visitorPrisonerItemsDiv .visitorItemEntry input').removeAttr('required');
@@ -729,6 +737,8 @@ $('#visitorItemsDiv .visitorItemEntry input').on('blur',function(){
 	if(checkData == 'true'){
 		$('#visitorItemsDiv .visitorItemEntry input').attr('required','required');
 		$('#visitorItemsDiv .visitorItemEntry select').attr('required','required');
+		$('#visitorItemsDiv .select2-input').removeAttr('required');
+
 	}else{
 
 		$('#visitorItemsDiv .visitorItemEntry input').removeAttr('required');
@@ -742,6 +752,9 @@ $('#visitorItemsDiv .visitorItemEntry select').on('change',function(){
 	if(checkData == 'true'){
 		$('#visitorItemsDiv .visitorItemEntry input').attr('required','required');
 		$('#visitorItemsDiv .visitorItemEntry select').attr('required','required');
+		$('#visitorItemsDiv .select2-input').removeAttr('required');
+
+		
 	}else{
 
 		$('#visitorItemsDiv .visitorItemEntry input').removeAttr('required');

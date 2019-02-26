@@ -14,6 +14,7 @@ if(is_array($Prisoner) && count($Prisoner)>0){
             'controller'            => 'Report',
             'action'                => 'debtorPrisonerReleasedAjax',
             'name'             => $name,
+            'country_id' 	   => $country_id,
             'state_id'		   => $state_id,
             'district_id'	   => $district_id,
             'prison_id'		   => $prison_id,

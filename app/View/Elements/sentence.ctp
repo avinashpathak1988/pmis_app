@@ -34,7 +34,7 @@
             <div class="clearfix"></div>
             <div class="span6 is_convicted <?php if(!isset($this->data['PrisonerSentenceCapture']['id'])){echo 'hidden';}?>">
                <div class="control-group">
-                    <label class="control-label">Awaiting/Sentence Awarded</label>
+                    <label class="control-label">Awaiting/Sentence Awarded<?php echo $req; ?></label>
                     <div class="controls uradioBtn">
                         <?php 
                         //debug($this->data['PrisonerSentenceCapture']); //exit;

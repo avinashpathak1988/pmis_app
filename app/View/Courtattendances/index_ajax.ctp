@@ -93,17 +93,29 @@ foreach($datas as $data){
             <td><?php echo $funcall->getName($data['ApplicationToCourt']['case_file_no'],"PrisonerCaseFile","case_file_no"); ?>&nbsp;</td> 
             <td><?php echo $funcall->getName($data['ApplicationToCourt']['court_level'],"Courtlevel","name"); ?>&nbsp;</td>
             <td><?php echo $funcall->getName($data['ApplicationToCourt']['court_name'],"Court","name"); ?>&nbsp;</td>
-            <td><a href="<?php echo $this->webroot;?>files/applicationtocourt/<?php echo $data['ApplicationToCourt']['upload_file']; ?>" target="_blank" style="color:blue;">View</a>&nbsp;</td>
+            <td>
+			<?php if($data['ApplicationToCourt']['upload_file'] != '') { ?>
+			<a href="<?php echo $this->webroot;?>files/applicationtocourt/<?php echo $data['ApplicationToCourt']['upload_file']; ?>" target="_blank" style="color:blue;">
+			<input type="button" value="View" class="btn btn-info">
+			</a>&nbsp;
+			<?php } else { ?>
+			Not Uploaded
+			<?php } ?>
+			</td>
 			 <td><?php echo date('d-m-Y',strtotime($data['ApplicationToCourt']['submission_date'])); ?></td>
 			
              <td style="width:150px;"><?php echo $data['ApplicationToCourt']['court_feedback']; ?><br> 
 			 <?php if($data['ApplicationToCourt']['court_feedback']=='Granted'){?>
+                    <?php if(isset($data['ApplicationToCourt']['application_name_option']) && $data['ApplicationToCourt']['application_name_option']!='2'){?>
+
 			  <a href="<?php echo Router::url('/', true);?>/prisoners/edit/<?php echo $uuid;?>#appeal_against_sentence" style="color:blue"> go to appeal </a>
-			
+			     <?php } ?>
 			 <!--<a href="" style="color:blue">go to appeal</a>-->
 			 <?php } ?>
 			 </td>
-			 <td><?php echo ($data['ApplicationToCourt']['feedback_date']!='') ? date('d-m-Y',strtotime($data['ApplicationToCourt']['feedback_date'])) : 'N/A'; ?></td>
+			 <td><?php
+			
+			 echo ($data['ApplicationToCourt']['feedback_date']!='' && $data['ApplicationToCourt']['feedback_date'] != '1970-01-01') ? date('d-m-Y',strtotime($data['ApplicationToCourt']['feedback_date'])) : 'N/A'; ?></td>
              <?php  ?>
             <?php /*if(!isset($is_excel)){ ?>
             <?php if($isAccess == 1){?>
@@ -147,7 +159,7 @@ foreach($datas as $data){
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                    <h4 class="modal-title">Copurt Feedback</h4>
+                                    <h4 class="modal-title">Court Feedback</h4>
                                 </div>
                                 <div class="modal-body">
                                     <table class="table table-bordered data-table table-responsive">
@@ -165,7 +177,7 @@ foreach($datas as $data){
                                         <tr>
                                             <td><b>Feedback Date</b></td>
                                             <td>
-											<?php echo $this->Form->input('feedback_date',array('div'=>false,'label'=>false,'class'=>'form-control maxCurrentDate','type'=>'text','placeholder'=>'Enter Feedback date.','required'=>true,'id'=>'feedback_date'.$data['ApplicationToCourt']['id'],'readonly','title'=>'Please select feedback date'));?>
+											<?php echo $this->Form->input('feedback_date',array('div'=>false,'label'=>false,'class'=>'form-control maxCurrentDate','type'=>'text','value'=>date('d-m-Y'),'placeholder'=>'Enter Feedback date.','required'=>true,'id'=>'feedback_date'.$data['ApplicationToCourt']['id'],'readonly','title'=>'Please select feedback date'));?>
 											</td>
                                         </tr>
                                         </tbody>
@@ -202,12 +214,7 @@ echo Configure::read("NO-RECORDS");
 <?php $ajaxUrl = $this->Html->url(array('controller'=>'courtattendances','action'=>'index',$uuid)); ?>
 <script type="text/javascript">
  $('.maxCurrentDate').datepicker({
-                format: 'dd-mm-yyyy',
-                autoclose:true,
-                endDate: new Date(),
-            }).on('changeDate', function (ev) {
-                 $(this).datepicker('hide');
-                 $(this).blur();
+                
             });
 
 function saveFeedback(id){

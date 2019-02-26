@@ -69,6 +69,7 @@ echo $this->Paginator->counter(array(
     'format' => __('Page {:page} of {:pages}, showing {:current} records out of {:count} total, starting on record {:start}, ending on {:end}')
 ));
 ?>
+
 <?php
     $exUrl = $this->Html->url(array('controller'=>'VisitorPasses','action'=>'indexAjax')+$searchData,true);
     $urlExcel = $exUrl.'/reqType:XLS';
@@ -93,10 +94,6 @@ echo $this->Paginator->counter(array(
           <th>Prison</th> 
           <th>Prisoner Number</th>
           <th>Prisoner Type</th>
-          <th>National Id</th>
-          <th>Profession</th>
-          <th>Contact</th>
-          <th>Relationship</th>
           <th>Purpose</th>
           <th>Visit Date</th>
          <!--  <th>Valid Till</th>
@@ -115,15 +112,23 @@ echo $this->Paginator->counter(array(
               <td><?php echo $data['VisitorPass']['gate_pass'] ?></td>
               <td><?php echo $data['Prison']['name'] ?></td>
               <td><?php echo $data['Prisoner']['prisoner_no'] ?></td>
-              <td><?php echo $data['PrisonerType']['name'] ?></td>
-
-              <td><?php echo $data['VisitorPass']['national_card'] ?></td>
-              <td><?php echo $data['VisitorPass']['profession_visitor'] ?></td>
-              <td><?php echo $data['VisitorPass']['Contact'] ?></td>
-              <td><?php echo $data['VisitorPass']['relationships'] ?></td>
+              <td><?php echo $funcall->getPrisonerType($data['Prisoner']['prisoner_type_id']); ?></td>
               <td><?php echo $data['VisitorPass']['purpose'] ?></td>
-              <td><?php echo $data['VisitorPass']['valid_form'] != ''?date('d-m-Y H:i:s',strtotime($data['VisitorPass']['valid_form'])):''; ?></td>
-              <!-- <td><?php echo $data['VisitorPass']['valid_till'] != ''?date('d-m-Y H:i:s',strtotime($data['VisitorPass']['valid_till'])):''; ?></td>
+              <td>
+                <?php if($data['VisitorPass']['is_suspended'] == '1'){ ?>
+                    Previous Date :<br/>
+                    <?php echo $data['VisitorPass']['valid_form'] != ''?date('d-m-Y',strtotime($data['VisitorPass']['valid_form'])):''; ?> <br/><br/>
+                    New Date of Visit:<br/>
+
+                <?php echo $data['VisitorPass']['suspended_date'] != ''?date('d-m-Y',strtotime($data['VisitorPass']['suspended_date'])):''; ?>
+                <?php }else{ ?>
+
+                    <?php echo $data['VisitorPass']['valid_form'] != ''?date('d-m-Y',strtotime($data['VisitorPass']['valid_form'])):''; ?> 
+                <?php } ?>
+                  
+
+                </td>
+              <!-- <td><?php echo $data['VisitorPass']['valid_till'] != ''?date('d-m-Y',strtotime($data['VisitorPass']['valid_till'])):''; ?></td>
               <td><?php echo $data['VisitorPass']['days'] ?></td> -->
 
               <td><?php echo $data['VisitorPass']['issue_date'] != ''?date('d-m-Y',strtotime($data['VisitorPass']['issue_date'])):''; ?></td>
@@ -143,80 +148,88 @@ echo $this->Paginator->counter(array(
                         </button> -->
                       </div>
                       <div class="modal-body">
-                              <!--   <?php debug($data) ?> -->
+                                <?php $passVisitors = $data['PassVisitor']; ?>
                               <div style="height:65px;width:100%;margin-bottom:10px;background: #902d2b;">
-    <div style="position: absolute;left: 32%;">
-      <img src="<?php echo $this->webroot;?>ugandalogo.png" class="img" alt="Uganda Prisons Service" style="height: 55px;float: left;">
-      <img src="<?php echo $this->webroot;?>theme/img/logo1.png" alt="Uganda Prisons Service" title="Uganda Prisons Service" style="margin-left: 10px;float: left;width: 130px;margin-top: 3px;">
-    </div>
-    
-</div>
+                                  <div style="position: absolute;left: 32%;">
+                                    <img src="<?php echo $this->webroot;?>ugandalogo.png" class="img" alt="Uganda Prisons Service" style="height: 55px;float: left;">
+                                    <img src="<?php echo $this->webroot;?>theme/img/logo1.png" alt="Uganda Prisons Service" title="Uganda Prisons Service" style="margin-left: 10px;float: left;width: 130px;margin-top: 3px;">
+                                  </div>
+                                  
+                              </div>
                               <div class="span12" >
                                 <?php echo $this->Form->input('id',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','type'=>'hidden','value'=>$data["VisitorPass"]["id"],'required'=>false))?>
                                  <div class="form-row" style="margin-bottom: 20px;">
                                     <span class="form-text" style="width:10%">Pass No :</span>
-                                    <span class="" style="">
-                                            <?php echo $this->Form->input('gate_pass',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','disabled','style'=>'width:87%;','type'=>'text','value'=>$data["VisitorPass"]["gate_pass"],'required'=>false))?>
+                                    <span class="" >
+                                            <?php echo $this->Form->input('gate_pass',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','style'=>'width:30%;','type'=>'text','value'=>$data["VisitorPass"]["gate_pass"],'required'=>false))?>
                                     </span>
-                                </div>
-                                <div class="form-row" style="margin-bottom: 20px;">
+
                                     <span class="form-text" style="width:10%">Prison station :</span>
-                                    <span class="" style="">
-                                            <?php echo $this->Form->input('prison',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','disabled','style'=>'width:20%;','type'=>'text','value'=>$data["Prison"]["name"],'required'=>false))?>
+                                    <span class="">
+                                            <?php echo $this->Form->input('prison',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','style'=>'width:30%;','type'=>'text','value'=>$data["Prison"]["name"],'required'=>false))?>
                                     </span>
-                                    <span class="form-text" style="width:10%">National ID/Card No :</span>
-                                    <span class="" style="">
-                                            <?php echo $this->Form->input('nat_id',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','disabled','style'=>'width:35%;','type'=>'text','value'=>$data["VisitorPass"]["national_card"],'required'=>false))?>
-                                    </span>
-                                </div>
-                                 <div class="form-row" style="margin-bottom: 20px;">
-                                    <span class="form-text" style="width:10%">Profession of Visitor :</span>
-                                    <span class="" style="">
-                                            <?php echo $this->Form->input('profession',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','disabled','style'=>'width:30%;','type'=>'text','value'=>$data["VisitorPass"]["profession_visitor"],'required'=>false))?>
-                                    </span>
-                                    <span class="form-text" style="width:10%">Contact No :</span>
-                                    <span class="" style="">
-                                            <?php echo $this->Form->input('contact',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','disabled','style'=>'width:28%;','type'=>'text','value'=>$data["VisitorPass"]["Contact"],'required'=>false))?>
-                                    </span>
+
                                 </div>
                                 <div class="form-row" style="margin-bottom: 20px;">
                                     <span class="form-text" style="width:10%">Prisoner to be Visit:</span>
                                     <span class="" style="">
-                                            <?php echo $this->Form->input('prisoner',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','disabled','style'=>'width:75%;','type'=>'text','value'=>$data["Prisoner"]["prisoner_no"],'required'=>false))?>
-                                    </span>
-                                    
-                                </div>
-                                 <div class="form-row" style="margin-bottom: 20px;">
-                                    <span class="form-text" style="width:10%">RelationShip:</span>
-                                    <span class="" style="">
-                                            <?php echo $this->Form->input('relationship',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','disabled','style'=>'width:82%;','type'=>'text','value'=>$data["VisitorPass"]["relationships"],'required'=>false))?>
+                                            <?php echo $this->Form->input('prisoner',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','style'=>'width:75%;','type'=>'text','value'=>$data["Prisoner"]["prisoner_no"],'required'=>false))?>
                                     </span>
                                     
                                 </div>
                                 <div class="form-row" style="margin-bottom: 20px;">
                                     <span class="form-text" style="width:10%"> Date & Time For Visit:</span>
                                     <span class="" style="">
-                                            <?php echo $this->Form->input('date_time',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','disabled','style'=>'width:73%;','type'=>'text','value'=>date('d-m-Y H:i:s',strtotime($data["VisitorPass"]["valid_form"])),'required'=>false))?>
+                                            <?php echo $this->Form->input('date_time',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','style'=>'width:73%;','type'=>'text','value'=>date('d-m-Y H:i:s',strtotime($data["VisitorPass"]["valid_form"])),'required'=>false))?>
                                     </span>
                                     
                                 </div>
                                  <div class="form-row" style="margin-bottom: 20px;">
                                     <span class="form-text" style="width:10%">Purpose:</span>
                                     <span class="" style="">
-                                            <?php echo $this->Form->input('purpose',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','disabled','style'=>'width:87%;','type'=>'text','value'=>$data["VisitorPass"]["relationships"],'required'=>false))?>
+                                            <?php echo $this->Form->input('purpose',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','style'=>'width:87%;','type'=>'text','value'=>$data["VisitorPass"]["purpose"],'required'=>false))?>
                                     </span>
                                     
                                 </div>
                                 <div class="form-row" style="margin-bottom: 20px;">
                                     <span class="form-text" style="width:10%">Issue Date:</span>
                                     <span class="" style="">
-                                            <?php echo $this->Form->input('issue_date',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','disabled','style'=>'width:85%;','type'=>'text','value'=>date('d-m-Y H:i:s',strtotime($data["VisitorPass"]["issue_date"])),'required'=>false))?>
+                                            <?php echo $this->Form->input('issue_date',array('div'=>false,'label'=>false,'class'=>'dotted-input','readonly','style'=>'width:85%;','type'=>'text','value'=>date('d-m-Y H:i:s',strtotime($data["VisitorPass"]["issue_date"])),'required'=>false))?>
                                     </span>
                                     
                                 </div>
+                                <br/>
+                                <div class="visitors-wrapper">
+                                  <div style="text-align: center;width: 100%;font-size:16px;font-weight:700;line-height: 1.42857143;color: #a03230;">Visitors Allowed</div>
+                                  <table style="width: 100%;" class="table table-bordered">
+                                    <thead>
+                                          <tr>
+                                            <th style="border: 1px solid;">Id Details</th>
+                                            <th style="border: 1px solid;">Contact</th>
+                                            <th style="border: 1px solid;">Relation</th>
+                                            <th style="border: 1px solid;">Profession</th>
+                                          </tr>
+                                    </thead>
+                                    <tbody>
+                                      
+                                <?php foreach ($passVisitors as $passVisitor) { ?>
+                                <tr>
+                                  <td style="border: 1px solid;"><?php echo $passVisitor['Iddetail']['name'] ?> : <?php echo $passVisitor['nat_id'];?></td>
+                                  <td style="border: 1px solid;"><?php echo $passVisitor['contact'];?></td>
+                                  <td style="border: 1px solid;"><?php echo isset($passVisitor['Relationship']['name'])?$passVisitor['Relationship']['name']:'';?></td>
+                                  <td style="border: 1px solid;"><?php echo $passVisitor['profession'];?></td>
+
+                                </tr>
+                                <?php }?>
+                                    </tbody>
+
+                                  </table>
+
+                                </div>
+                                <br/>
                                 <div class="form-row" style="margin-bottom: 20px;">
                                     <span class="" >
-                                            <?php echo $this->Form->input('comm',array('div'=>false,'label'=>false,'class'=>'dotted-input','style'=>'width:50%;float:right;margin-right:5%;','type'=>'text','required'=>false))?>
+                                            <?php echo $this->Form->input('comm',array('div'=>false,'label'=>false,'class'=>'dotted-input','style'=>'width:50%;float:right;margin-right:5%;text-align:center;','type'=>'text','readonly','required'=>false,'value'=>$comm['User']['name']))?>
                                     </span>
                                     
                                 </div>
@@ -254,7 +267,8 @@ echo $this->Paginator->counter(array(
                 <!-- modal end -->
 
               </td>
-              <td >
+
+              <td>
 
               <?php echo $this->Form->create('VisitorPassEdit',array('url'=>'/VisitorPasses/add','admin'=>false,'class'=>'pull-left','style'=>'margin-right:10px'));?> 
                     <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['VisitorPass']['id']));
@@ -271,13 +285,34 @@ echo $this->Paginator->counter(array(
                     <?php 
                     echo $this->Form->end();
                      ?> 
-                     
+                     <br/>
+                     <br/>
+                     <?php if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE'))
+                        { ?>
+
+                      <?php if($data['VisitorPass']['is_valid'] == '1'){ ?>
+
+                      <button type="button" class="btn btn-warning btn-mini button-gap suspend" data-id="<?php echo $data['VisitorPass']['id']; ?>">
+                        Suspend
+                      </button><br/>
+                        <button type="button" class="btn btn-warning btn-mini button-gap invalid" style="margin-top: 5px;" data-id="<?php echo $data['VisitorPass']['id']; ?>">
+                        Mark Invalid
+                      </button>
+                      <?php }else{ ?>
+                        <span style="color: red;">Invalid Pass</span>
+                      <?php } ?>
+                      
+
+                     <?php }
+                      ?>
+                      
               </td>
               
 
 
             </tr>
-      <?php } ?>
+
+      <?php $rowCnt++; } ?>
   </tbody>
 </table>
 

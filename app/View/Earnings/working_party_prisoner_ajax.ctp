@@ -255,12 +255,12 @@ if(!isset($is_excel)){
                 $status_info .= '<b>Remark: </b>'.$data['ApprovalProcess'][0]['remark'].'';
               ?>
               <a href="javaScript:void(0);" class="pop btn-mini btn-success" pageTitle="Status Info" pageBody="<?php echo $status_info;?>"><?php echo $display_status;?></a>
-              <?php 
+              <?php  
             }?>
           </td>
           <td>
           <?php
-        if(!isset($is_excel) && ($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE') || $this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))){
+        if(!isset($is_excel) && (($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE') && $data['WorkingPartyPrisoner']['status']!='Reviewed') || ($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') && $data['WorkingPartyPrisoner']['status']!='Approved'))){
 ?>
 
 <button type="button" class="btn btn-mini btn-info" data-toggle="modal" data-target="#myModal_<?php echo $data['WorkingPartyPrisoner']['id']?>">Prisoner approval status</button>

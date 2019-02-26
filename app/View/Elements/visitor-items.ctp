@@ -24,8 +24,12 @@
                     <div class="span3">
                     <label class="control-label" style="text-align: left;">Quantity<span style="color:red;"></span></label>
                     </div>
-                    <div class="span4">
+                    <div class="span2">
                     <label class="control-label" style="text-align: left;">Weight<span style="color:red;"></span></label>
+                    </div>
+                    <div class="span2">
+                    
+                    <label class="control-label" style="text-align: left;">Units<span style="color:red;"></span></label>
                     </div>
                 </div>
                 <?php
@@ -82,11 +86,14 @@
                     <div class="span3">
                     <label class="control-label" style="text-align: left;">Quantity<span style="color:red;"></span></label>
                     </div>
-                    <div class="span4">
+                    <div class="span2">
                     
                     <label class="control-label" style="text-align: left;">Weight<span style="color:red;"></span></label>
                     </div>
+                    <div class="span2">
                     
+                    <label class="control-label" style="text-align: left;">Units<span style="color:red;"></span></label>
+                    </div>
                 </div>
                 <div class="entry2 visitorItemEntry input-group row-fluid uradioBtn">
                     <div class="span3">

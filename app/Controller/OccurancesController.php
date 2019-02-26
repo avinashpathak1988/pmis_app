@@ -93,6 +93,7 @@ class OccurancesController extends AppController
                 }
             }
         }
+
         if(isset($this->data['OccuranceEdit']['id']) && (int)$this->data['OccuranceEdit']['id'] != 0){
             if($this->Occurance->exists($this->data['OccuranceEdit']['id'])){
                 $this->request->data = $this->Occurance->findById($this->data['OccuranceEdit']['id']);
@@ -142,6 +143,8 @@ class OccurancesController extends AppController
         $this->set('is_enables',$this->is_enables);        
         $this->set(compact('rparents'));
 	}
+
+
 
     public function view($id) {
         $this->loadModel('Occurance');
@@ -333,6 +336,57 @@ class OccurancesController extends AppController
                         'Occurance.name'
                     )
                 ));  
+         if($this->request->is(array('post','put'))){//debug($this->data);exit;
+        if(isset($this->request->data['ApprovalProcess']) && count($this->request->data['ApprovalProcess']) > 0)
+        {
+            $status = 'Saved'; 
+            $remark = '';
+            if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') || ($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE')))
+            {
+                if(isset($this->request->data['ApprovalProcessForm']) && count($this->request->data['ApprovalProcessForm']) > 0)
+                {
+                    $status = $this->request->data['ApprovalProcessForm']['type']; 
+                    $remark = $this->request->data['ApprovalProcessForm']['remark'];
+                }
+            }
+            $items = $this->request->data['ApprovalProcess'];
+            //debug($status);exit;
+            $status = $this->setApprovalProcess($items, 'Occurance', $status, $remark);
+            if($status == 1)
+            {
+                //notification on approval of payment list --START--
+                if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE'))
+                {
+                    $notification_msg = "occurance list of prisoners are pending for approval.";
+                    $notifyUser = $this->User->find('first',array(
+                        'recursive'     => -1,
+                        'conditions'    => array(
+                            'User.usertype_id'    => Configure::read('OFFICERINCHARGE_USERTYPE'),
+                            'User.is_trash'     => 0,
+                            'User.is_enable'     => 1,
+                            'User.prison_id'  => $this->Session->read('Auth.User.prison_id')
+                        )
+                    ));
+                    if(isset($notifyUser['User']['id']))
+                    {
+                        $this->addNotification(array(                        
+                            "user_id"   => $notifyUser['User']['id'],                        
+                            "content"   => $notification_msg,                        
+                            "url_link"   => "occurances",                    
+                        )); 
+                    }
+                }
+                
+                $this->Session->write('message_type','success');
+                $this->Session->write('message','Saved Successfully !');
+            }
+            else 
+            {
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','saving failed');
+            }
+        }
+    }
 
         if($this->Session->read('Auth.User.prison_id')!=Configure::read('ADMIN_USERTYPE')){
             $prisonCondi = array("Prison.id"=>$this->Session->read('Auth.User.prison_id'));
@@ -363,6 +417,9 @@ class OccurancesController extends AppController
             $this->set(array(
                 'prisonListData' =>$prisonListData,
             ));
+    }
+    function occuranceApproval(){
+       
     }
 
     public function occuranceAjax() {

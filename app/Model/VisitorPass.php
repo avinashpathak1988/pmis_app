@@ -13,5 +13,14 @@ class VisitorPass extends AppModel {
        
         
     );
+    public $hasMany = array(
+        'PassVisitor'   => array(
+            'className'     => 'PassVisitor',
+            'foreignKey'    => 'pass_id',
+            'order'         => 'PassVisitor.created Asc',
+            'conditions'    => array('is_trash' => 0),
+
+        ),
+    );
 }
   ?>

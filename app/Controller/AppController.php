@@ -36,7 +36,6 @@ class AppController extends Controller {
     );
 
     public $uses = array('Menu','User','Prisoner','Prison','PrisonerAttendance','PrisonerPaysheet','PurchaseItem','UserAccessControl','Discharge', 'PrisonerSentence','ApprovalProcess','PrisonerPayment','StagePromotion','InPrisonPunishment','CashItem','PhysicalProperty','PropertyTransaction','PrisonerSaving','StageHistory','Notification','LodgerStation', 'PrisonerBailDetail', 'WorkingPartyTransfer','WorkingPartyReject', 'EarningGradePrisoner', 'PrisonerSentenceCount', 'PrisonerSentenceAppeal','District','County','SubCounty','Parish', 'PrisonerOffence', 'PrisonerCaseFile', 'PrisonerAdmission', 'DebtorJudgement','ApplicationToCourt','IncidentManagement');
-
     public function beforeFilter()
     {
         Security::setHash('md5');
@@ -1043,22 +1042,25 @@ class AppController extends Controller {
     } 
     public function groupArray($arr, $group, $preserveGroupKey = false, $preserveSubArrays = false) {
         $temp = array();
-        foreach($arr as $key => $value) {
-            $groupValue = $value[$group];
-            if(!$preserveGroupKey)
-            {
-                unset($arr[$key][$group]);
-            }
-            if(!array_key_exists($groupValue, $temp)) {
-                $temp[$groupValue] = array();
-            }
+        if(!empty($arr) && count($arr))
+        {
+        	foreach($arr as $key => $value) {
+	            $groupValue = $value[$group];
+	            if(!$preserveGroupKey)
+	            {
+	                unset($arr[$key][$group]);
+	            }
+	            if(!array_key_exists($groupValue, $temp)) {
+	                $temp[$groupValue] = array();
+	            }
 
-            if(!$preserveSubArrays){
-                $data = count($arr[$key]) == 1? array_pop($arr[$key]) : $arr[$key];
-            } else {
-                $data = $arr[$key];
-            }
-            $temp[$groupValue][] = $data;
+	            if(!$preserveSubArrays){
+	                $data = count($arr[$key]) == 1? array_pop($arr[$key]) : $arr[$key];
+	            } else {
+	                $data = $arr[$key];
+	            }
+	            $temp[$groupValue][] = $data;
+	        }
         }
         return $temp;
     }
@@ -1069,7 +1071,7 @@ class AppController extends Controller {
         //consecutive: 1
         //concurrent : 2
         //pd: 3
-        $pdsentence_length = array('years'=>'','months'=>'', 'days'=>''); 
+        $pdSentence_length = array('years'=>'','months'=>'', 'days'=>''); 
         $total_sentence = array('years'=>'','months'=>'', 'days'=>''); 
         $remission_sentence = array('years'=>'','months'=>'', 'days'=>'');
         $resultData = array('years'=>'','months'=>'', 'days'=>''); 
@@ -1260,7 +1262,7 @@ class AppController extends Controller {
                 'UserAccessControl.prison_id'    => $prison_id,
                 'UserAccessControl.user_type'    => $user_type,
                 'UserAccessControl.is_trash'     => 0,
-                'UserAccessControl.module'       => $module
+                'UserAccessControl.module_id'    => $module
             )
         ));
         if(isset($data['UserAccessControl'][$action]))
@@ -1483,13 +1485,17 @@ class AppController extends Controller {
                     'conditions'    => array(
                         'PrisonerRecaptureDetail.escape_discharge_id'   => $result['Discharge']['id'],
                         'PrisonerRecaptureDetail.is_trash'              => 0,
-                        'PrisonerRecaptureDetail.status'              => 'Approved'
+                        //'PrisonerRecaptureDetail.status'              => 'Approved'
                     ),
                     'order'=>array(
                         'PrisonerRecaptureDetail.id'              => 'DESC'
                     )
                 ));
-                if(empty($data))
+                if(isset($data['PrisonerRecaptureDetail']['status']))
+                {
+                    $resultData['recapture_status'] = $data['PrisonerRecaptureDetail']['status'];
+                }
+                if(empty($data) || (isset($data['PrisonerRecaptureDetail']['status']) && ($data['PrisonerRecaptureDetail']['status'] != 'Approved')))
                 {
                     $resultData['display_recapture_form'] = 1;
                 }
@@ -4129,7 +4135,7 @@ class AppController extends Controller {
             );
             if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
             {
-                $conditions += array('0'=>'PrisonerCaseFile.status IN ("Approved","Reviewed") or PrisonerCaseFile.login_user_id='.$login_user_id);
+                $conditions += array('0'=>'(PrisonerCaseFile.status IN ("Approved","Reviewed") or PrisonerCaseFile.login_user_id='.$login_user_id.')');
             }
             if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
             {
@@ -4407,7 +4413,7 @@ class AppController extends Controller {
                 "conditions"    => array(
                     "PrisonerSentenceAppeal.prisoner_id"   => $prisoner_id,
                     "PrisonerSentenceAppeal.is_trash"   => 0,
-                    "(PrisonerSentenceAppeal.appeal_status = 'Notes of appeal' AND PrisonerSentenceAppeal.appeal_result = '')"
+                    "(PrisonerSentenceAppeal.appeal_status = 'Cause List' AND PrisonerSentenceAppeal.appeal_result = '')"
                 ),
                 "fields"    => array(
                     "PrisonerOffence.id",
@@ -4452,7 +4458,6 @@ class AppController extends Controller {
             ));
         }
         return $result;
-        
     }
     //get AppealCount -- START -- 
     function getAppealCount()
@@ -4720,6 +4725,13 @@ class AppController extends Controller {
                     'PrisonerSentence.prisoner_id'  => $prisoner_id
                 )
             ));
+            // $fields = array(
+            //     'Prisoner.prisoner_sub_type_id'    => Configure::read('CONDEMNED'),
+            // );
+            // $conds = array(
+            //     'Prisoner.id'    => $prisoner_id,
+            // );
+            // $this->PrisonerIdDetail->updateAll($fields, $conds);
         }
         return $result;
     }

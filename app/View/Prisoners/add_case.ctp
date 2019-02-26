@@ -138,7 +138,7 @@
         <div class="widget-title">
             <h5>Offence Details</h5>
         </div>
-        <div class="widget-content" style="    padding-bottom: 0;">
+        <div class="widget-content" style="padding-bottom: 0;">
             <!-- Multiple offence start -->
             <div class="row-fluid secondDiv" id="<?php echo $case_key;?>_offence_list">                
                 <div class="span12 offence_list" style="background:#fff;border-top:1px solid #ddd;border-bottom:1px solid #ddd;box-shadow:0 0 5px #ddd;border-left:5px solid #a03230;margin:10px 0px; position:relative; padding-bottom: 10px;" id="<?php echo $case_key.'_'.$key.'_offence_list';?>">
@@ -223,7 +223,7 @@
             <div class="clearfix"></div>
             <div class="">
                 <span class="input-group-btn">
-                    <button class="btn btn-success btn-add offence-btn-add" type="button" style="padding: 8px 8px;" id="<?php echo $case_key;?>-add-offence" onclick="addOffence('<?php echo $case_key;?>');">
+                    <button class="btn btn-success btn-add offence-btn-add" type="button" style="padding: 8px 8px;" id="add-count-<?php echo $case_key;?>" onclick="addOffence('<?php echo $case_key;?>');">
                         Add Count
                     </button>
                 </span>

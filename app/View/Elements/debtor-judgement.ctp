@@ -40,7 +40,16 @@ if(isset($debtor_case_file_id) && ($debtor_case_file_id > 0))
                 <div class="control-group">
                     <label class="control-label">Creditor Contact No. :</label>
                     <div class="controls">
-                        <?php echo $this->Form->input('creditor_contact_no',array('div'=>false,'label'=>false,'class'=>'form-control span11 alpha','type'=>'text', 'placeholder'=>'Enter Creditors Contact No.','required'=>false,'id'=>'creditor_name','title'=>'Please enter Creditor Contact No.'));?>
+                        <?php echo $this->Form->input('creditor_contact_no',array('div'=>false,'label'=>false,'class'=>'form-control span11 phone','type'=>'text', 'placeholder'=>'Enter Creditors Contact No.','required'=>false,'id'=>'creditor_name','title'=>'Please enter Creditor Contact No.', 'maxlength'=>'15'));?>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div> 
+            <div class="span6">
+                <div class="control-group">
+                    <label class="control-label">No Pay:</label>
+                    <div class="controls">
+                        <?php echo $this->Form->input('no_pay',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'checkbox', 'id'=>'debtor_no_pay', 'onClick'=>'debtorNoPay()'));?>
                     </div>
                 </div>
             </div>
@@ -371,5 +380,19 @@ $(function()
         );
         
   });
+    //Debtor no pay -- START -- 
+    $('#debtor_no_pay').click(function(){
+        if($(this).prop("checked") == true){
+            //hide payment div
+            $('#payment_list').hide();
+            $('#payment-btn-add').hide();
+        }
+        else if($(this).prop("checked") == false){
+            //show payment div
+            $('#payment_list').show();
+            $('#payment-btn-add').show();
+        }
+    });
+    //Debtor no pay -- END -- 
 });
 </script>

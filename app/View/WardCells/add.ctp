@@ -31,8 +31,8 @@
                        
                     </div>
                     <div class="row input_fields_wrap" id="inputfields">
-                    	<div class=" row more-feilds">
-	                        <div class="span6">
+                    	<div class="row more-feilds">
+	                        <div class="span6 removeclass">
 	                            <div class="control-group">
 	                                <label class="control-label">Cell Name:</label>
 	                                <div class="controls">
@@ -40,7 +40,7 @@
 	                                </div>
 	                            </div>
 	                        </div>
-	                        <div class="span6">
+	                        <div class="span6 removeclass">
 	                            <div class="control-group">
 	                                <label class="control-label">Cell No<?php echo MANDATORY; ?> :</label>
 	                                <div class="controls">
@@ -55,7 +55,7 @@
 						        <label for="">&nbsp;</label><br/>
 						       <!--  <a class="btn btn-success add-more">+ Add More</a> -->
 						        <button type="button" id="btn1">Add More</button>
-                                <button type="button" id="btn2">Remove</button>
+                                <button type="button" class="hidden btn-danger" id="remove_cell">Remove</button>
 				    </div>
 						
                     <div class="form-actions" align="center">
@@ -69,17 +69,28 @@
 </div>
 <script type="text/javascript">
 	  $("#btn1").click(function(){ 
-    	// alert(1);
+    	
         var html = $(".more-feilds:first").clone();
         $("#inputfields").append(html); 
-        $(".more-feilds:last input").val('');  
+        $(".more-feilds:last input").val(''); 
 
-        $("#btn2").click(function(){
-        $(".more-feilds:last").remove();   
-   
-    }); 
+        var count = parseInt($('.more-feilds').length);
+        if(count > 1)
+        {
+            $('#remove_cell').removeClass('hidden');
+        }
     });
-      
+       
+    $("#remove_cell").click(function()
+    {
+        $(".more-feilds:last").remove();
+        var count = parseInt($('.more-feilds').length);
+        if(count == 1)
+        {
+            $('#remove_cell').addClass('hidden');
+        }
+    }); 
+
 	 
 $(function(){
     $("#WardCellAddForm").validate({

@@ -4321,5 +4321,145 @@ function prisonerStateListAjax(){
         }
         return $result;
     }
+    public function prisonerRemarks() {
+    	// $this->loadModel('Prisoner');
+
+		 	if($this->request->is(array('post','put')) && isset($this->data['PrisonerRemark']) && is_array($this->data['PrisonerRemark']) && count($this->data['PrisonerRemark']) >0){
+			// debug($this->data['PrisonerRemark']); exit;
+            $db = ConnectionManager::getDataSource('default');
+            $db->begin();       
+            $this->loadModel('PrisonerRemark');      
+            if($this->PrisonerRemark->save($this->request->data)){
+                if(isset($this->data['PrisonerRemark']['id']) && (int)$this->data['PrisonerRemark']['id'] != 0){
+                    if($this->auditLog('PrisonerRemark', 'PrisonerRemark', $this->data['PrisonerRemark']['id'], 'Update', json_encode($this->data))){
+                        $db->commit(); 
+                        $this->Session->write('message_type','success');
+                        $this->Session->write('message','Saved Successfully !');
+                        // $this->redirect(array('action'=>'index'));                      
+                    }else{
+                        $db->rollback();
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Saving Failed !');
+                    }
+                }else{
+                    if($this->auditLog('PrisonerRemark', 'PrisonerRemark', $this->PrisonerRemark->id, 'Add', json_encode($this->data))){
+                        $db->commit(); 
+                        $this->Session->write('message_type','success');
+                        $this->Session->write('message','Saved Successfully !');
+                        // $this->redirect(array('action'=>'index'));                      
+                    }else{
+                        $db->rollback();
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Saving Failed !');
+                    }
+                }
+            }else{
+                $db->rollback();
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Saving Failed !');
+            }
+    }
+    if(isset($this->params['named']['prison_state']) && $this->params['named']['prison_state'] != '')
+		 {
+	        $prison_state=$this->params['named']['prison_state'];
+	         $condition += array('StateOfPrisoner.prison_state' => $prison_state);
+	     }
+	      if(isset($this->params['named']['prison_state']) && $this->params['named']['prison_state'] != '')
+		 {
+	        $prison_state=$this->params['named']['prison_state'];
+	         $condition += array('StateOfPrisoner.prison_state' => $prison_state);
+	     }
+
+	     $prisonerListname = $this->Prisoner->find('list',array(
+                    'recursive'     => -1,
+                    'fields'        => array(
+                        'Prisoner.id',
+                        'Prisoner.prisoner_no'
+                    ),
+                    'order'=>array(
+                        'Prisoner.id'
+                    )
+                ));
+	      $prisonListname = $this->Prison->find('list',array(
+                    'recursive'     => -1,
+                    'fields'        => array(
+                        'Prison.id',
+                        'Prison.name'
+                    ),
+                    
+                    'order'=>array(
+                        'Prison.id'
+                    )
+                ));
+	     $this->set(array(
+			
+			'prisonListname'    => $prisonListname,
+			'prisonerListname'  => $prisonerListname
+		
+		));
+
+    }
+    public function prisonerRemarksAjax() {
+    	$this->layout = 'ajax';
+		$this->loadModel('Prisoner');
+		// $this->loadModel('Prison');
+		$prisoner_state='';
+		$prison_state='';
+		 $condition 		= array('Prisoner.prison_id'=>$this->Session->read('Auth.User.prison_id'));
+		 $this->loadModel('PrisonerRemark');
+		 $prisonerRemarkData = $this->PrisonerRemark->find('all', array());
+
+
+
+
+
+		 
+		 $limit = array('limit'  => 20);		
+		$this->paginate = array(
+			'recursive' => -1,
+			"joins" => array(
+                array(
+                    "table" => "prisoner_age_verifications",
+                    "alias" => "PrisonerAgeVerification",
+                    "type" => "left",
+                    "conditions" => array(
+                        "Prisoner.id = PrisonerAgeVerification.prisoner_id"
+                    ),
+                ),
+            ),
+			'fields'=> array(
+                    'Prisoner.*',
+                    'PrisonerAgeVerification.photo'
+
+                ),
+			'conditions'	=> $condition,
+			
+		)+$limit;
+		$datas = $this->paginate('Prisoner');
+		// debug($prisonerRemarkData); exit;
+		$this->set(array(
+			'datas'			=> $datas,
+			// 'verify_age'    => $verify_age,
+			'prisonerRemarkData'=> $prisonerRemarkData,
+			// 'prisonerList'  => $prisonerList,
+		
+		));
+
+
+    }
+  
+     function getPrisonerRemark($priosner_id=''){
+        $this->loadModel('PrisonerRemark');
+        $fullname = '';
+        $condition = array(
+            'PrisonerRemark.priosner_id'    => $priosner_id
+        );
+        $prisonerRemark = $this->PrisonerRemark->find('all', array(
+            'recursive'     => -1,
+            'conditions'    => $condition
+        ));
+        
+         return $prisonerRemark;
+     }
     
 }

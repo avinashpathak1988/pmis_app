@@ -56,10 +56,10 @@ if(isset($this->request->data['CauseList']['next_date']) && $this->request->data
                                                     <label class="control-label"></label>
                                                     <div class="controls uradioBtn">
 													<?php
-                                                       $to_options= array('1'=>'Out of time','2'=>'Any other');
+                                                    $to_options= array('1'=>'Out of time','2'=>'Any other');
                                                     $attributes2 = array(
                                                         'legend' => false, 
-														'onclick'=> 'dissplayApplicationName(this.value)',
+														'onclick'=> 'dissplayApplicationName(this.value,'.$prisoner_id.')',
                                                         'default'=>2
                                                     );
                                                     echo $this->Form->radio('application_name_option', $to_options, $attributes2);
@@ -481,7 +481,7 @@ if(isset($this->request->data['CauseList']['next_date']) && $this->request->data
                                                         <div class="controls">
                                                                 <?php 
                                                                
-                                                                 echo $this->Form->input('case_no.',array('value'=>$case_no,'id'=>'file_no','div'=>false,'label'=>false,'class'=>'form-control span11 commontab pmis_select','type'=>'select', 'onchange'=>'showOffenceCount(this.value,2)', 'multiple','options'=>$casefilesToCourt, 'empty'=>'')); 
+                                                                 echo $this->Form->input('case_no.',array('value'=>$case_no,'id'=>'file_no','div'=>false,'label'=>false,'class'=>'form-control span11 commontab pmis_select','type'=>'select', 'onchange'=>'showOffenceCount(this.value,2)', 'multiple','options'=>$casefilesToCourt,)); 
 
                                                                  ?>
                                                         </div>
@@ -3214,38 +3214,38 @@ function showCourtName(id,count)
 	  
 	if(id == 8)
     {
-        $('label[for="0_magistrate_level"]').text("Judges:");
-        $('label[for="1_magistrate_level"]').text("Judges:");
+        $('label[for="0_magistrate_level"]').html('Judges<span style="color:red">*</span>:');
+        $('label[for="1_magistrate_level"]').html('Judges<span style="color:red">*</span>:');
     }
     
     if(id == 5)
     {
-        $('label[for="0_magistrate_level"]').text("Magistrate:");
-        $('label[for="1_magistrate_level"]').text("Magistrate:");
+        $('label[for="0_magistrate_level"]').html('Magistrate<span style="color:red">*</span>:');
+        $('label[for="1_magistrate_level"]').html('Magistrate<span style="color:red">*</span>:');
     }
     
     if(id == 6)
     {
-        $('label[for="0_magistrate_level"]').text("Magistrate:");
-        $('label[for="1_magistrate_level"]').text("Magistrate:");
+        $('label[for="0_magistrate_level"]').html('Magistrate<span style="color:red">*</span>:');
+        $('label[for="1_magistrate_level"]').html('Magistrate<span style="color:red">*</span>:');
     }
     
     if(id == 7)
     {
-        $('label[for="0_magistrate_level"]').text("Chief Magistrate:");
-        $('label[for="1_magistrate_level"]').text("Chief Magistrate:");
+        $('label[for="0_magistrate_level"]').html('Chief Magistrate<span style="color:red">*</span>:');
+        $('label[for="1_magistrate_level"]').html('Chief Magistrate<span style="color:red">*</span>:');
     }
     
     if(id == 9)
     {
-        $('label[for="0_magistrate_level"]').text("Panel Of Justices:");
-       $('label[for="1_magistrate_level"]').text("Panel Of Justices:");
+        $('label[for="0_magistrate_level"]').html('Panel Of Justices<span style="color:red">*</span>:');
+       $('label[for="1_magistrate_level"]').html('Panel Of Justices<span style="color:red">*</span>:');
     }
     
     if(id == 10)
     {
-        $('label[for="0_magistrate_level"]').text("Panel Of Justices:"); 
-        $('label[for="1_magistrate_level"]').text("Panel Of Justices:"); 
+        $('label[for="0_magistrate_level"]').html('Panel Of Justices<span style="color:red">*</span>:'); 
+        $('label[for="1_magistrate_level"]').html('Panel Of Justices<span style="color:red">*</span>:'); 
     }
    
       
@@ -3293,7 +3293,7 @@ function showAppeal(isdual)
 
 
 
-function dissplayApplicationName(value)
+function dissplayApplicationName(value,prisoner_id)
 {
 	if(value==1)
 	{
@@ -3303,6 +3303,14 @@ function dissplayApplicationName(value)
 	{
 		$("#application_name").val('');
 	}
+	
+	var getFileURL = '<?php echo $this->Html->url(array('controller'=>'Courtattendances','action'=>'showAppCourtFile'));?>/'+prisoner_id+'/'+value;
+		$.post(getFileURL,{},function(data){
+			if(data)
+			{
+				$('#case_file_no').html(data);
+			}
+		 });
 } 
 
 /*function ApplicationToCourtSave()

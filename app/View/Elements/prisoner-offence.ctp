@@ -3,10 +3,12 @@ $prisoner_type_id =$this->data['Prisoner']['prisoner_type_id'];
 $caseFiles = array(); 
 $judicialOfficerLevel = 'Presiding Judicial Officer';
 $isAdd = $funcall->isAccess('prisoner_admission','is_add'); 
+$isAdd = 1;
 if(isset($this->data['PrisonerAdmission']['id']) && !empty($this->data['PrisonerAdmission']['id']))
 {
     $caseFiles = $funcall->getPrisonerCaseFiles($this->data['PrisonerAdmission']['id']);
 }
+//debug($caseFiles);
 ?>
     <!-- Court details -->
     <div class="row-fluid secondDiv widget-box" style="background:#fff;border-top:1px solid #ddd;border-bottom:1px solid #ddd;box-shadow:0 0 5px #ddd;border-left:5px solid #a03230;margin:10px 0px;">
@@ -420,7 +422,7 @@ if(isset($this->data['PrisonerAdmission']['id']) && !empty($this->data['Prisoner
                                         <div class="clearfix"></div>
                                         <div class="">
                                             <span class="input-group-btn">
-                                                <button class="btn btn-success btn-add add-count" type="button" style="padding: 8px 8px;" onclick="addOffence('<?php echo $c;?>');">
+                                                <button class="btn btn-success btn-add add-count" type="button" style="padding: 8px 8px;" onclick="addOffence('<?php echo $c;?>');" id="add-count-<?php echo $c;?>">
                                                     Add Count
                                                 </button>
                                             </span>
@@ -636,7 +638,7 @@ if(isset($this->data['PrisonerAdmission']['id']) && !empty($this->data['Prisoner
                                 <div class="clearfix"></div>
                                 <div class="">
                                     <span class="input-group-btn">
-                                        <button class="btn btn-success offence-add-btn add-count" type="button" style="padding: 8px 8px;" id="0-offence-add-btn" onclick="addOffence('0');">
+                                        <button class="btn btn-success offence-add-btn add-count" type="button" style="padding: 8px 8px;" onclick="addOffence('0');" id="add-count-0">
                                             <!-- <span class="icon icon-plus"></span> -->
                                             Add Count
                                         </button>
@@ -657,7 +659,7 @@ if(isset($this->data['PrisonerAdmission']['id']) && !empty($this->data['Prisoner
             <div class="">
                 <?php if($isAdd == 1){?> 
                     <span class="input-group-btn">
-                        <button class="btn btn-success btn-add case-btn-add" type="button" style="padding: 8px 8px;">
+                        <button class="btn btn-success btn-add case-btn-add" type="button" style="padding: 8px 8px;" id="add-case-file">
                             Add File
                         </button>
                     </span>
@@ -704,12 +706,18 @@ $(function()
     $(document).on('click', '.case-btn-add', function(e)
     {
         e.preventDefault();
-
+        //disable button -- START -- 
+        $('#add-case-file').html('Loading');
+        $('#add-case-file').removeClass('btn-success');
+        $('#add-case-file').addClass('btn-warning');
+        $('#add-case-file').removeAttr( "onclick" );
+        $('#add-case-file').css( "cursor","default" );
+        //disable button -- END -- 
         var count = parseInt($('#case_list .case_list').length);
         var prisoner_type_id = '<?php echo $prisoner_type_id;?>';
         $.get(addCaseURL, {key:count, prisoner_type_id:prisoner_type_id}, function(res) {
             $('#case_list').append(res);
-            $('#'+count+'_offence_list .offence_list:last').hide();
+            //$('#'+count+'_offence_list .offence_list:last').hide();
         });
 
         setTimeout(function(){
@@ -730,6 +738,13 @@ $(function()
             $("#"+count+"_0_offence_category_id").select2({placeholder: "-- Select --"});
             $("#"+count+"_0_district_id").select2({placeholder: "-- Select --"});
 
+            //Enable button -- START -- 
+            $('#add-case-file').html('Add File');
+            $('#add-case-file').removeClass('btn-warning');
+            $('#add-case-file').addClass('btn-success');
+            $('#add-case-file').attr( "onclick", "addOffence('"+case_key+"');" );
+            $('#add-case-file').css( "cursor","pointer" );
+            //Enable button -- END --
             setTimeout(function(){
                 $('#'+count+'_offence_list .offence_list:last').show();
             }, 100);
@@ -742,6 +757,13 @@ $(function()
 //Add offence START --
 function addOffence(case_key)
 {
+    //disable button -- START -- 
+    $('#add-count-'+case_key).html('Loading');
+    $('#add-count-'+case_key).removeClass('btn-success');
+    $('#add-count-'+case_key).addClass('btn-warning');
+    $('#add-count-'+case_key).removeAttr( "onclick" );
+    $('#add-count-'+case_key).css( "cursor","default" );
+    //disable button -- END -- 
     if(case_key != '')
     {
         var count = parseInt($('#'+case_key+'_offence_list .offence_list').length);
@@ -765,7 +787,13 @@ function addOffence(case_key)
             setTimeout(function(){
                 $('#'+case_key+'_offence_list .offence_list:last').show();
             }, 100);
-            
+            //Enable button -- START -- 
+            $('#add-count-'+case_key).html('Add Count');
+            $('#add-count-'+case_key).removeClass('btn-warning');
+            $('#add-count-'+case_key).addClass('btn-success');
+            $('#add-count-'+case_key).attr( "onclick", "addOffence('"+case_key+"');" );
+            $('#add-count-'+case_key).css( "cursor","pointer" );
+            //Enable button -- END -- 
         }, 1200);
     }
 }

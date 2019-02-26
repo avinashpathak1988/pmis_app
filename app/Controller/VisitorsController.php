@@ -875,7 +875,7 @@ class VisitorsController   extends AppController {
                                 if(isset($visitor['Visiter']['prisoner_id'])){
                                     $prionerId = $visitor['Visiter']['prisoner_id'];
                                     $prisoner = $this->Prisoner->findById($prionerId);
-
+                                    $prisonerToVisit = $this->Prisoner->findById($prionerId);
                                     $visitorNamesRequest = $visitor['VisitorName'];
 
                                     foreach ($visitorNamesRequest as $visitorName) {
@@ -885,11 +885,9 @@ class VisitorsController   extends AppController {
                                         if(isset($prisoner['Prisoner']['prisoner_no'])){
                                             $prisoner_id = $prisoner['Prisoner']['id'];
                                             $checkAllowed = $this->checkIfAllowedToVisitBackendCheck($prisoner_id,$natIdType,$natId);
-                                        }else{
-                                            $checkAllowed =1;
                                         }
                                         
-                                        if($checkAllowed == 2 || $checkAllowed == 0){
+                                        if($checkAllowed == 2 || $checkAllowed == 0 || $checkAllowed == 3){
                                             $allAllowed = $checkAllowed;break;
                                         }
                                     }
@@ -984,12 +982,7 @@ class VisitorsController   extends AppController {
                                             if(isset($visitorPrisonerItem['VisitorPrisonerCashItem']['pp_amount'])){
                                                     $this->loadModel('Prisoner'); 
 
-                                                    $prisonerToVisit = $this->Prisoner->find('first', array(
-                                                        //'recursive'     => -1,
-                                                        'conditions'    => array(
-                                                            'Prisoner.prisoner_no'      => $this->data['Visitor']['prisoner_no']
-                                                        ),
-                                                    ));
+                                                    
                                             $alreadyExistingItems = $this->VisitorPrisonerCashItem->find('all',array(
                                                     'recursive'     => -1,
                                                     'conditions'    => array(
@@ -1173,6 +1166,10 @@ class VisitorsController   extends AppController {
                         $this->Session->write('message','Visitors are in Blacklisted list.');
                         $this->redirect(array('action'=>'index'));
 
+                }else if($allAllowed == 3){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Visitor not allowed by stage.');
+                        $this->redirect(array('action'=>'index'));
                 }else{
                     $this->Session->write('message_type','error');
                     $this->Session->write('message','Visitors not allowed to visit.');
@@ -2157,7 +2154,96 @@ public function gateBookReportAjax(){
         exit;
     }
 
+
+    public function getStageValidate($prisoner_id){
+        // $prisoner_id = $this->params['named']['prisoner_id'];
+        $this->loadModel('Privilege');
+        $stageData = $this->StageHistory->find("first", array(
+            "recursive"     => -1,
+            "conditions"    => array(
+                "StageHistory.prisoner_id"  => $prisoner_id,
+                "StageHistory.is_trash"     => 0,
+            ),
+        ));
+
+        if(isset($stageData) && count($stageData)>0){
+            $conditionPri = array();
+            $conditionLetter = array();
+            $type = '';            
+            $conditionPri = array("Privilege.privilege_right_id"=>Configure::read('VISIT-RECEIVE'));
+
+            // check the diciplinary action for privilages =====
+            $punishmentData = $this->InPrisonPunishment->find("first", array(
+                "recursive"     => -1,
+                "conditions"    => array(
+                    "InPrisonPunishment.prisoner_id"    => $prisoner_id,
+                    "InPrisonPunishment.is_trash"       => 0,
+                    "InPrisonPunishment.status"         => 'Approved',
+                    "InPrisonPunishment.internal_punishment_id"         => 6,
+                    "'".date("Y-m-d")."' between InPrisonPunishment.punishment_start_date and InPrisonPunishment.punishment_end_date"
+                ),
+                "order"         => array(
+                    "InPrisonPunishment.id"    => "desc",
+                ),
+            ));
+            // echo "<pre>";print_r($punishmentData);
+            $is_punishment = false;
+            if(isset($punishmentData['InPrisonPunishment']['privilege_id']) && $punishmentData['InPrisonPunishment']['privilege_id']!=''){
+                if(in_array(Configure::read("VISIT-RECEIVE"),explode(",", $punishmentData['InPrisonPunishment']['privilege_id']))){
+                    $type = "receive";
+                    $conditionPri = array("Privilege.privilege_right_id"=>Configure::read("VISIT-RECEIVE"));
+                    $is_punishment = true;
+                }
+            }
+
+            
+            $privilegeData = $this->Privilege->find("first", array(
+                "recursive"     => -1,
+                "conditions"    => array(
+                    "Privilege.stage_id"  => $stageData['StageHistory']['stage_id'],
+                    "Privilege.is_trash"     => 0,
+                )+$conditionPri,
+            ));
+            // debug($privilegeData);
+            if(isset($privilegeData['Privilege']['interval_week']) && $privilegeData['Privilege']['interval_week']!=''){
+                $visitersData = $this->Visitor->find("first", array(
+                    "recursive"     => -1,
+                    "conditions"    => array(
+                        "Visitor.prisoner_no"  => $this->Prisoner->field("prisoner_no", array("Prisoner.id"=>$prisoner_id)),
+                        "Visitor.is_trash"     => 0,
+                    ),
+                    "order"         => array(
+                        "Visitor.id"    => "desc",
+                    ),
+                ));
+                //=====================================================
+                if($is_punishment){
+                    $nextReceiveDate = date('d-m-Y', strtotime($punishmentData['InPrisonPunishment']['punishment_end_date']));
+
+                    if(strtotime($nextReceiveDate) > strtotime(date("d-m-Y"))){
+                        $privilage = array();
+                        foreach (explode(",", $punishmentData["InPrisonPunishment"]["privilege_id"]) as $key => $value) {
+                            $privilage[] = $this->getName($value,"PrivilegeRight","name");
+                        }
+                        return "This prisoner receive visiter after ".$nextReceiveDate.". Prisoner has punished by Forfeiture of privileges, restrict for ".implode(", ", $privilage)." till ".$nextReceiveDate;
+                    }
+                }
+                //=====================================================
+                if(isset($visitersData) && count($visitersData)>0){
+                    $nextReceiveDate = date('d-m-Y', strtotime('+'.$privilegeData['Privilege']['interval_week'].' week', strtotime($visitersData['Visitor']['date'])));
+                    if(strtotime($nextReceiveDate) > strtotime(date("d-m-Y"))){
+                        return "This prisoner receive visiter after ".date('d-m-Y', strtotime('+'.$privilegeData['Privilege']['interval_week'].' week', strtotime($visitersData['Visitor']['date']))).". Prisoner belongs to ".$this->getName($stageData['StageHistory']['stage_id'],"Stage","name").", So the prisoner will be able to receive visiter in interval of ".$privilegeData['Privilege']['interval_week']." weeks";
+                    }                    
+                }
+            }else{
+                return "Privilege is not updated for ".$this->getName($stageData['StageHistory']['stage_id'],"Stage","name");
+            }
+        }else{
+            return "This prisoner is not in stage system";
+        }
+    }
     //check pass
+   //check pass
     public function checkIfAllowedToVisit(){
         $this->layout = 'ajax';
         $this->loadModel('Prisoner');
@@ -2210,29 +2296,62 @@ public function gateBookReportAjax(){
 
 
                     //check pass
-                    if($allowed == 'false'){
-                        if(isset($natIdType) && $natIdType != '' && isset($natId) && $natId != ''){
+                if($allowed == 'false'){
+                    if(isset($natIdType) && $natIdType != '' && isset($natId) && $natId != ''){
                         $this->loadModel('VisitorPass');
-                        $visitorPasses = $this->VisitorPass->find('first', array(
-                            //'recursive'     => -1,
+                        $this->loadModel('PassVisitor');
+                        $visitorPasses = $this->VisitorPass->find('all', array(
+                            'recursive'     => -1,
                             'conditions'    => array(
                                 'VisitorPass.prison_id'      => $prison_id,
-                                'VisitorPass.national_card'      => $natId,
                                 'VisitorPass.prisoner_id'      => $prisoner_id,
                             ),
                          ));
+                        foreach ($visitorPasses as $pass) {
+                            $passVisitors = $this->PassVisitor->find('all',array(
+                                    'recursive'     => -1,
+                                        'conditions'    => array(
+                                            'PassVisitor.pass_id'      => $pass['VisitorPass']['id'],
+                                            'PassVisitor.is_trash'      => 0,
+
+                                        ), 
+                                ));
+
+                            foreach ($passVisitors as $pass_visitor) {
+
+                                    if($pass_visitor['PassVisitor']['nat_id_type'] == $natIdType && $pass_visitor['PassVisitor']['nat_id'] ==  $natId){
+                                        if($pass['VisitorPass']['is_valid'] == 1){
+                                            if($pass['VisitorPass']['is_suspended'] == 1){
+                                                $visitDate = date('d-m-Y',strtotime($pass['VisitorPass']['suspended_date']));
+                                            }else{
+                                                $visitDate = date('d-m-Y',strtotime($pass['VisitorPass']['valid_form']));
+                                            }
+
+                                             if($visitDate ==  date('d-m-Y') ){
+                                                $allowed ='true';
+                                                } 
+                                        }
+                                        
+                                           
+                                        }
+                                }
+                        }
                         //debug($visitorPasses);exit;
-                            if(isset($visitorPasses['VisitorPass'])){
-                                $visitDate = date('d-m-Y',strtotime($visitorPasses['VisitorPass']['valid_form']));
-                               if($visitDate ==  date('d-m-Y') ){
-                                    $allowed ='true';
-                               }  
-                            }
-                           
+                    }
+                }
+
+                if($prisoner['Prisoner']['prisoner_type_id'] == Configure::read('CONVICTED')){
+                    if($allowed == 'true'){
+                        $stageData = $this->getStageValidate($prisoner_id);
+                        if($stageData != ''){
+                            $allowed='stageNa';
                         }
                     }
-
+                }
+                
             }
+
+
             //debug($natIdType);exit;
             $this->loadModel('BlacklistedVisitor');
             if($allowed == 'true'){
@@ -2252,6 +2371,8 @@ public function gateBookReportAjax(){
                 }else{
                     echo 'allowed';
                 }
+            }else if($allowed == 'stageNa'){
+                echo $stageData; 
             }
             else{
                 echo 'not allowed';
@@ -2314,23 +2435,56 @@ public function gateBookReportAjax(){
                 //check pass
                 if($allowed == 'false'){
                     if(isset($natIdType) && $natIdType != '' && isset($natId) && $natId != ''){
-                    $this->loadModel('VisitorPass');
-                    $visitorPasses = $this->VisitorPass->find('first', array(
-                        //'recursive'     => -1,
-                        'conditions'    => array(
-                            'VisitorPass.prison_id'      => $prison_id,
-                            'VisitorPass.national_card'      => $natId,
-                            'VisitorPass.prisoner_id'      => $prisoner_id,
-                        ),
-                     ));
-                    //debug($visitorPasses);exit;
-                        if(isset($visitorPasses['VisitorPass'])){
-                            $visitDate = date('d-m-Y',strtotime($visitorPasses['VisitorPass']['valid_form']));
-                           if($visitDate ==  date('d-m-Y') ){
-                                $allowed ='true';
-                           }  
+                        $this->loadModel('VisitorPass');
+                        $this->loadModel('PassVisitor');
+
+                        $visitorPasses = $this->VisitorPass->find('all', array(
+                            'recursive'     => -1,
+                            'conditions'    => array(
+                                'VisitorPass.prison_id'      => $prison_id,
+                                'VisitorPass.prisoner_id'      => $prisoner_id,
+                            ),
+                         ));
+                        foreach ($visitorPasses as $pass) {
+                            $passVisitors = $this->PassVisitor->find('all',array(
+                                    'recursive'     => -1,
+                                        'conditions'    => array(
+                                            'PassVisitor.pass_id'      => $pass['VisitorPass']['id'],
+                                            'PassVisitor.is_trash'      => 0,
+                                        ), 
+                                ));
+
+                            foreach ($passVisitors as $pass_visitor) {
+
+                                    if($pass_visitor['PassVisitor']['nat_id_type'] == $natIdType && $pass_visitor['PassVisitor']['nat_id'] ==  $natId){
+                                        if($pass['VisitorPass']['is_valid'] == 1){
+                                            if($pass['VisitorPass']['is_suspended'] == 1){
+                                                $visitDate = date('d-m-Y',strtotime($pass['VisitorPass']['suspended_date']));
+                                            }else{
+                                                $visitDate = date('d-m-Y',strtotime($pass['VisitorPass']['valid_form']));
+                                            }
+
+                                             if($visitDate ==  date('d-m-Y') ){
+                                                $allowed ='true';
+                                                } 
+                                        }
+                                        
+                                           
+                                        }
+                                }
                         }
-                       
+                        //debug($visitorPasses);exit;
+                    }
+                }
+
+                if($prisoner['Prisoner']['prisoner_type_id'] == Configure::read('CONVICTED')){
+                    if($allowed == 'true'){
+                        $stageData = $this->getStageValidate($prisoner_id);
+                        if($stageData != ''){
+                            $allowed='false';
+                            return 3;
+
+                        }
                     }
                 }
 
@@ -2360,6 +2514,7 @@ public function gateBookReportAjax(){
         }
         
     }
+
     public function submitCanteenFood(){
         $this->layout = 'ajax';
         $this->loadModel('CanteenFoodItem');

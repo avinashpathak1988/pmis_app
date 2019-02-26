@@ -14,6 +14,12 @@
     .form-text-full{
     	width:100%;
     }
+    .froward_btn{
+        display: inline-block;
+        position: absolute;
+        bottom: -34px;
+        left: 56%;
+    }
     textarea{
     	 background-image: -webkit-linear-gradient(left, white 10px, transparent 10px), -webkit-linear-gradient(right, white 10px, transparent 10px), -webkit-linear-gradient(white 30px, #ccc 30px, #ccc 31px, white 31px);
 	    background-image: -moz-linear-gradient(left, white 10px, transparent 10px), -moz-linear-gradient(right, white 10px, transparent 10px), -moz-linear-gradient(white 30px, #ccc 30px, #ccc 31px, white 31px);
@@ -57,6 +63,9 @@
     .form-table2 th{
         border:1px solid;
     }
+    #date_of_granted_div{
+        display: none;
+    }
 
 </style>
 
@@ -64,20 +73,48 @@
     <div class="row-fluid">
         <div class="span12">
             <div class="widget-box">
+                <?php echo $this->element('reportheader'); ?>
                 <div class="widget-title"> <span class="icon"> <i class="icon-align-justify"></i> </span>
                     <h5>PRISONS DEPARTMENT</h5>
                     
-                   <div style="float:right;padding-top: 7px;">
-                        
+                   <!-- <div style="float:right;padding-top: 7px;">
+                           
                          <?php echo $this->Html->link('Extract prisoners record list',array('controller'=>'ExtractPrisonersRecord','action'=>'index'),array('class' => 'btn btn-primary'));?> 
                         &nbsp;&nbsp;
-                    </div>
+                    </div> -->
                </div>
 
                 <div class="widget-content nopadding">
                     <?php echo $this->Form->create('ExtractPrisonerRecord',array('class'=>'form-horizontal','enctype'=>'multipart/form-data'));?>
                             <?php echo $this->Form->input('id', array('type'=>'hidden' ))?>
                             <?php echo $this->Form->input('prisoner_id', array('type'=>'hidden','value'=>$prisoner['Prisoner']['id']))?>
+                    <div class="form-row italica">
+
+                            <?php if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE') && isset($data['ExtractPrisonerRecord']['id']))
+                                {
+
+                                  $currentStatus= $data['ExtractPrisonerRecord']['status'];
+                                if($currentStatus == 'Approved' || $currentStatus == 'Final-Approved'){
+                                    $finalStatusList = array('1'=>'Granted','2'=>'Rejected');
+                                   ?>
+                                   <div class="span6">
+                                       <label >Select Status :</label>
+                                  <?php echo $this->Form->input('final_status',array('div'=>false,'label'=>false,'class'=>'form-control ','type'=>'select','options'=>$finalStatusList,'onchange'=>'showIfGranted(this.value)', 'empty'=>'-- Select Status --','required','id'=>'final_status','title'=>'Please select Status','style'=>'width:80%;'));?>
+                                   </div>
+                                   <div class="span6" id="date_of_granted_div">
+                                    <label >Select Date of granted :</label>
+
+                                  <?php echo $this->Form->input('date_of_granted',array('div'=>false,'label'=>false,'class'=>'form-control mydate','type'=>'text','id'=>'date_of_granted','title'=>'Please select Date of Granted','style'=>'width:80%;'));?>
+                                   </div>
+                                   
+                            <?php 
+                                    }
+
+                                } 
+                            ?>
+                    </div><br/>
+                    <br/>
+                    <div class="row" style="height: 40px;"></div>
                     <div class="form-row italica">
                         Reference Number in regard to any previous Correspondence with Attorney General's Office
                          <?php echo $this->Form->input('ref_no',array('div'=>false,'label'=>false,'class'=>'dotted-input','style'=>'width:10%;','type'=>'text','required'));?>
@@ -354,12 +391,83 @@
                     <span class="span12">
                                 <div class="form-actions" align="center">
                                     <button type="submit" id="extractSaveBtn" class="btn btn-success formSaveBtn" formnovalidate="true">Save</button>
-                                    <?php echo $this->Form->button('Reset', array('type'=>'reset', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger formResetBtn', 'formnovalidate'=>true))?>
+                                <?php echo $this->Form->end();?>
+                                    <?php 
+//Approval process start
+$btnName = Configure::read('SAVE');
+$isModal = 0;
+if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE'))
+{
+  $btnName = Configure::read('SAVE');
+}
+else if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
+{
+  $btnName = Configure::read('REVIEW');
+  $isModal = 1;
+}
+else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+{
+  $btnName = Configure::read('APPROVE');
+  $isModal = 1;
+}
+else if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE'))
+{
+  $btnName = Configure::read('FINALAPPROVE');
+  $isModal = 1;
+}
+echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal','enctype'=>'multipart/form-data','url' => '/ExtractPrisonersRecord/add/'.$id));?>
+<?php if($isModal == 1)
+{?>
+  <!-- Verify Modal START -->
+  <?php echo $this->element('verify-modal');?>                       
+  <!-- Verify Modal END -->
+<?php } ?>
+
+                                    <?php if(isset($data['ExtractPrisonerRecord']['id'])){ 
+                                        $credit_id = $data['ExtractPrisonerRecord']['id'];
+                                        $rowCnt =0;
+                                        $modelName='ExtractPrisonerRecord';
+                                        ?>
+ <?php 
+              if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE') && ($data[$modelName]['status'] == 'Draft'))
+              {
+                echo $this->Form->input('ApprovalProcess.'.$rowCnt.'.fid', array(
+                        'type'=>'hidden', 'value'=>$credit_id, 'label'=>false,
+                        'format' => array('before', 'input', 'between', 'label', 'after', 'error' ) 
+                  ));
+              }
+              else if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE') && ($data[$modelName]['status'] == 'Saved'))
+              {
+                echo $this->Form->input('ApprovalProcess.'.$rowCnt.'.fid', array(
+                        'type'=>'hidden', 'value'=>$credit_id, 'label'=>false,
+                        'format' => array('before', 'input', 'between', 'label', 'after', 'error' ) 
+                  ));
+              }
+              else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') && ($data[$modelName]['status'] == 'Reviewed'))
+              {
+                echo $this->Form->input('ApprovalProcess.'.$rowCnt.'.fid', array(
+                        'type'=>'hidden', 'value'=>$credit_id, 'label'=>false,
+                        'format' => array('before', 'input', 'between', 'label', 'after', 'error' ) 
+                  ));
+              }
+              else if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE') && ($data[$modelName]['status'] == 'Approved'))
+              {
+                echo $this->Form->input('ApprovalProcess.'.$rowCnt.'.fid', array(
+                        'type'=>'hidden', 'value'=>$credit_id, 'label'=>false,
+                        'format' => array('before', 'input', 'between', 'label', 'after', 'error' ) 
+                  ));
+              }
+              ?>
+
+                                        <button type="button" onclick="ShowConfirmYesNo();" tabcls="next" id="forwardBtn" class="btn btn-primary froward_btn"><?php echo $btnName; ?></button>
+
+                                 <?php   } ?>
+                                <?php echo $this->Form->end();?>
+                                 
                                 </div>
                             </span>
 
 
-                                <?php echo $this->Form->end();?>
 
                 </div>
 
@@ -370,6 +478,8 @@
 </div>
 <?php 
 $allowedEdit = false;
+$isCgp =false;
+
 if(isset($this->data['ExtractPrisonerRecord']['status']) && $this->data['ExtractPrisonerRecord']['status'] == 'Draft' ){
         if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE')){
             $allowedEdit =true;
@@ -382,22 +492,116 @@ if(isset($this->data['ExtractPrisonerRecord']['status']) && $this->data['Extract
     if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE')){
         $allowedEdit =true;
         }
+}else if(isset($this->data['ExtractPrisonerRecord']['status']) && $this->data['ExtractPrisonerRecord']['status'] == 'Approved'){
+
+    if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE')){
+        $allowedEdit =true;
+
+        }
 }
+if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE')){
+        $isCgp = true;
+    }
+
 
 if(!isset($this->data['ExtractPrisonerRecord']['status'])){
     $allowedEdit = true;
 }
 
-if(!$allowedEdit){ ?>
+if($allowedEdit){ ?>
     <script type="text/javascript">
         $(document).ready(function(){
-            $("#ExtractPrisonerRecordAddForm :input").prop("disabled", true);
+                $("#ExtractPrisonerRecordAddForm :input").prop("disabled", false);
+                $("#ApprovalProcessFormAddForm :input").prop("disabled", false);
+                 $('#extractSaveBtn').removeAttr('disabled');
+
+                 $('#forwardBtn').removeAttr('disabled');
+                $('#forwardBtn').show();
+
         });
     </script>
 <?php
-    }
+    }else{ ?>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#ExtractPrisonerRecordAddForm :input").prop("disabled", true);
+                $("#ApprovalProcessFormAddForm :input").prop("disabled", false);
+                
+                 $('#forwardBtn').attr('disabled','disabled');
+                $('#forwardBtn').hide();
+                $('#extractSaveBtn').hide();
+                
+            });
+        </script>
+<?php }
+?>
+<?php if($isCgp){ ?>
+    <script type="text/javascript">
+        $(document).ready(function(){
+
+                $("#final_status").removeAttr('disabled');
+                $('#date_of_granted').removeAttr('disabled');
+
+        });
+    </script>
+<?php
+    }else{ ?>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                
+                $("#final_status").attr('readonly','readonly');
+                $('#date_of_granted').attr('readonly','readonly');
+                
+            });
+        </script>
+<?php }
 ?>
 <script type="text/javascript">
+        $(document).ready(function(){
+            $('#verifyBtn').click(function(){
+                if($("#ApprovalProcessFormAddForm").valid()){
+                        if( !confirm('Are you sure to save?')) {
+                                        return false;
+                        }
+                    }
+                });
+        });
+    
+      function showIfGranted(selVal){
+        if(selVal == '1'){
+            $('#date_of_granted_div').css('display','block');
+        }else{
+            $('#date_of_granted_div').css('display','none');
+        }
+        // /alert(selVal);
+      }
+
+
+        var btnName = '<?php echo $btnName;?>';
+        var isModal = '<?php echo $isModal;?>';
+        function ShowConfirmYesNo() {
+            AsyncConfirmYesNo(
+                    "Are you sure want to "+btnName+"?",
+                    btnName,
+                    'Cancel',
+                    MyYesFunction,
+                    MyNoFunction
+                );
+        }
+
+        function MyYesFunction() {
+          if(isModal == 1)
+          {
+            $('#verify').modal('show');
+          }
+          else 
+          {
+            $('#ApprovalProcessFormAddForm').submit();
+          }
+        }
+        function MyNoFunction() {
+            
+        }
     $(function(){
         $("#ExtractPrisonerRecordAddForm").validate({ 
             rules: {  

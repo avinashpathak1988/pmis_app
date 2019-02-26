@@ -3,7 +3,7 @@
 //debug($appeal_file_no);
 ?>
 <div>
-    <div class="span12" style="background:#fff;border-top:1px solid #ddd;border-bottom:1px solid #ddd;box-shadow:0 0 5px #ddd;border-left:5px solid #a03230;margin:10px 0px; position:relative; padding-bottom: 10px;">
+    <div class="span12 petition_hide" style="background:#fff;border-top:1px solid #ddd;border-bottom:1px solid #ddd;box-shadow:0 0 5px #ddd;border-left:5px solid #a03230;margin:10px 0px; position:relative; padding-bottom: 10px;">
         <div class="span6">
                 <div class="control-group">
                     <label class="control-label">Prisoner Name :</label>
@@ -32,7 +32,7 @@
         </div> 
         <div class="span6">
             <div class="control-group">
-                <label class="control-label">Date of Petition:</label>
+                <label class="control-label">Date of Submission of Petition<?php echo $req;?>:</label>
                 <div class="controls">
                     <?php echo $this->Form->input('petition_date',array('div'=>false,'label'=>false,'class'=>'form-control span11 maxCurrentDate','type'=>'text','placeholder'=>"Enter petition date",'required'=>false, 'readonly', 'default'=>date('d-m-Y')));?>
                 </div>
@@ -42,7 +42,7 @@
         <div class="clearfix"></div>
         <div class="span6">
             <div class="control-group">
-                <label class="control-label">Court Level<?php echo $req; ?> :</label>
+                <label class="control-label">Court Level:</label>
                 <div class="controls">
                     <?php $cid = "'petition'";
                     echo $this->Form->input('courtlevel_id',array('div'=>false,'label'=>false,'onChange'=>'getCourtList(this.value,'.$cid.')','class'=>'form-control span11 pmis_select','type'=>'select','options'=>$courtLevelList, 'empty'=>'','required','id'=>'petition_courtlevel_id', 'title'=>'Select Court Level'));?>
@@ -52,7 +52,7 @@
         <div class="span6">
             <div class="control-group">
                 <label class="control-label">Court Name
-                    <span id="admission_section_of_law_id_div"><?php echo $req; ?></span> :</label>
+                    <span id="admission_section_of_law_id_div"></span> :</label>
                 <div class="controls">
                     <?php 
                     $courtList = array();
@@ -67,7 +67,10 @@
                 <label class="control-label">Case File no:</label>
                 <div class="controls">
                     <?php 
-                        echo $this->Form->input('petition_case_file_no',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','onChange'=>'getPetitionOffence(this.value)','type'=>'select','options'=>$case_file_no, 'empty'=>'','required', 'title'=>'Case File is required.', 'required' => false)); ?>
+                    
+                    echo implode(", ", $case_file_no);
+                   
+                       //echo $this->Form->input('petition_case_file_no',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','onChange'=>'getPetitionOffence(this.value)','type'=>'select','options'=>$case_file_no, 'empty'=>'','required', 'title'=>'Case File is required.', 'required' => false)); ?>
                 </div>
             </div>
         </div>
@@ -75,7 +78,7 @@
             <div class="control-group">
                 <label class="control-label">High Court File No:</label>
                 <div class="controls">
-                    <?php echo $this->Form->input('petition_court_file_no',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'text','placeholder'=>"Enter High Court File No",'required'=>false));?>
+                    <?php //echo $this->Form->input('petition_court_file_no',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'text','placeholder'=>"Enter High Court File No",'required'=>false));?>
                 </div>
             </div>
         </div>
@@ -84,7 +87,9 @@
             <div class="control-group">
                 <label class="control-label">Offence:</label>
                 <div class="controls">
-                    <?php echo $this->Form->input('offence_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','options'=>$offenceIdList, 'empty'=>'','required'));?>
+                    <?php 
+                     echo implode(", ", $offenceIdList);
+                   // echo $this->Form->input('offence_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','options'=>$offenceIdList, 'empty'=>'','required'));?>
                 </div>
             </div>
         </div>

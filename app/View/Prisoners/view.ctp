@@ -178,7 +178,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div class="span6">
                                                         <div class="control-group">
-                                                            <label class="control-label">Date of Birth:</label>
+                                                            <label class="control-label">Date of Birth :</label>
                                                              <?php echo date('d-m-Y',strtotime($data['Prisoner']['date_of_birth']));?>
 
                                                              
@@ -217,13 +217,28 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                       <td>
                                                     <div class="span6">
                                                         <div class="control-group">
-                                                            <label class="control-label">Is a Refugee</label>
+                                                            <label class="control-label">Is a Refugee : </label>
                                                              <?php if ($data['Prisoner']['is_refugee']==1) {
                                                                  echo "Yes";
                                                              }else{echo "No";} ?>
                                                            
                                                         </div>
                                                     </div>
+                                                    </td>
+
+                                                </tr>
+                                                <tr>
+                                                   
+                                                      <td>
+                                                   		<div class="span6">
+                                                        	<div class="control-group">
+                                                            <label class="control-label">DOA : </label>
+                                                             <?php if ($data['Prisoner']['doa']!='') {
+                                                                 echo date('d-m-y', strtotime($data['Prisoner']['doa']));
+                                                             }else{echo Configure::read('NA');} ?>
+                                                           
+                                                        	</div>
+                                                		</div>
                                                     </td>
 
                                                 </tr>
@@ -247,7 +262,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">County:</label>
+                                                            <label class="control-label">County : </label>
                                                               <?php if ($data['Prisoner']['county_id']!=''){echo $data['Prisoner']['county_id'];
                                                        }else{echo Configure::read('NA');} ?>
                                                           
@@ -261,7 +276,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div class="span6">
                                                         <div class="control-group">
-                                                            <label class="control-label">Sub County:</label>
+                                                            <label class="control-label">Sub County : </label>
                                                              <?php if ($data['Prisoner']['sub_county_id']!=''){echo $data['Prisoner']['sub_county_id'];
                                                        }else{echo Configure::read('NA');} ?>
                                                           
@@ -273,7 +288,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Parish:</label>
+                                                            <label class="control-label">Parish : </label>
                                                              <?php if ($data['Prisoner']['parish_id']!=''){echo $data['Prisoner']['parish_id'];
                                                        }else{echo Configure::read('NA');} ?>
                                                          
@@ -287,8 +302,16 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                 	<td>
                                                 		 <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Village:</label>
-                                                            <?php echo $data['Prisoner']['village_id']; ?>	
+                                                            <label class="control-label">Village : </label>
+                                                            <?php 
+                                                            if ($data['Prisoner']['village_id']) {
+                                                            	 echo $data['Prisoner']['village_id'];
+                                                            }else{
+                                                            	echo Configure::read('NA');
+                                                            }
+
+
+                                                            ?>	
                                                            
                                                         </div>
                                                     </div>
@@ -324,7 +347,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Sex:</label>
+                                                            <label class="control-label">Sex : </label>
 
                                                             <?php echo $funcall->getName($data['Prisoner']['gender_id'],"Gender","name");?>
                                                            
@@ -338,7 +361,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Continent
+																Continent : 
 																</label>
                                                                  <?php echo $funcall->getName($data['Prisoner']['continent_id'],"Continent","name");?>
                                                           
@@ -349,7 +372,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Country Of Origin:</label>
+                                                            <label class="control-label">Country Of Origin : </label>
                                                              <?php echo $funcall->getName($data['Prisoner']['country_id'],"Country","name");?>
                                                             
                                                            
@@ -375,7 +398,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Nationality:</label>
+                                                            <label class="control-label">Nationality : </label>
                                                          <?php echo $data['Prisoner']['nationality_name']; ?>
                                                            
                                                         </div>
@@ -388,7 +411,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																District Of Origin
+																District Of Origin : 
 																</label>
                                                             <?php if ($data['Prisoner']['district_id']!='') {
                                                                echo $data['Prisoner']['district_id'];
@@ -416,7 +439,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Permanent Address
+																Permanent Address : 
 																</label>
                                                            <?php echo $data['Prisoner']['permanent_address']; ?>
                                                            
@@ -426,7 +449,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Desired Districts Of Relese :</label>
+                                                            <label class="control-label">Desired Districts Of Relese : </label>
                                                                <?php echo $funcall->getName($data['Prisoner']['desired_districts_relese'],"District","name");?>
                                                           
                                                            
@@ -440,9 +463,15 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Employment Type
+																Employment Type : 
 																</label>
-                                                                  <?php echo $funcall->getName($data['Prisoner']['employment_type'],"Employment","name");?>
+                                                                  <?php if ($data['Prisoner']['employment_type']!='') {
+                                                                  	 echo $funcall->getName($data['Prisoner']['employment_type'],"Employment","name");
+                                                                  
+                                                                  } else{
+                                                                  	echo Configure::read('NA');
+                                                                  }
+                                                                 ?>
                                                          
                                                            
                                                         </div>
@@ -451,8 +480,16 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Occupation at Arrest :</label>
-                                                             <?php echo $funcall->getName($data['Prisoner']['occupation_id'],"Occupation","name");?>
+                                                            <label class="control-label">Occupation at Arrest : </label>
+                                                             <?php if ($data['Prisoner']['occupation_id']!='') {
+                                                             	
+                                                             echo $funcall->getName($data['Prisoner']['occupation_id'],"Occupation","name");
+                                                        	 }else{
+                                                        	 	echo Configure::read('NA');
+                                                        	 }
+
+
+                                                             ?>
                                                            
                                                            
                                                         </div>
@@ -466,9 +503,15 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Level Of Education 
+																Level Of Education : 
 																</label>
-                                                                 <?php echo $funcall->getName($data['Prisoner']['level_of_education_id'],"LevelOfEducation","name");?>
+                                                                 <?php 
+                                                                 if ($data['Prisoner']['level_of_education_id']!=''&& $data['Prisoner']['level_of_education_id']!=0) {
+                                                                 	
+                                                                 echo $funcall->getName($data['Prisoner']['level_of_education_id'],"LevelOfEducation","name");
+                                                                }else{
+                                                                	echo Configure::read('NA');
+                                                                }?>
                                                            
                                                            
                                                         </div>
@@ -478,7 +521,14 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div>
                                                         <div class="control-group">
                                                             <label class="control-label">Skill :</label>
-                                                              <?php echo $funcall->getName($data['Prisoner']['skill_id'],"Skill","name");?>
+                                                              <?php 
+                                                              if ($data['Prisoner']['skill_id']!=0) {
+                                                              	
+                                                              echo $funcall->getName($data['Prisoner']['skill_id'],"Skill","name");
+                                                               }else{
+                                                               	echo Configure::read('NA');
+                                                               }
+                                                              ?>
                                                            
                                                            
                                                         </div>
@@ -492,9 +542,16 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Religion 
+																Religion : 
 																</label>
-                                                                <?php echo $funcall->getName($data['Prisoner']['apparent_religion_id'],"Religion","name");?>
+                                                                <?php 
+                                                                if ($data['Prisoner']['apparent_religion_id']!=0) {
+                                                                	
+                                                                echo $funcall->getName($data['Prisoner']['apparent_religion_id'],"Religion","name");
+                                                            	}else{
+                                                            			echo Configure::read('NA');
+                                                            	}
+                                                                ?>
                                                            
                                                            
                                                         </div>
@@ -503,8 +560,8 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Height  :</label>
-                                                             <?php if ($data['Prisoner']['height_feet']!='') {
+                                                            <label class="control-label">Height  : </label>
+                                                             <?php if ($data['Prisoner']['height_feet']!=0) {
                                                                   echo $data['Prisoner']['height_feet'];
                                                              }else{echo Configure::read('NA');} ?>
                                                            
@@ -520,9 +577,9 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Build  
+																Build :   
 																</label>
-                                                              <?php if ($data['Prisoner']['build_id']!='') {
+                                                              <?php if ($data['Prisoner']['build_id']!=0) {
                                                                 echo $funcall->getName($data['Prisoner']['build_id'],"Build","name");
                                                               } else{
                                                                 echo Configure::read('NA');
@@ -534,8 +591,8 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Face   :</label>
-                                                             <?php if ($data['Prisoner']['face_id']!='') {
+                                                            <label class="control-label">Face :</label>
+                                                             <?php if ($data['Prisoner']['face_id']!=0) {
                                                                  echo $funcall->getName($data['Prisoner']['face_id'],"Face","name");
                                                              }else{ echo Configure::read('NA');}  ?>
                                                            
@@ -549,9 +606,9 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Eyes 	 
+																Eyes :  	 
 																</label>
-                                                             <?php if($data['Prisoner']['eyes_id']!=''){echo $funcall->getName($data['Prisoner']['eyes_id'],"Eyes","name");
+                                                             <?php if($data['Prisoner']['eyes_id']!=0){echo $funcall->getName($data['Prisoner']['eyes_id'],"Eyes","name");
                                                          }else{echo Configure::read('NA');} ?>
                                                            
                                                         </div>
@@ -560,8 +617,8 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Mouth   :</label>
-                                                            <?php if($data['Prisoner']['mouth_id']!=''){echo $funcall->getName($data['Prisoner']['mouth_id'],"Mouth","name");
+                                                            <label class="control-label">Mouth : </label>
+                                                            <?php if($data['Prisoner']['mouth_id']!=0){echo $funcall->getName($data['Prisoner']['mouth_id'],"Mouth","name");
                                                          }else{echo Configure::read('NA');} ?>
                                                            
                                                            
@@ -576,9 +633,9 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Speech  
+																Speech :   
 																</label>
-                                                                  <?php if($data['Prisoner']['speech_id']!=''){echo $funcall->getName($data['Prisoner']['speech_id'],"Speech","name");
+                                                                  <?php if($data['Prisoner']['speech_id']!=0){echo $funcall->getName($data['Prisoner']['speech_id'],"Speech","name");
                                                          }else{echo Configure::read('NA');} ?>
 																 
                                                            
@@ -589,8 +646,8 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Teeth   :</label>
-                                                            <?php if($data['Prisoner']['teeth_id']!=''){echo $funcall->getName($data['Prisoner']['teeth_id'],"Teeth","name");
+                                                            <label class="control-label">Teeth : </label>
+                                                            <?php if($data['Prisoner']['teeth_id']!=0){echo $funcall->getName($data['Prisoner']['teeth_id'],"Teeth","name");
                                                          }else{echo Configure::read('NA');} ?>
                                                                  
                                                             
@@ -605,9 +662,9 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Lips  
+																Lips :   
 																</label>
-                                                                  <?php if($data['Prisoner']['lips_id']!=''){echo $funcall->getName($data['Prisoner']['lips_id'],"Lips","name");
+                                                                  <?php if($data['Prisoner']['lips_id']!=0){echo $funcall->getName($data['Prisoner']['lips_id'],"Lips","name");
                                                          }else{echo Configure::read('NA');} ?>
                                                         
                                                         </div>
@@ -616,8 +673,8 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Ears   :</label>
-                                                             <?php if($data['Prisoner']['ears_id']!=''){echo $funcall->getName($data['Prisoner']['ears_id'],"Ears","name");
+                                                            <label class="control-label">Ears :</label>
+                                                             <?php if($data['Prisoner']['ears_id']!=0){echo $funcall->getName($data['Prisoner']['ears_id'],"Ears","name");
                                                          }else{echo Configure::read('NA');} ?>
                                                            
                                                            
@@ -631,9 +688,9 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Hair  
+																Hair :   
 																</label>
-                                                                  <?php if($data['Prisoner']['hairs_id']!=''){echo $funcall->getName($data['Prisoner']['hairs_id'],"Hair","name");
+                                                                  <?php if($data['Prisoner']['hairs_id']!=0){echo $funcall->getName($data['Prisoner']['hairs_id'],"Hair","name");
                                                                     }else{echo Configure::read('NA');} ?>
                                                            
                                                            
@@ -644,8 +701,14 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Marital Status  :</label>
-                                                             <?php echo $funcall->getName($data['Prisoner']['marital_status_id'],"MaritalStatus","name");?>
+                                                            <label class="control-label">Marital Status : </label>
+                                                             <?php 
+                                                             if ($data['Prisoner']['marital_status_id']!=0) {
+                                                             
+                                                             echo $funcall->getName($data['Prisoner']['marital_status_id'],"MaritalStatus","name");
+                                                         	}else{
+                                                         		echo Configure::read('NA');
+                                                         	}?>
 
                                                             
                                                            
@@ -659,7 +722,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                	<tbody>
                                                		<tr>
                                                			 <th colspan="2">
-																	Body Marks
+																	Body Marks : 
 																	</th>
                                                		</tr>
                                                		<tr>
@@ -667,7 +730,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Distinguish Marks  
+																Distinguish Marks :  
 																</label>
                                                                   <?php if($data['Prisoner']['marks']!=''){echo $data['Prisoner']['marks'];
                                                                     }else{echo Configure::read('NA');} ?>
@@ -679,7 +742,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Head Marks :</label>
+                                                            <label class="control-label">Head Marks : </label>
                                                             <?php if($data['Prisoner']['head_marks']!=''){echo $data['Prisoner']['mahead_marksks'];
                                                                     }else{echo Configure::read('NA');} ?>
                                                            
@@ -693,7 +756,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Left Side Marks  
+																Left Side Marks :   
 																</label>
                                                                 <?php if($data['Prisoner']['left_side_marks']!=''){echo $data['Prisoner']['left_side_marks'];
                                                                     }else{echo Configure::read('NA');} ?>
@@ -705,7 +768,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Right Side Marks:</label>
+                                                            <label class="control-label">Right Side Marks : </label>
                                                              <?php if($data['Prisoner']['right_side_marks']!=''){echo $data['Prisoner']['right_side_marks'];
                                                                     }else{echo Configure::read('NA');} ?>
                                                          
@@ -727,7 +790,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Deformities   
+																Deformities :    
 																</label>
                                                                  <?php if($data['Prisoner']['deformities']!=''){echo $data['Prisoner']['deformities'];
                                                                     }else{echo Configure::read('NA');} ?>
@@ -739,7 +802,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Habits </label>
+                                                            <label class="control-label">Habits :  </label>
                                                             <?php if($data['Prisoner']['habits']!=''){echo $data['Prisoner']['habits'];
                                                                     }else{echo Configure::read('NA');} ?>
                                                             
@@ -754,7 +817,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Age On Admission   
+																Age On Admission :    
 																</label>
                                                            <?php echo $data['Prisoner']['age_on_admission']; ?>
                                                            
@@ -764,7 +827,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Current Age </label>
+                                                            <label class="control-label">Current Age :  </label>
                                                            <?php echo $data['Prisoner']['age']; ?>
                                                            
                                                         </div>
@@ -777,9 +840,16 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Resident Address   
+																Resident Address :    
 																</label>
-                                                           <?php echo $data['Prisoner']['resident_address']; ?>
+                                                           <?php
+                                                           if ($data['Prisoner']['resident_address']!='') {
+                                                            	
+                                                           echo $data['Prisoner']['resident_address'];}
+                                                           else{
+                                                           	echo Configure::read('NA');
+                                                           }
+                                                            ?>
                                                            
                                                         </div>
                                                     </div>
@@ -787,7 +857,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Description </label>
+                                                            <label class="control-label">Description :  </label>
                                                              <?php if($data['Prisoner']['description']!=''){echo $data['Prisoner']['description'];
                                                                     }else{echo Configure::read('NA');} ?>
                                                        
@@ -812,7 +882,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                         </table>
                                           <div class="row-fluid">
 			                                <div class="span12 heading">
-			                                    <h5>Id Proof Details</h5>
+			                                    <h5>Id Proof Details : </h5>
 			                                </div>
 			                              </div>
 			                               <?php if(count($data['IdProof'])>0){?>
@@ -825,7 +895,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																ID Name  
+																ID Name :   
 																</label>
                                                           <?php echo $idproof['Iddetail']['name'];?>
                                                            
@@ -835,7 +905,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">ID Number </label>
+                                                            <label class="control-label">ID Number :  </label>
                                                             <?php echo $idproof['id_number'];?>
                                                            
                                                         </div>
@@ -865,7 +935,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																First Name  
+																First Name :   
 																</label>
                                                             <?php echo $kin['first_name'];?>
                                                         </div>
@@ -874,7 +944,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Middle Name </label>
+                                                            <label class="control-label">Middle Name :  </label>
                                                            <?php echo $kin['middle_name'];?>
                                                            
                                                         </div>
@@ -887,7 +957,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-															Surname 
+															Surname :  
 																</label>
                                                             <?php echo $kin['last_name'];?>
                                                            
@@ -897,7 +967,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Relationship </label>
+                                                            <label class="control-label">Relationship :  </label>
                                                            <?php echo $kin['Relationship']['name'];?>
                                                            
                                                         </div>
@@ -910,7 +980,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-															Sex	 
+															Sex : 	 
 																</label>
                                                               <?php echo $funcall->getName($kin['gender_id'],"Gender","name");?>
                                                            
@@ -920,7 +990,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">National Id Number </label>
+                                                            <label class="control-label">National Id Number :  </label>
                                                            <?php echo $kin['national_id_no'];?>
                                                            
                                                         </div>
@@ -933,7 +1003,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Physical Address
+																Physical Address : 
 																</label>
                                                             <?php echo $kin['physical_address'];?>
                                                            
@@ -943,7 +1013,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">District </label>
+                                                            <label class="control-label">District :  </label>
                                                            <?php echo $kin['District']['district_id'];?>
                                                            
                                                         </div>
@@ -956,7 +1026,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Sub Country
+																Sub Country : 
 																</label>
                                                             <?php echo $kin['gombolola'];?>
                                                            
@@ -966,7 +1036,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Parish </label>
+                                                            <label class="control-label">Parish : </label>
                                                            <?php echo $kin['parish'];?>
                                                            
                                                         </div>
@@ -979,7 +1049,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Village
+																Village : 
 																</label>
                                                            <?php echo $kin['village'];?>
                                                            
@@ -989,7 +1059,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Name of LC 1 Chairperson</label>
+                                                            <label class="control-label">Name of LC 1 Chairperson : </label>
                                                             <?php echo $kin['chief_name'];?>
                                                            
                                                         </div>
@@ -1002,7 +1072,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Passport Non
+																Passport Non : 
 																</label>
                                                            <?php echo $kin['passport_no'];?>
                                                            
@@ -1012,7 +1082,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Voter ID No</label>
+                                                            <label class="control-label">Voter ID No : </label>
                                                             <?php echo $kin['voter_id_no'];?>
                                                            
                                                         </div>
@@ -1052,7 +1122,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Father's Name </label>
+                                                            <label class="control-label">Father's Name : </label>
                                                           <?php echo $Child['father_name'];?>
                                                            
                                                         </div>
@@ -1065,7 +1135,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-															Mother's Name
+															Mother's Name : 
 																</label>
                                                            <?php echo $Child['mother_name'];?>
                                                            
@@ -1075,7 +1145,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Relationship with child </label>
+                                                            <label class="control-label">Relationship with child : </label>
                                                            <?php echo $Child['relation_with_child'];?>
                                                            
                                                         </div>
@@ -1088,7 +1158,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-															Date of Birth	 
+															Date of Birth : 	 
 																</label>
                                                             <?php echo date('d-m-Y',strtotime($Child['dob']));?>
                                                            
@@ -1098,7 +1168,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <td>
                                                     <div>
                                                         <div class="control-group">
-                                                            <label class="control-label">Place Of birth </label>
+                                                            <label class="control-label">Place Of birth : </label>
                                                            <?php echo $Child['birth_place'];?>
                                                            
                                                         </div>
@@ -1111,7 +1181,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Gender
+																Gender : 
 																</label>
                                                            <?php echo $Child['Gender']['name'];?>
                                                            
@@ -1283,7 +1353,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                             <label class="control-label">
 																Personal Number
 																</label>
-                                                            <?php echo $PrisonerSentence['personal_no'];?>
+                                                            <?php echo $data['Prisoner']['personal_no'];?>
                                                            
                                                         </div>
                                                     </div>
@@ -1292,7 +1362,14 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div>
                                                         <div class="control-group">
                                                             <label class="control-label">Prisoner Number </label>
-                                                            <?php echo "partha"; ?><?php echo $PrisonerSentence['prisoner_no'];?>
+                                                            <?php if ($data['Prisoner']['prisoner_no']!='') {
+                                                              echo $data['Prisoner']['prisoner_no'];
+                                                            }else{
+                                                                echo Configure::read('NA');
+                                                            }
+                                                             ?>
+                                                            
+                                                            
                                                            
                                                         </div>
                                                     </div>
@@ -1302,7 +1379,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div>
                                                         <div class="control-group">
                                                             <label class="control-label">Class  </label>
-                                                            <?php echo $PrisonerSentence['class'];?>                                                           
+                                                            <?php echo $data['class'];?>                                                           
                                                         </div>
                                                     </div>
 

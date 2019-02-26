@@ -113,7 +113,7 @@ class PrisonsController extends AppController{
                   'Magisterial.name'
                 )
           ));
-          $this->loadModel('State');
+         /* $this->loadModel('State');
           $state=$this->State->find('list',array(
                 'conditions'=>array(
                   'State.is_enable'=>1,
@@ -122,8 +122,21 @@ class PrisonsController extends AppController{
                 'order'=>array(
                   'State.name'
                 )
+          ));*/
+
+          $this->loadModel('GeographicalRegion');
+          $geographical=$this->GeographicalRegion->find('list',array(
+                'conditions'=>array(
+                  'GeographicalRegion.is_enable'=>1,
+                  'GeographicalRegion.is_trash'=>0,
+                ),
+                'order'=>array(
+                  'GeographicalRegion.name'
+                )
           ));
-        $this->set(compact('is_enable','security_id','stationcategory_id','magisterial_id','state'));
+
+
+        $this->set(compact('is_enable','security_id','stationcategory_id','magisterial_id','state','geographical'));
         $this->request->data=$this->Prison->findById($id);
         if(isset($id) && $id != '')
         {
@@ -132,7 +145,21 @@ class PrisonsController extends AppController{
 
         if(isset($id) && $id != '')
         {
-          $districtList = $this->PrisonDistrict->find('list', array(
+
+                    $state = $this->State->find('list', array(
+                    'recursive'     => -1,
+                    'fields'        => array(
+                        'State.id',
+                        'State.name',
+                    ),
+                    'conditions'    => array(
+                        'State.id'    => $this->data['Prison']['state_id'],
+                    ),          
+               
+                    ));
+                    
+
+                    $districtList = $this->PrisonDistrict->find('list', array(
                     'recursive'     => -1,
                     'fields'        => array(
                         'PrisonDistrict.id',
@@ -156,10 +183,14 @@ class PrisonsController extends AppController{
                     ),          
                
                     ));
+
                      $this->set(array(
                     'districtList'     => $districtList,
                     'geodistrictList'  => $geodistrictList,
+                    'state'            => $state
                 ));  
+
+                   
         }
 
     }
@@ -377,6 +408,63 @@ class PrisonsController extends AppController{
         }else
         {
             echo '<option value="">--Select Geographical District--</option>';
+        }
+        
+    }
+
+    /*public function getgeographicalAjax()
+    {
+        $this->autoRender = false;
+        $geographicalr_id  = '';
+        $this->loadModel("GeographicalRegion"); 
+      
+        if(isset($this->params['named']['geographicalr_id']) && (int)$this->params['named']['geographicalr_id'] != 0){
+            $geographicalr_id = $this->params['named']['geographicalr_id'];
+            $condition = array('GeographicalRegion.id' => $geographicalr_id );
+            $georegion = $this->GeographicalRegion->find('list', array(
+              'fields'          => array('id','name'),
+              'conditions'      => $condition,  
+            ));
+
+          if(is_array($georegion) && count($georegion)>0){
+                echo '<option value="">--Select UPS Region--</option>';
+                foreach($georegion as $key=>$val){
+                    echo '<option value="'.$key.'">'.$val.'</option>';
+                }
+            }else{
+                echo '<option value="">--Select UPS Region--</option>';
+            }
+        }else
+        {
+            echo '<option value="">--Select UPS Region--</option>';
+        }
+        
+    }*/
+ public function getgeographicalAjax()
+    {
+        $this->autoRender = false;
+        //$id  = '';
+        $this->loadModel("State"); 
+      
+        if(isset($this->params['named']['geographical_region_id']) && (int)$this->params['named']['geographical_region_id'] != 0){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            $condition = array('State.geographical_region_id' => $geographical_region_id);
+            $upsregion = $this->State->find('list', array(
+              'fields'          => array('id','name'),
+              'conditions'      => $condition,  
+            ));
+
+          if(is_array($upsregion) && count($upsregion)>0){
+                echo '<option value="">--Select UPS Region--</option>';
+                foreach($upsregion as $key=>$val){
+                    echo '<option value="'.$key.'">'.$val.'</option>';
+                }
+            }else{
+                echo '<option value="">--Select UPS Region--</option>';
+            }
+        }else
+        {
+            echo '<option value="">--Select UPS Region--</option>';
         }
         
     }

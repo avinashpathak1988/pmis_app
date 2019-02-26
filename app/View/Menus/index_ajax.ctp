@@ -54,6 +54,11 @@ echo $this->Paginator->counter(array(
                 </th>
                 <th>
                   <?php 
+                  echo $this->Paginator->sort('Menu.module_id',isset($modelArr['module_id'])?$modelArr['module_id']:'Module name',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'Menus','action' => 'indexAjax')));
+                  ?>  
+                </th>
+                <th>
+                  <?php 
                   echo $this->Paginator->sort('Menu.order',isset($modelArr['order'])?$modelArr['order']:'Order',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'Menus','action' => 'indexAjax')));
                   ?>  
                 </th>
@@ -73,6 +78,7 @@ echo $this->Paginator->counter(array(
         					<td><?php if(isset($menu['MainMenu']['parentname']) && $menu['MainMenu']['parentname']!='')echo ucwords(h($menu['MainMenu']['parentname']));else echo Configure::read('NA'); ?>&nbsp;</td>
         					<td><?php if($menu['Menu']['name']!='')echo ucwords(h($menu['Menu']['name']));else echo Configure::read('NA'); ?>&nbsp;</td>	
         					<td><?php if($menu['Menu']['url']!='')echo ucwords(h($menu['Menu']['url']));else echo Configure::read('NA'); ?>&nbsp;</td>
+                  <td><?php echo $funcall->getName($menu['Menu']['module_id'],"Module","name"); ?>&nbsp;</td>
         					<td><?php echo ucwords(h($menu['Menu']['order'])); ?>&nbsp;</td>							
         					<td><?php if($menu['Menu']['is_enable'] == '1'){
         							                    echo "<font color=green>Yes</font>"; 

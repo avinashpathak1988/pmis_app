@@ -2897,7 +2897,7 @@ class CourtattendancesController  extends AppController {
 				
 				foreach($offenceList as $offkey => $offval)
 				{
-					$offence_name .= '<option value=""></value>';
+					//$offence_name .= '<option value=""></value>';
 					 $offence_name .= '<option value="'.$offval['PrisonerOffence']['id'].'">'. $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")".'</option>';
 					
 				}
@@ -2953,7 +2953,7 @@ class CourtattendancesController  extends AppController {
             $this->loadModel('PrisonerOffence');
             $prisoner_case_file_id = rtrim($prisoner_case_file_id,',');
 			$file_id = explode(',',$prisoner_case_file_id);
-			if(isset($file_id) && $file_id!='')
+			if(isset($file_id) && count($file_id) > 0)
 			{
 				foreach($file_id as $value)
 				{
@@ -2980,37 +2980,39 @@ class CourtattendancesController  extends AppController {
 			
 			$offencecountList = $this->Courtattendance->find('all', array(
                 'recursive'     => -1,
-				'joins'=>array(
-								array(
-									'table' => 'prisoner_offences',
-									'alias' => 'PrisonerOffence',
-									'type' => 'left',
-									'foreignKey' => false,
-									'conditions'=> array(
-									'Courtattendance.case_no = PrisonerOffence.prisoner_case_file_id',
-									),
-								),	
-				),
-                'conditions'=> array("Courtattendance.case_no IN (". $case_file_id ." ) AND Courtattendance.prisoner_id = ".$prisoner_id." AND Courtattendance.uuid = '".$uuid."' AND Courtattendance.status = 'Approved' AND Courtattendance.court_date = '".date('Y-m-d')."' "),
-                'fields'        => array('Courtattendance.id','Courtattendance.offence_id','PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',),
+				'conditions'=> array("Courtattendance.case_no IN (". $case_file_id ." ) AND Courtattendance.prisoner_id = ".$prisoner_id." AND Courtattendance.uuid = '".$uuid."' AND Courtattendance.status = 'Approved' AND Courtattendance.court_date = '".date('Y-m-d')."' "),
+                'fields'        => array('Courtattendance.id','Courtattendance.offence_id'),
             ));
 			
 			$offence_count = '';
 			$to_court_id = '';
-			if(isset($offencecountList) && count($offencecountList) > 0)
-			{
-				foreach($offencecountList as $offkey => $offval)
-				{	
-					$to_court_id = $offval['Courtattendance']['id'];
-					$offence_count .= '<option value="'.$offval['PrisonerOffence']['id'].'">'.$this->getName($offval['PrisonerOffence']['offence'],'Offence','name').'</option>';									
-				}
-			}
-			else
-					{
-						$offence_count = '';
-						
-					}
 			
+			if(count($offencecountList) > 0)
+			{
+					$offenceList = $this->PrisonerOffence->find('all', array(
+					'recursive'     => -1,
+					'conditions'=> array("PrisonerOffence.id IN (". $offencecountList[0]['Courtattendance']['offence_id'] ." ) "),
+					'fields'        => array(
+						'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
+					),
+				));
+				
+				if(count($offenceList) > 0)
+				{
+						foreach($offenceList as $offkey => $offval)
+						{	
+							$offence_count .= '<option value="'.$offval['PrisonerOffence']['id'].'">'.$this->getName($offval['PrisonerOffence']['offence'],'Offence','name').'-'.$offval['PrisonerOffence']['offence_no'].'</option>';									
+						}
+				}
+				else
+				{
+					$offence_count = '';
+					
+				}
+				
+			}
+			
+		
 			$this->loadModel('PrisonerSentenceAppeal');
 			$appealCount = $this->PrisonerSentenceAppeal->find('count',array(
 									'conditions'=>array('PrisonerSentenceAppeal.case_file_id'=>$prisoner_case_file_id),
@@ -3041,10 +3043,13 @@ class CourtattendancesController  extends AppController {
 			$condition += array('Courtattendance.uuid'=>$uuid);
 		}
 		
-		if(isset($this->params['named']['authority_type']) && $this->params['named']['authority_type'] != ''){
-            $authority_type = $this->params['named']['authority_type'];
-			
+		if(isset($this->params['named']['authority_type']) && $this->params['named']['authority_type'] != '' && $this->params['named']['authority_type'] != 'undefined'){
+            $authority_type = $this->params['named']['authority_type'];			
 			$condition += array('Courtattendance.authority_type'=>1);
+		}
+		else{
+			$authority_type = $this->params['named']['authority_type'];			
+			$condition += array('Courtattendance.authority_type'=>array(1,2,3));
 		}	
        
        // debug($condition);     
@@ -3393,29 +3398,19 @@ class CourtattendancesController  extends AppController {
 			'recursive'     => -1,
 			'joins' => array(
 								array(
-									'table' => 'prisoner_case_files',
-									'alias' => 'PrisonerCaseFile',
+									'table' => 'offences',
+									'alias' => 'Offence',
 									'type' => 'left',
 									'foreignKey' => false,
 									'conditions'=> array(
-											'PrisonerCaseFile.case_file_no = PrisonerOffence.prisoner_case_file_id',
+											'Offence.id = PrisonerOffence.offence',
 									),
-									
-								),
-								array(
-									'table' => 'courtattendances',
-									'alias' => 'Courtattendance',
-									'type' => 'left',
-									'foreignKey' => false,
-									'conditions'=> array(
-											'Courtattendance.case_no = PrisonerCaseFile.case_file_no',
-									),
-								)		
+								
+						),
 						),
 		'fields'=>array( 'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',),
-			'conditions'=>array("PrisonerOffence.prisoner_case_file_id IN (". $id ." ) "),
+			'conditions'=>array("PrisonerOffence.id IN (". $id ." ) "),
 		)); 
-			
 			
 			$offence_name = '';
 			if(isset($offenceList) && !empty($offenceList))
@@ -4508,5 +4503,87 @@ class CourtattendancesController  extends AppController {
             'status'            => $status
         ));
     }
+	
+	public function showAppCourtFile($prisoner_id = '', $value = '')
+	{
+		$this->autoRender = false;
+		$this->loadModel('PrisonerSentence');
+		
+		if($prisoner_id != '')
+		{
+			
+			$case_id=$this->PrisonerSentence->find('all',array(
+				  "recursive" => -1,
+                  'conditions'=>array(
+                   'PrisonerSentence.wish_to_appeal'=>1,
+				   'PrisonerSentence.prisoner_id'=>$prisoner_id,
+                  ),
+				  'fields'=>array('PrisonerSentence.case_id'),
+                  'order'=>array(
+                    'PrisonerSentence.id'
+                  )
+            ));
+			
+			$caseFile = '';
+			if(count($case_id) > 0)
+			{
+				
+				foreach($case_id as $case_key => $case_val)
+				{
+					$caseFile .= $case_val['PrisonerSentence']['case_id'].',';
+				}
+			}
+			
+			$caseFile = rtrim($caseFile,',');
+			$caseFilearr = explode(',',$caseFile);
+			
+			if($value==1)
+			{
+				$caseFileno=$this->PrisonerCaseFile->find('list',array(
+						  "recursive" => -1,
+						  'conditions'=>array(
+						   'PrisonerCaseFile.is_trash'=>0,
+						   'PrisonerCaseFile.prisoner_id'=>$prisoner_id,
+						   'PrisonerCaseFile.id'=>$caseFilearr,
+						  ),
+						  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
+						  'order'=>array(
+							'PrisonerCaseFile.case_file_no'
+						  )
+					));
+			}
+			else
+			{
+				$caseFileno=$this->PrisonerCaseFile->find('list',array(
+						  "recursive" => -1,
+						  'conditions'=>array(
+						   'PrisonerCaseFile.is_trash'=>0,
+						   'PrisonerCaseFile.prisoner_id'=>$prisoner_id,
+						),
+						  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
+						  'order'=>array(
+							'PrisonerCaseFile.case_file_no'
+						  )
+					));
+			}	
+			
+			
+			
+			$options = '';
+			if(count($caseFileno) > 0)
+			{
+				foreach($caseFileno as $filekey => $fileval)
+				{
+					$options .= '<option value='.$filekey.'>'.$fileval.'</option>';
+				}
+			}
+			else
+			{
+				$options .= '<option value=""></option>';
+			}
+		}
+		 
+		echo $options;
+	}
 	
 }

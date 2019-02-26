@@ -130,7 +130,10 @@ echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal',
             <?php } ?>
             <?php if(!isset($is_excel)) { ?>
             <?php if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE')){ 
+              ?>
+            <th style="text-align: left;">Action</th>
 
+              <?php
 
           } else{?>
             <th style="text-align: left;">Action</th>
@@ -155,7 +158,7 @@ foreach($datas as $data){
           } else {?>
             <td>
             <?php
-            if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE') && ($data['Lodger']['status'] == 'Draft'))
+            if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE') && ($data['Lodger']['status'] == 'Draft') && $data['Lodger']['ward_id']!='')
             { 
                   echo $this->Form->input('ApprovalProcess.'.$rowCnt.'.fid', array(
                       'type'=>'checkbox', 'value'=>$data['Lodger']['id'],'hiddenField' => false, 'label'=>false,
@@ -261,6 +264,28 @@ foreach($datas as $data){
                                         ?>
                                         </tbody>
                                     </table>
+                                    <?php
+                                    if(isset($data['Lodger']['ward_id']) && $data['Lodger']['ward_id']!=''){
+                                    ?>
+                                    <table class="table table-responsive table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Ward Name</th>
+                                                <td><?php echo $funcall->getName($data['Lodger']['ward_id'],"Ward","name");  ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Cell No.</th>
+                                                <td><?php echo $funcall->getName($data['Lodger']['ward_cell_id'],"WardCell","cell_no")  ?></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Cell Name</th>
+                                                <td><?php echo $funcall->getName($data['Lodger']['ward_cell_id'],"WardCell","cell_name")  ?></td>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <?php
+                                	}
+                                    ?>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -292,9 +317,53 @@ foreach($datas as $data){
             }?>
           </td>
           <?php } ?>
-          <?php if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE')){ 
+          <?php if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE')){?>
+            <td>
+             <?php if(!isset($is_excel) && $data['Lodger']['ward_id']=='') { ?>
+                <!-- Trigger the modal with a button -->
+                    <button type="button" class="btn btn-info btn-mini" data-toggle="modal" data-target="#myModalWard<?php echo $data['Lodger']['id']; ?>">Update Ward</button>
 
+                    <!-- Modal -->
+                    <div id="myModalWard<?php echo $data['Lodger']['id']; ?>" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
 
+                            <!-- Modal content-->
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Details</h4>
+                                </div>
+                                <div class="modal-body" id="show_details<?php echo $data['Lodger']['id']; ?>">
+                                   
+                                    <table class="table table-bordered data-table table-responsive">
+                                      <tbody>
+                                          <tr>
+                                            <td>Ward</td>
+                                            <td><?php 
+                                            echo $this->Form->input("prisoner_id.".$data['Lodger']['id'],array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'hidden','value'=>$data['Lodger']['prisoner_id']));
+                                            echo $this->Form->input("ward_id.".$data['Lodger']['id'],array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>$funcall->showWard($prisonerDetails["Prisoner"]["gender_id"],''), 'empty'=>'-- Select Ward --','required','title'=>'Please select ward','onchange'=>'showCell(this.value,'.$data['Lodger']['id'].')'));
+                                            ?></td>
+                                          </tr>
+                                          <tr>
+                                              <td>Cell No.</td>
+                                              <td><?php echo $this->Form->input('ward_cell_id',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>array(), "id"=>'ward_cell_id'.$data['Lodger']['id'],'empty'=>'-- Select Cell --','title'=>'Please select ward'));?></td>
+                                          </tr>
+                                          <tr>
+                                              <td colspan="2" align="center" style="text-align: center;"><input type="button" class="btn btn-success" value="Update" onclick="updateWard('Terminate',<?php echo $data['Lodger']['id']?>)"></td>
+                                          </tr>
+                                          </tbody>
+                                      </table>                                      
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                <?php } ?>
+            </td>
+            <?php
           } else{?>
         
 

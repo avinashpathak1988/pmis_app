@@ -98,8 +98,10 @@ class StationjournalsController extends AppController{
         $prison_id      = '';
         $journal_date      = '';
         $condition      = array(
-            'Stationjournal.is_trash'   => 0,
-            
+            'Stationjournal.is_trash'   => 0
+        );
+         $condition      += array(
+            'Stationjournal.prison_id'   => $this->Session->read('Auth.User.prison_id')
         );
         if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != ''){
             $prison_id = $this->params['named']['prison_id'];
@@ -175,6 +177,9 @@ class StationjournalsController extends AppController{
          return $data['Prison']['name'];
     }
     public function add(){
+        if ($isAccess==1) {
+            
+        
         $this->layout='table';
         if($this->request->is(array('post','put'))){//debug($this->data);exit;
             $this->request->data['Stationjournal']['journal_date']=date('Y-m-d',strtotime($this->request->data['Stationjournal']['journal_date']));
@@ -238,6 +243,11 @@ class StationjournalsController extends AppController{
         //debug($duty_officer);
           
         $this->set(compact('is_enable','prison_id','duty_officer','psid'));
+    }else{
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+    }
     }
     /**
      * Edit Function
