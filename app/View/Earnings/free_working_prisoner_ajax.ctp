@@ -34,7 +34,7 @@ if(is_array($datas) && count($datas)>0){
                     <?php echo $rowCnt; ?>
                 </td>
                 <td>
-                    <?php echo $this->Html->link($prisoner_no,array('controller'=>'earnings','action'=>'freeWorkingPrisonerDetails/'.$prisoner_uuid),array('escape'=>false,'class'=>'btn btn-success',)); ?>
+                    <?php echo $this->Html->link($prisoner_no,array('controller'=>'earnings','action'=>'freeWorking/'.$prisoner_uuid),array('escape'=>false,'class'=>'btn btn-success',)); ?>
                 </td>
                 <td><?php if(isset($prisonerData['total_working_days']))echo $prisonerData['total_working_days'];?></td>
                 

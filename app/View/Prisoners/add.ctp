@@ -39,7 +39,6 @@ if(isset($this->data['Prisoner']['date_of_birth']) && $this->data['Prisoner']['d
                                     $prisoner_unique_no = $this->request->data['Prisoner']['prisoner_unique_no'];
                                     echo $this->Form->input('prisoner_unique_no',array(
                                         'type'=>'hidden',
-                                        'class'=>'prisoner_unique_no',
                                         'value'=>$prisoner_unique_no
                                     ));
                                     echo $this->Form->input('personal_no',array(

@@ -285,20 +285,41 @@ foreach($datas as $data){
                                     </table>
                                     <?php
                                 	}
-                                    ?>
+                                  ?>
+                                  <?php
+                                  if(isset($data['Lodger']['place_of_recapture']) && $data['Lodger']['place_of_recapture']!=''){
+                                  ?>
+                                  <table class="table table-responsive table-bordered">
+                                      <thead>
+                                          <tr>
+                                              <th>Ward Name</th>
+                                              <td><?php echo $funcall->getName($data['Lodger']['ward_id'],"Ward","name");  ?></td>
+                                          </tr>
+                                          <tr>
+                                              <th>Cell No.</th>
+                                              <td><?php echo  $data['Lodger']['place_of_recapture']; ?></td>
+                                          </tr>
+                                          <tr>
+                                              <th>Cell Name</th>
+                                              <td><?php echo $data['Lodger']['place_of_recapture'];  ?></td>
+                                          </tr>
+                                      </thead>
+                                  </table>
+                                  <?php
+                                }
+                                  ?>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 <?php } ?>
             </td>
-             <?php if ($this->Session->read('Auth.User.usertype_id')==Configure::read('GATEKEEPER_USERTYPE')) {
+            <?php if ($this->Session->read('Auth.User.usertype_id')==Configure::read('GATEKEEPER_USERTYPE')) {
        
-      } else{?>
+            } else{?>
             <td>
             <?php if($data["Lodger"]['status'] == 'Draft')
             {

@@ -51,7 +51,7 @@
                                 <div class="control-group">
                                     <label class="control-label">From Date</label>
                                     <div class="controls">
-                                        <?php echo $this->Form->input('from_date',array('div'=>false,'label'=>false,'type'=>'text', 'class'=>'form-control', 'id'=>'from_date', 'readonly'=>true));?>
+                                        <?php echo $this->Form->input('from_date',array('div'=>false,'label'=>false,'type'=>'text', 'class'=>'form-control','readonly'=>'readonly', 'id'=>'from_date', 'readonly'=>true,'readonly'=>true));?>
                                     </div>
                                 </div>
                             </div>
@@ -59,10 +59,50 @@
                                 <div class="control-group">
                                     <label class="control-label">To Date</label>
                                     <div class="controls">
-                                        <?php echo $this->Form->input('to_date',array('div'=>false,'label'=>false,'type'=>'text', 'class'=>'form-control', 'id'=>'to_date', 'readonly'=>true));?>
+                                        <?php echo $this->Form->input('to_date',array('div'=>false,'label'=>false,'type'=>'text', 'class'=>'form-control', 'readonly'=>'readonly','id'=>'to_date', 'readonly'=>true));?>
                                     </div>
                                 </div>
-                            </div>     
+                            </div>  
+                            <div class="span6">
+                                    <div class="control-group">
+                                        <label class="control-label">Month - Year:</label>
+                                        <div class="controls">
+                                            <?php $monthsList=array(
+                                                ''=>'-- Month -- ',
+                                                '01'=>'Jan',
+                                                '02'=>'Feb',
+                                                '03'=>'Mar',
+                                                '04'=>'Apr',
+                                                '05'=>'May',
+                                                '06'=>'Jun',
+                                                '07'=>'Jul',
+                                                '08'=>'Aug',
+                                                '09'=>'Sep',
+                                                '10'=>'Oct',
+                                                '11'=>'Nov',
+                                                '12'=>'Dec',
+                                                );
+
+                                            $yearsList=array(
+                                                ''=>'-- Year -- ',
+                                                '2013'=>'2013',
+                                                '2014'=>'2014',
+                                                '2015'=>'2015',
+                                                '2016'=>'2016',
+                                                '2017'=>'2017',
+                                                '2018'=>'2018',
+                                                '2019'=>'2019',
+                                                '2020'=>'2020',
+                                                '2021'=>'2021',
+                                            );
+
+                                            ?>
+
+                                        <?php echo $this->Form->input('selected_month',array('div'=>false,'label'=>false,'class'=>'span5 pmis_select','type'=>'select','options'=>$monthsList, 'empty'=>'','required'=>false,'id'=>'selected_month_id'));?>
+                                        <?php echo $this->Form->input('selected_year',array('div'=>false,'label'=>false,'class'=>'span5 pmis_select','type'=>'select','options'=>$yearsList, 'empty'=>'','required'=>false,'style'=>'margin-left:5px;','id'=>'selected_year_id'));?>
+                                        </div>
+                                    </div>
+                                </div>     
 
 
                                                      
@@ -70,6 +110,7 @@
                         </div>
                         <div class="form-actions" align="center">
                             <button id="btnsearchcash" class="btn btn-success" type="button" onclick="javascript:showData();">Search</button>
+                             <?php echo $this->Form->input('Reset', array('type'=>'button', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger', 'onclick'=>"resetData()"))?>
                         </div>
                     <?php echo $this->Form->end();?>
                     </div>           
@@ -104,6 +145,13 @@ echo $this->Html->scriptBlock("
         });
 
     });    
+    function resetData(){
+
+       
+        $('select').select2('val', '');
+        showData();
+        
+    }
     function showData(){
         var url   = '".$ajaxUrl."';
         url = url + '/state_id:'+$('#state_id').val();  
@@ -111,6 +159,8 @@ echo $this->Html->scriptBlock("
         url = url + '/prison_id:'+$('#prison_id').val();            
         url = url + '/from_date:'+$('#from_date').val();
         url = url + '/to_date:'+$('#to_date').val();
+        url = url + '/selected_month_id:'+$('#selected_month_id').val();
+        url = url + '/selected_year_id:'+$('#selected_year_id').val();
         $.post(url, {}, function(res) {
             $('#listingDiv').html(res);
         });           

@@ -9,6 +9,10 @@ class WorkingParty extends AppModel {
         'Officer' => array(
             'className' => 'User',
             'foreignKey' => 'officer_incharge',
+        ),
+        'EmploymentType' => array(
+            'className' => 'EmploymentType',
+            'foreignKey' => 'employment_type_id',
         )
     );
 	public $validate = array(

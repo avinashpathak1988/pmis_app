@@ -45,13 +45,19 @@ echo $this->Paginator->counter(array(
       
       
       <!-- <th><?php echo __('Edit'); ?></th> -->
-      <!-- <th><?php echo __('Delete'); ?></th> -->
+      <?php if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+      {?>
+        <th><?php echo __('Delete'); ?></th>
+      <?php }?>
+      
     </tr>
   </thead>
 <tbody>
 <?php
 $rowCnt = $this->Paginator->counter(array('format' => __('{:start}')));
-foreach($datas as $data){
+foreach($datas as $data)
+{
+  //$id = $data['EarningGradePrisoner']['id'];
 ?>
     <tr>
       <td><?php echo $rowCnt; ?>&nbsp;</td>
@@ -69,12 +75,19 @@ foreach($datas as $data){
           <?php echo $this->Form->create('EarningGradePrisonerEdit',array('url'=>'/EarningGrades/assignGrades','admin'=>false));?> 
           <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['EarningGradePrisoner']['id'])); ?>
           <?php echo $this->Form->end(array('label'=>'Edit','class'=>'btn btn-primary btn-mini','div'=>false, 'onclick'=>"javascript:return confirm('Are you sure want to edit?')")); ?> 
-        </td>
-        <td>
-            <?php echo $this->Form->create('EarningGradePrisonerDelete',array('url'=>'/EarningGrades/assignGrades','admin'=>false));?> 
-            <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['EarningGradePrisoner']['id'])); ?>
-            <?php echo $this->Form->end(array('label'=>'Delete','class'=>'btn btn-danger btn-mini','div'=>false, 'onclick'=>"javascript:return confirm('Are you sure want to delete?')")); ?>
-      </td> -->
+        </td>-->
+        <?php if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+        {?>
+          <td>
+            <?php 
+            echo $this->Form->create('EarningGradePrisonerDelete',array('url'=>'/EarningRates/assignGrades','admin'=>false));
+            echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['EarningGradePrisoner']['id']));
+            echo $this->Form->button('<i class="icon-trash"></i>', array('type'=>'button', 'div'=>false, 'label'=>false, 'class'=>'btn btn-danger', 'onclick'=>"deleteAssignGrade();"));
+            echo $this->Form->end();
+            ?>
+          </td> 
+        <?php }?>
+        
     </tr>
 <?php
 $rowCnt++;
@@ -88,4 +101,18 @@ $rowCnt++;
 <span style="color:red;font-weight:bold;">No Record Found!!</span>
 <?php    
 }
-?>    
+?> 
+<script>
+function deleteAssignGrade(formId) {
+  
+  AsyncConfirmYesNo(
+      "Are you sure want to delete?",
+      'Delete',
+      'Cancel',
+      function(){
+        $('#EarningGradePrisonerDeleteAssignGradeAjaxForm').submit();
+      },
+      function(){}
+  );
+}
+</script>    

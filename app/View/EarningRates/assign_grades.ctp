@@ -32,7 +32,7 @@ if(isset($this->data['EarningRate']['end_date']) && $this->data['EarningRate']['
                                         <div class="control-group">
                                         <label class="control-label">Prisoner No:</label>
                                             <div class="controls">
-                                                <?php echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>$prisonerlist,'empty'=>'---Select Prioner---','onchange'=>'getPrisonerGradelist(this.value);'));?>
+                                                <?php echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'class'=>'form-control pmis_select span11','type'=>'select','options'=>$prisonerlist,'empty'=>'','onchange'=>'getPrisonerGradelist(this.value);'));?>
                                             </div>
                                            
                                         </div>
@@ -42,7 +42,7 @@ if(isset($this->data['EarningRate']['end_date']) && $this->data['EarningRate']['
                                         <div class="control-group">
                                              <label class="control-label">Grade<?php echo $req; ?> :</label>
                                             <div class="controls">
-                                                <?php echo $this->Form->input('grade_id',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>$gradeslist,'empty'=>'---Select Grade---', 'required'));?>
+                                                <?php echo $this->Form->input('grade_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','options'=>$gradeslist,'empty'=>'', 'required'));?>
                                             </div>
                                         </div>
                                     </div>
@@ -52,7 +52,7 @@ if(isset($this->data['EarningRate']['end_date']) && $this->data['EarningRate']['
                                         <div class="control-group">
 
 
-                                            <label class="control-label">Assignment / Promotion Date<?php echo $req; ?> :</label>
+                                            <label class="control-label">Assignment/<br>Promotion Date<?php echo $req; ?> :</label>
                                             <div class="controls">
                                                 <?php $currentDate = date('d-m-Y');
                                                 echo $this->Form->input('assignment_date',array('div'=>false,'label'=>false,'type'=>'text','placeholder'=>'Enter Assignment/Prommotion date', 'data-date-format'=>"dd-mm-yyyy",
@@ -73,7 +73,7 @@ if(isset($this->data['EarningRate']['end_date']) && $this->data['EarningRate']['
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
+                                    
                                     <div class="span6">
                                         <div class="control-group">
                                             <label class="control-label">Remarks :</label>
@@ -82,13 +82,12 @@ if(isset($this->data['EarningRate']['end_date']) && $this->data['EarningRate']['
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="clearfix"></div> 
-                                    
+                                    <div class="clearfix"></div>
+                                <div class="span12">
+                                    <div class="form-actions" align="center">
+                                        <?php echo $this->Form->input('Submit', array('type'=>'submit', 'class'=>'btn btn-success','div'=>false,'label'=>false,'id'=>'submit','onclick'=>"javascript:return validateForm();"))?>
+                                    </div>
                                 </div>
-
-                              <div class="form-actions" align="center">
-                                    <?php echo $this->Form->input('Submit', array('type'=>'submit', 'class'=>'btn btn-success','div'=>false,'label'=>false,'id'=>'submit','onclick'=>"javascript:return validateForm();"))?>
-                              </div>
                                 <?php echo $this->Form->end();?>     
                         </div>
                          <div class="table-responsive" id="listingDiv">
@@ -137,15 +136,34 @@ echo $this->Html->scriptBlock("
 
     function getPrisonerGradelist(val)
     {
-        var url   = '".$getPrisonerGradeListUrl."';
-        url = url + '/prisoner_id:'+val;
-        $.post(url, {}, function(res) {
-            var data = JSON.parse(res);
-            $('#EarningGradePrisonerGradeId').html(data.gradelist);
-            $('#prisoner_stage_id').val(data.currentStage);
-            $('#prisoner_stage_name').val(data.currentStageName);
-            $('#EarningGradePrisonerRemarks').val(data.stagePromotionRemark);
+        $('#EarningGradePrisonerGradeId').val('');
+        $('#EarningGradePrisonerGradeId').select2({
+            placeholder: '-- Select --',
+            allowClear: true
         });
+        if(val != '')
+        {
+            var url   = '".$getPrisonerGradeListUrl."';
+            url = url + '/prisoner_id:'+val;
+            $.post(url, {}, function(res) {
+                var data = JSON.parse(res);
+                $('#EarningGradePrisonerGradeId').html(data.gradelist);
+                $('#prisoner_stage_id').val(data.currentStage);
+                $('#prisoner_stage_name').val(data.currentStageName);
+                $('#EarningGradePrisonerRemarks').val(data.stagePromotionRemark);
+                $('#EarningGradePrisonerGradeId').select2({
+                    placeholder: '-- Select --',
+                    allowClear: true
+                });
+            });
+        }
+        else 
+        {
+            $('#EarningGradePrisonerGradeId').html('');
+            $('#prisoner_stage_id').val('');
+            $('#prisoner_stage_name').val('');
+            $('#EarningGradePrisonerRemarks').val('');
+        }
     }
 
     function showData(){

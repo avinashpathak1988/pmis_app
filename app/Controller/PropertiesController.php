@@ -520,7 +520,7 @@ class PropertiesController   extends AppController {
              $condition      = array(
                 'PhysicalProperty.is_trash'=>0,
                 'PhysicalProperty.is_enable'=>1,
-                'PhysicalProperty.login_user_id'=>$this->Auth->user('id'),
+                // 'PhysicalProperty.login_user_id'=>$this->Auth->user('id'),
                 'PhysicalProperty.property_type'=>"Physical Property",
                 'PhysicalProperty.id in(select physicalproperty_id from physical_property_items where item_status="'.$status_type.'")',
 
@@ -530,7 +530,7 @@ class PropertiesController   extends AppController {
             $condition      = array(
                 'PhysicalProperty.is_trash'=>0,
                 'PhysicalProperty.is_enable'=>1,
-                'PhysicalProperty.login_user_id'=>$this->Auth->user('id'),
+                // 'PhysicalProperty.login_user_id'=>$this->Auth->user('id'),
                 'PhysicalProperty.property_type'=>"Physical Property",
                 'PhysicalProperty.id in(select physicalproperty_id from physical_property_items where item_status in ("Incoming","Supplementary Incoming","Outgoing","Supplementary Outgoing","Destroy"))',
 
@@ -600,7 +600,7 @@ class PropertiesController   extends AppController {
             'limit'         => 20,
         );
         $datas = $this->paginate('PhysicalProperty');
-        //debug($datas);exit;
+        //debug($condition);exit;
         $outgoingStatusList = $this->OutgoingStatus->find('list',array(
                     'recursive'     => -1,
                     'fields'        => array(
@@ -627,6 +627,7 @@ class PropertiesController   extends AppController {
                 'User.name'
             )
         ));
+        // debug($condition);
         $this->set(array(
             'datas'         => $datas,
             'prisoner_uuid'     => $prisoner_uuid,   

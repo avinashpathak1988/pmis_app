@@ -27,7 +27,7 @@
                         </div>   
                         <div class="span6">
                             <div class="control-group">
-                                <label class="control-label">Lodger Out Type</label>
+                                <label class="control-label">Lodger Out Type <?php echo MANDATORY; ?></label>
                                 <div class="controls uradioBtn">
                                 <?php
                                 $to_options= array('Release'=>'Release','Permanent'=>'Permanent');
@@ -46,7 +46,7 @@
                                 </div>
                             </div>
                         </div>                   
-                        <div class="span6">
+                        <div class="span6" id="lodger_out_div">
                             <div class="control-group">
                                 <label class="control-label">Destination Prison <?php echo MANDATORY; ?> :</label>
                                 <div class="controls">
@@ -74,3 +74,24 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+$(function(){
+    $("#LodgerOutLodgerOutAddForm").validate({
+        ignore: "",
+      
+    });
+    $('#LodgerOutReleaseType').on('change', function(e) {
+        if(this.value=='Permanent'){
+            $("#lodger_out_div").hide();
+            $('#destination_prison').select2('destroy');
+            $("#destination_prison").append("<option value='<?php echo $this->Session->read('Auth.User.prison_id'); ?>'>11</option>");
+            $('#destination_prison').val(<?php echo $this->Session->read('Auth.User.prison_id'); ?>);
+        }else{
+            $("#lodger_out_div").show();
+            $("#destination_prison option[value='<?php echo $this->Session->read('Auth.User.prison_id'); ?>']").remove();
+            $("#destination_prison").select2();
+            $("#destination_prison").val('');
+        }
+    }); 
+});
+</script>

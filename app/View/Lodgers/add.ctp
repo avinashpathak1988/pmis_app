@@ -74,9 +74,9 @@
                         </div>
                     </div>
 					
-                     <div class="row-fluid escaped_div" id="escaped_div_form">
-                     	
-                     </div>
+                    <div class="row-fluid escaped_div" id="escaped_div_form">
+                    	
+                    </div>
                     <div class="row-fluid secondDiv" id="prisonerItemForm" >
                         <h5>Prisoner Physical Items</h5>
                         <?php echo $this->element('lodger-prisoner-items');?>

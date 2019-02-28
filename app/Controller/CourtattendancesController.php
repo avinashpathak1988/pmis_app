@@ -421,8 +421,7 @@ class CourtattendancesController  extends AppController {
 				),
 			));
 			
-			
-			
+						
             $this->loadModel('Magisterial');
 			$this->loadModel('PrisonerCaseFile');
             $caseFileno=$this->PrisonerCaseFile->find('list',array(
@@ -437,7 +436,7 @@ class CourtattendancesController  extends AppController {
                   )
             ));
 			
-			$casefilesToCourt = $this->getTocourtFileNo($prisonerData['Prisoner']['id']);
+			$casefilesToCourt = $this->getTocourtFileNo($prisonerData['Prisoner']['id'],$prisonerData['Prisoner']['prisoner_type_id']);
 			
 			
 			/* for return form court case file no */
@@ -2856,11 +2855,24 @@ class CourtattendancesController  extends AppController {
 	
 	public function getCountOffence(){
 		
+		
+
+		$this->loadModel('PrisonerSentenceAppeal');
+		$this->loadModel('PrisonerSentence');
 		$this->autoRender = false;
 		$prisoner_case_file_id = $this->params['named']['prisoner_case_file_id'];
 		$offence_name = '';
 		$offence_count = '';
 		$case_file_id = '';
+		$offences = array();
+		$case_file_id_arr1 = '';
+		
+		$case_file_array = array();
+		$case_file_array1 = array();
+		$case_file_array2 = array();
+		$new_array = array();
+		$case_file_id_arr = array();
+		
         if(isset($prisoner_case_file_id) && (int)$prisoner_case_file_id != ''){
            $condition = array();
             $this->loadModel('PrisonerOffence');
@@ -2875,67 +2887,119 @@ class CourtattendancesController  extends AppController {
 			}
 			
             $case_file_id = rtrim($case_file_id,',');
-            $offenceList = $this->PrisonerOffence->find('all', array(
+			
+			
+			$sentenceAppeal = $this->PrisonerOffence->find('all',array(
+							'recursive' => -1,
+										'conditions'=>array(
+										'PrisonerOffence.prisoner_case_file_id IN ('. $case_file_id.')',
+										
+								),
+								'fields'=>array( 'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',)
+					));
+			
+			if(isset($sentenceAppeal) && count($sentenceAppeal) > 0)
+			{
+				foreach($sentenceAppeal as $keys => $vals)
+				{
+					array_push($offences,$vals['PrisonerOffence']['id']);
+				}
+				
+				
+				
+				$senerence_count = $this->PrisonerSentence->find('all',array(
+									'recursive' => -1,
+									'conditions' => array('PrisonerSentence.offence_id'=>$offences),
+									'fields' => array('PrisonerSentence.offence_id','PrisonerSentence.is_convicted','PrisonerSentence.wish_to_appeal','PrisonerSentence.waiting_for_confirmation'),
+				));
+				
+				
+				if(isset($senerence_count) && count($senerence_count) > 0)
+						{
+							foreach($senerence_count as $case_file_val)
+							{
+								if($case_file_val['PrisonerSentence']['is_convicted']==0)
+								{
+									array_push($new_array,  $case_file_val['PrisonerSentence']['offence_id']);
+									
+								}
+								if($case_file_val['PrisonerSentence']['is_convicted']==1)
+								{
+									if($case_file_val['PrisonerSentence']['waiting_for_confirmation']==1)
+									{
+										array_push($new_array,  $case_file_val['PrisonerSentence']['offence_id']);
+									}
+									if($case_file_val['PrisonerSentence']['wish_to_appeal']==1)
+									{
+										array_push($case_file_array1,  $case_file_val['PrisonerSentence']['offence_id']);
+									}
+									
+								}
+							}
+							
+							if($case_file_array1 != '')
+							{
+								
+								$sentenceAppeal = $this->PrisonerSentenceAppeal->find('all',array(
+											'recursive' => -1,
+														'conditions'=>array(
+														'PrisonerSentenceAppeal.appeal_status'=>'Cause List',
+														'PrisonerSentenceAppeal.offence_id'=> $case_file_array1,
+														//'PrisonerSentenceAppeal.prisoner_id' => $prisoner_id,
+												),
+												'fields'=>array('PrisonerSentenceAppeal.offence_id')
+									));
+									
+									foreach($sentenceAppeal as $sentval)
+									{
+										array_push($new_array,$sentval['PrisonerSentenceAppeal']['offence_id']);
+									}
+							}
+							
+							$new_array = array_values(array_merge($offences,$case_file_array,$case_file_array2,$case_file_id_arr));		
+									
+						}
+				
+				$offenceList = $this->PrisonerOffence->find('all', array(
                 'recursive'     => -1,
-                'conditions'=> array("PrisonerOffence.prisoner_case_file_id IN (". $case_file_id ." ) "),
+                'conditions'=> array("PrisonerOffence.id" => $new_array),
                 'fields'        => array(
                     'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
                 ),
-            ));
-			
-			/*$offencecountList = $this->PrisonerOffence->find('all', array(
-                'recursive'     => -1,
-                'conditions'=> array("PrisonerOffence.prisoner_case_file_id IN (". $case_file_id ." ) "),
-                'fields'        => array(
-                    'PrisonerOffence.id','PrisonerOffence.offence_no'
-                ),
-            ));*/
+				));
 			
 			
-			if(isset($offenceList) && !empty($offenceList))
-			{
-				
-				foreach($offenceList as $offkey => $offval)
+				if(isset($offenceList) && !empty($offenceList))
 				{
-					//$offence_name .= '<option value=""></value>';
-					 $offence_name .= '<option value="'.$offval['PrisonerOffence']['id'].'">'. $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")".'</option>';
+					
+					foreach($offenceList as $offkey => $offval)
+					{
+						//$offence_name .= '<option value=""></value>';
+						 $offence_name .= '<option value="'.$offval['PrisonerOffence']['id'].'">'. $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")".'</option>';
+						
+					}
+				}
+				else
+				{
+					$offence_name = '';
 					
 				}
-			}
-			else
-			{
-				$offence_name = '';
-				
-			}
 			
-			if(isset($offencecountList) && !empty($offencecountList))
-			{
-				
-				foreach($offencecountList as $offkey => $offval)
-				{
-					 $offence_count .= '<option value="'.$offval['PrisonerOffence']['offence_no'].'">'.$offval['PrisonerOffence']['offence_no'].'</option>';
-					
-				}
-			}
-			else
-			{
-				$offence_count = '';
-				
-			}
-			
-			$this->loadModel('PrisonerSentenceAppeal');
+						
 			$appealCount = $this->PrisonerSentenceAppeal->find('count',array(
 									'conditions'=>array('PrisonerSentenceAppeal.case_file_id'=>$prisoner_case_file_id),
 									
+									
 								));
-            
+			}
+
         }
 		else
 		{
-           
+           $offence_name = '';
         }
 		
-		echo rtrim($offence_name,',').'##'.rtrim($offence_count,',').'##'.@$appealCount;
+		echo rtrim($offence_name,',').'##'.'0'.'##'.@$appealCount;
 	}
 	
 	public function getFromCourtOffence(){
@@ -3448,7 +3512,7 @@ class CourtattendancesController  extends AppController {
         }
     }
 	
-	public function getTocourtFileNo($prisoner_id='')
+	public function getTocourtFileNo($prisoner_id='',$sentene_type='')
 	{
 		$this->loadModel('PrisonerCaseFile');
 		$this->loadModel('PrisonerSentenceAppeal');
@@ -3466,7 +3530,7 @@ class CourtattendancesController  extends AppController {
 									),
 									
 								),
-								array(
+								/*array(
 									'table' => 'courtattendances',
 									'alias' => 'Courtattendance',
 									'type' => 'left',
@@ -3474,9 +3538,9 @@ class CourtattendancesController  extends AppController {
 									'conditions'=> array(
 											'Courtattendance.case_no = PrisonerSentence.case_id',
 									),
-								)		
+								)*/		
 						),
-		'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no','PrisonerSentence.sentence_type'),
+		'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no','PrisonerSentence.sentence_type','PrisonerSentence.is_convicted','PrisonerSentence.wish_to_appeal','PrisonerSentence.waiting_for_confirmation'),
 			'conditions'=>array('PrisonerCaseFile.prisoner_id'=>$prisoner_id),
 		)); 
 		
@@ -3497,9 +3561,10 @@ class CourtattendancesController  extends AppController {
 		'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no','PrisonerSentence.sentence_type'),
 			'conditions'=>array('PrisonerCaseFile.prisoner_id'=>$prisoner_id),
 		)); */
-		
+		//debug($case_files);
 		$case_file_array = array();
 		$case_file_array1 = array();
+		$case_file_array2 = array();
 		$case_file_id_arr = array();
 		$new_array = array();
 		$case_file_id = '';
@@ -3508,24 +3573,34 @@ class CourtattendancesController  extends AppController {
 		{
 			foreach($case_files as $case_file_val)
 			{
-				if($case_file_val['PrisonerSentence']['sentence_type']==1)
+				if($case_file_val['PrisonerSentence']['is_convicted']==0)
 				{
 					array_push($case_file_array,  $case_file_val['PrisonerCaseFile']['id']);
 					
 				}
-				if($case_file_val['PrisonerSentence']['sentence_type']==2)
+				if($case_file_val['PrisonerSentence']['is_convicted']==1)
 				{
-					array_push($case_file_array1,  $case_file_val['PrisonerCaseFile']['id']);
+					if($case_file_val['PrisonerSentence']['waiting_for_confirmation']==1)
+					{
+						array_push($case_file_array2,  $case_file_val['PrisonerCaseFile']['id']);
+					}
+					if($case_file_val['PrisonerSentence']['wish_to_appeal']==1)
+					{
+						array_push($case_file_array1,  $case_file_val['PrisonerCaseFile']['id']);
+					}
+					
 				}
 			}
 			
 			if($case_file_array1 != '')
 			{
 				
-				$sentenceAppeal = $this->PrisonerSentenceAppeal->find('all',array('conditions'=>array(
-										'PrisonerSentenceAppeal.status'=>'Approved',
-										'PrisonerSentenceAppeal.is_closed'=>'0',
+				$sentenceAppeal = $this->PrisonerSentenceAppeal->find('all',array(
+							'recursive' => -1,
+										'conditions'=>array(
+										'PrisonerSentenceAppeal.appeal_status'=>'Cause List',
 										'PrisonerSentenceAppeal.case_file_id'=> $case_file_array1,
+										//'PrisonerSentenceAppeal.prisoner_id' => $prisoner_id,
 								),
 								'fields'=>array('PrisonerSentenceAppeal.case_file_id')
 					));
@@ -3536,9 +3611,11 @@ class CourtattendancesController  extends AppController {
 					}
 			}
 			
-			$new_array = array_values(array_merge($case_file_array,$case_file_id_arr));		
+			$new_array = array_values(array_merge($case_file_array,$case_file_array2,$case_file_id_arr));		
 					
 		}
+		
+		//debug($case_file_array1); exit;
 		if(!empty($new_array))
 		{
 			
@@ -3557,7 +3634,7 @@ class CourtattendancesController  extends AppController {
 			
 			return $caseFileno;
 		}
-		else{
+		/*else{
 			
 			$caseFileno=$this->PrisonerCaseFile->find('list',array(
 				  "recursive" => -1,
@@ -3572,7 +3649,7 @@ class CourtattendancesController  extends AppController {
             ));
 			
 			return $caseFileno;
-		}		
+		}*/		
 		
 	}
 	

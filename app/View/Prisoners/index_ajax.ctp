@@ -146,8 +146,11 @@ if(is_array($datas) && count($datas)>0){
                                     {
                                         echo '<span style="color:green;font-weight:bold;background-color:#fff;padding:1px 3px;" class="btn btn-mini">Readmitted after bail</span>';
                                     }
-                                    else if($data['Prisoner']['is_death'] == 0 && $data['Prisoner']['is_readmitted'] == 0)
-                                        echo $this->Html->link('Re-admit','/prisoners/add/'.$prisoner_unique_no,array('escape'=>false,'class'=>'btn btn-success btn-mini','title'=>'Re admission'));
+                                    else if($data['Prisoner']['is_death'] == 0)
+                                    {
+                                        if($data['Prisoner']['is_readmitted'] == 0)
+                                            echo $this->Html->link('Re-admit','/prisoners/add/'.$prisoner_unique_no,array('escape'=>false,'class'=>'btn btn-success btn-mini','title'=>'Re admission'));
+                                    }
                                     else
                                         echo '<span style="color:red;font-weight:bold;background-color:#fff;padding:1px 3px;" class="btn btn-mini">Dead</span>';
                                 }

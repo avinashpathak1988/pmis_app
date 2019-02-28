@@ -58,6 +58,7 @@ echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal',
             <th>Name of staff in charge</th>
             <th>Capacity</th>
             <th>Remarks</th>
+            <th>Employment Type</th>
             <!-- <th>Is Enable</th> -->
             <th>Approve Status</th>
             <th>Working Status</th>
@@ -113,6 +114,7 @@ if(!isset($is_excel) && ($this->Session->read('Auth.User.usertype_id')==Configur
             <td><?php echo $funcall->getName($data['WorkingParty']['login_user_id'],'User','name'); ?></td>
             <td><?php echo $data['WorkingParty']['capacity']; ?></td>
             <td><?php echo substr($data['WorkingParty']['remarks'],0,10); ?></td>
+            <td><?php echo $data['EmploymentType']['name']; ?></td>
             <!-- <td> -->
               <?php 
               // if($data[$modelName]['is_enable'] == 0)

@@ -41,13 +41,6 @@ echo $this->Paginator->counter(array(
        <th><?php echo $this->Paginator->sort('Assignment Date'); ?></th>
        <th><?php echo $this->Paginator->sort('good conduct'); ?></th>
        <th><?php echo __('Edit'); ?></th>
-       <th><?php echo __('Delete'); ?></th>
-      
-     
-      
-      
-      
-      
     </tr>
   </thead>
 <tbody>
@@ -75,17 +68,6 @@ foreach($datas as $data){
           <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['AssignSkill']['id'])); ?>
           <?php echo $this->Form->end(array('label'=>'Edit','class'=>'btn btn-primary btn-mini','div'=>false, 'onclick'=>"javascript:return confirm('Are you sure want to edit?')")); ?> 
         </td>
-        <td>
-            <?php echo $this->Form->create('AssignSkillDelete',array('url'=>'/Earnings/assignSkill','admin'=>false));?> 
-            <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['AssignSkill']['id'])); ?>
-            <?php echo $this->Form->end(array('label'=>'Delete','class'=>'btn btn-danger btn-mini','div'=>false, 'onclick'=>"javascript:return confirm('Are you sure want to delete?')")); ?>
-      </td>
-      
-     
-     
-         				
-      
-      
     </tr>
 <?php
 $rowCnt++;

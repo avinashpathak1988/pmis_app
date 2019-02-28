@@ -46,7 +46,7 @@
                                     <div class="controls">
                                         <?php $currentDate = date('d-m-Y');
                                         echo $this->Form->input('assignment_date',array('div'=>false,'label'=>false,'type'=>'text','id'=>'assignment_date_search','placeholder'=>'Enter Assignment/Prommotion date', 'data-date-format'=>"dd-mm-yyyy",
-                                             'readonly'=>'readonly','class'=>'form-control maxCurrentDate','type'=>'text','required', 'default'=>$currentDate));?>
+                                             'readonly'=>'readonly','class'=>'form-control maxCurrentDate','type'=>'text','required'));?>
                                     </div>
                                 </div>
                             </div>

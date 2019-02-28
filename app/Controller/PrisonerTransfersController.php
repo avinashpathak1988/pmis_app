@@ -3218,4 +3218,24 @@ class PrisonerTransfersController   extends AppController {
             ),
         ));
     }
+
+    public function showWard($gender_id, $ward_type='') {
+        $this->autoRender = false;
+        $this->loadModel("Ward");
+        return $this->Ward->find('list', array(
+            'recursive'     => -1,
+            'conditions'    => array(
+                'Ward.gender'       => $gender_id,
+                // 'Ward.prison'       => $this->Session->read('Auth.User.prison_id'),
+                // 'Ward.ward_type'    => $ward_type,
+            ),
+            'fields'        => array(
+                'Ward.id',
+                'Ward.name',
+            ),
+            'order'         => array(
+                'Ward.name'
+            ),
+        )); 
+    }
  }

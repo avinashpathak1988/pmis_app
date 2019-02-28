@@ -50,7 +50,7 @@
                                     <div class="control-group">
                                         <label class="control-label">From Date :</label>
                                         <div class="controls">
-                                            <?php echo $this->Form->input('from_date', array('type'=>'text', 'id'=>'from_date', 'class'=>'span11 from_date','div'=>false,'label'=>false,'placeholder'=>'Enter from date','required'))?>
+                                            <?php echo $this->Form->input('from_date', array('type'=>'text', 'id'=>'from_date', 'class'=>'span11 from_date','div'=>false,'label'=>false,'placeholder'=>'Enter from date','readonly'=>true,'required'))?>
                                         </div>
                                     </div>
                                 </div>
@@ -58,7 +58,7 @@
                                     <div class="control-group">
                                         <label class="control-label">To Date :</label>
                                         <div class="controls">
-                                            <?php echo $this->Form->input('to_date', array('type'=>'text', 'id'=>'to_date', 'class'=>'span11 to_date','div'=>false,'label'=>false,'placeholder'=>'Enter to date','required'))?>
+                                            <?php echo $this->Form->input('to_date', array('type'=>'text', 'id'=>'to_date', 'class'=>'span11 to_date','div'=>false,'label'=>false,'placeholder'=>'Enter to date','readonly'=>true,'required'))?>
                                         </div>
                                     </div>
                                 </div>
@@ -124,6 +124,7 @@
                     </div> 
                         <div class="form-actions" align="center">
                             <button id="btnsearchcash" class="btn btn-success" type="button" onclick="javascript:showData();">Search</button>
+                            <?php echo $this->Form->input('Reset', array('type'=>'button', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger', 'onclick'=>"resetData()"))?>
                         </div>
                     <?php echo $this->Form->end();?>
                     </div>           
@@ -158,6 +159,13 @@ echo $this->Html->scriptBlock("
         });
 
     });    
+    function resetData(){
+
+       
+        $('select').select2('val', '');
+        showData();
+        
+    }
     function showData(){
         var url   = '".$ajaxUrl."';
         url = url + '/state_id:'+$('#state_id').val();  

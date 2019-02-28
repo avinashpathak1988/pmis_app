@@ -1,15 +1,15 @@
 <style>
 .nodisplay{display:none;}
 </style>
-
 <div class="container-fluid">
     <div class="row-fluid">
-        <div id="commonheader"></div>
-        <div class="span12" style="margin-left: 0;">
+        <div class="span12">
             <div class="widget-box">
-               
+                <div class="widget-title"> <span class="icon"> <i class="icon-align-justify"></i> </span>
+                    <h5></h5>
+                </div>
                 <div class="widget-content nopadding">
-                    <div class="">
+                   <div class="">
                         <div class="span2" style="margin-left: 0;"><strong>Prisoner No: </strong></div>
                         <div class="span10">
                             <?php if(isset($prisonerData['Prisoner']['prisoner_no']))echo ucfirst($prisonerData['Prisoner']['prisoner_no']);?>

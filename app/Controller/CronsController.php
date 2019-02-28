@@ -768,4 +768,87 @@ class CronsController extends AppController{
         }
         exit;
     }
+
+    // cron setup for sending the notification to assign grade --PARTHA-- START
+
+     public function notifyForAssignStageNotifications(){
+         $prisonerCondition = array(
+                'Prisoner.is_enable'      => 1,
+                'Prisoner.is_trash'       => 0,
+                'Prisoner.present_status' => 1,
+                'Prisoner.is_death'       => 0,
+                'Prisoner.transfer_id'    => 0,
+                'StagesAssign.id NOT IN ' => array(1,3),
+                // 'StagesAssign.status' => "Approved"
+                // 'AssignSkill.prisoner_id' => 'Prisoner.id'
+            );
+       $prisonerlist=$this->Prisoner->find('all',array(
+                    'recursive'     => -1,
+                   
+                    "joins" => array(
+                        array(
+                            "table" => "stage_assigns",
+                            "alias" => "StagesAssign",
+                            "type" => "LEFT",
+                            "conditions" => array(
+                            "Prisoner.id= StagesAssign.prisoner_id"
+                            )
+                            
+                        ),
+                        array(
+                            "table" => "assign_skills",
+                            "alias" => "AssignSkill",
+                            "type" => "right",
+                            "conditions" => array(
+                            "Prisoner.id= AssignSkill.prisoner_id"
+                            )
+                        )
+                    ),
+                     'fields'        => array(
+                        'Prisoner.id',
+                        'Prisoner.prisoner_no',
+                        'StagesAssign.stage_id'
+                      
+
+                    ),
+                    'conditions'    => $prisonerCondition,
+                    'order'=>array(
+                        'Prisoner.prisoner_no'
+                    )
+                )); 
+
+        // debug($prisonerlist); exit;
+        if(!empty($prisonerlist))
+        {
+            $usertypes = array(
+                Configure::read('RECEPTIONIST_USERTYPE'),
+                Configure::read('PRINCIPALOFFICER_USERTYPE'),
+                Configure::read('OFFICERINCHARGE_USERTYPE')
+            );
+            $usertypes = implode(',',$usertypes);
+            foreach($prisonerlist as $prisonerId=>$stage_id)
+            {
+                $userList = $this->User->find("list", array(
+                    'fields'        => array(
+                        'User.id',
+                        'User.name',
+                    ),
+                    'conditions'    => array(
+                        'User.is_enable'      => 1,
+                        'User.is_trash'       => 0,
+                        'User.prison_id'       => $this->Prisoner->field("prison_id",array('id'=>$prisonerId)),
+                        'User.usertype_id IN ('.$usertypes.')'
+                    )
+                ));
+            // debug($this->getName($stage_id['StagesAssign']['stage_id'],"Stage","name")); exit;
+                $message = 'The Prisoner having prisoner no-'.$this->Prisoner->field("prisoner_no",array('id'=>$prisonerId))." and stage id :".$this->getName($stage_id['StagesAssign']['stage_id'],"Stage","name").' is not assgned to grade'; 
+                $url_link = 'earningRates/assignGrades/';
+                // debug($userList);
+                $this->addManyNotification($userList, $message, $url_link);
+            }
+        }
+        exit;
+    }
+
+    // cron setup for sending the notification to assign grade --PARTHA-- END
 }

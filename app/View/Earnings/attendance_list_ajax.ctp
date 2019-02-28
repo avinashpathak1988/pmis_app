@@ -30,23 +30,24 @@ $modelName = 'PrisonerAttendance';
         <tr>
            
             <th>SL#</th>
+            <th>Working party</th>
             <th>
                 <?php 
-                echo $this->Paginator->sort('PrisonerAttendance.attendance_date','Attendance Date',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'Earnings','action' => 'attendanceAjax', 'status' => $status, 'working_party_id'=>$working_party_id, 'date_from' => $date_from, 'date_to' => $date_to)));
+                echo $this->Paginator->sort('PrisonerAttendance.prisoner_id','Prisoner No',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'Earnings','action' => 'attendanceListAjax', 'status' => $status, 'working_party_id'=>$working_party_id, 'date_from' => $date_from, 'date_to' => $date_to)));
                 ?>
             </th>
-            <th>
+         <!--    <th>
                 <?php 
-                echo $this->Paginator->sort('Prisoner.prisoner_no','Prisoner No',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'Earnings','action' => 'attendanceAjax', 'status' => $status, 'working_party_id'=>$working_party_id, 'date_from' => $date_from, 'date_to' => $date_to)));
+                echo $this->Paginator->sort('PrisonerAttendance.name','Prisoner Name',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'Earnings','action' => 'attendanceListAjax', 'status' => $status, 'working_party_id'=>$working_party_id, 'date_from' => $date_from, 'date_to' => $date_to)));
                 ?>
-            </th>
-            <th>
+            </th> -->
+             <th>
                 <?php 
-                echo $this->Paginator->sort('Prisoner.name','Prisoner Name',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'Earnings','action' => 'attendanceAjax', 'status' => $status, 'working_party_id'=>$working_party_id, 'date_from' => $date_from, 'date_to' => $date_to)));
+                echo $this->Paginator->sort('PrisonerAttendance.attendance_date','Attendance Date',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'Earnings','action' => 'attendanceListAjax', 'status' => $status, 'working_party_id'=>$working_party_id, 'date_from' => $date_from, 'date_to' => $date_to)));
                 ?>
             </th>
             <th>Present Status</th>
-            <th>Working party</th>
+           
             <!-- <th>Approve Status</th> -->
         </tr>
     </thead>
@@ -67,11 +68,12 @@ $modelName = 'PrisonerAttendance';
              
             <?php } ?>
             <td><?php echo $rowCnt; ?></td>
-            <td><?php echo date('d-m-Y', strtotime($data['PrisonerAttendance']['attendance_date'])); ?></td>
-            <td><?php echo $data['Prisoner']['prisoner_no']; ?></td>
-            <td><?php echo $data['Prisoner']['fullname']; ?></td>
-            <td><?php echo isset($data['PrisonerAttendance']['is_present']) && $data['PrisonerAttendance']['is_present']==1?'Present':'Absent'; ?></td>
             <td><?php echo $data['WorkingParty']['name']; ?></td>
+            <td><?php echo $data['Prisoner']['prisoner_no']; ?></td>
+            <!-- <td><?php echo $data['Prisoner']['fullname']; ?></td> -->
+            <td><?php echo date('d-m-Y', strtotime($data['PrisonerAttendance']['attendance_date'])); ?></td>
+            <td><?php echo isset($data['PrisonerAttendance']['is_present']) && $data['PrisonerAttendance']['is_present']==1?'Present':'Absent'; ?></td>
+           
            <!--  <td>
                 <?php if($data[$modelName]['status'] == 'Draft')
                 {

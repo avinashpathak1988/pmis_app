@@ -339,7 +339,8 @@ $deathRecord = $funcall->MedicalDeathRecord->find("count", array(
                     {?>                                 
                         <div style="float:right;padding-top: 7px;padding-right: 4px;">
                             <?php 
-                            if ($deathRecord==0 || $this->Session->read('Auth.User.usertype_id')=='OFFICERINCHARGE_USERTYPE') {
+                            //debug($this->Session->read('Auth.User.usertype_id'));
+                            if ($deathRecord==0 || $this->Session->read('Auth.User.usertype_id')==4) {
                             echo $this->Html->link('Add Debit','#debitCash',array('escape'=>false,'class'=>'btn btn-success btn-mini','id'=>'addDebit','data-toggle'=>"collapse"));
                             } 
                             ?>

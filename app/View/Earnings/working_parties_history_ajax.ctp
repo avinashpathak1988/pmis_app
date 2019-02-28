@@ -115,9 +115,9 @@ echo $this->Paginator->counter(array(
             <td><?php echo $funcall->getName($data['WorkingPartyPrisoner']['prisoner_id'],'Prisoner', 'prisoner_no');?></td>
             <td><?php echo $funcall->getName($data['WorkingPartyPrisoner']['prisoner_id'],'Prisoner', 'first_name');?></td>
             <td><?php echo $funcall->getName($data['WorkingPartyPrisoner']['working_party_id'], 'WorkingParty', 'name'); ?></td>
-            <td><?php echo date('d-m-y', strtotime($funcall->getPrisonerAttendance($data['WorkingPartyPrisoner']['prisoner_id'],$data['WorkingPartyPrisoner']['working_party_id']))); ?></td>
+            <td><?php echo date('d-m-Y', strtotime($funcall->getPrisonerAttendance($data['WorkingPartyPrisoner']['prisoner_id'],$data['WorkingPartyPrisoner']['working_party_id']))); ?></td>
             
-            <td><?php echo date('d-m-y', strtotime($funcall->getPrisonerAttendanceEndDate($data['WorkingPartyPrisoner']['prisoner_id'],$data['WorkingPartyPrisoner']['working_party_id']))); ?></td>
+            <td><?php echo date('d-m-Y', strtotime($funcall->getPrisonerAttendanceEndDate($data['WorkingPartyPrisoner']['prisoner_id'],$data['WorkingPartyPrisoner']['working_party_id']))); ?></td>
            <!--  <td><?php //echo $data['WorkingPartyPrisoner']['name']; ?></td> -->
            
         </tr>

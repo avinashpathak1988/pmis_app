@@ -311,16 +311,12 @@ class EarningRatesController   extends AppController {
      }
      public function assignGrades()
      {
-        //debug($this->data); exit;
-        /*
-        *Code To save assigned grades to prisoner
-        */
+        $prison_id      = $this->Auth->user('prison_id');
         /*
         *Code To save assigned grades to prisoner
         */
         if(isset($this->data['EarningGradePrisoner']) && is_array($this->data['EarningGradePrisoner']) && $this->data['EarningGradePrisoner']!='')
              {
-                //debug($this->data['EarningGradePrisoner']); exit;
                 if(isset($this->data['EarningGradePrisoner']['uuid']) && $this->data['EarningGradePrisoner']['uuid']=='')
                  {
                     $uuidArr=$this->EarningGradePrisoner->query("select uuid() as code");
@@ -330,6 +326,12 @@ class EarningRatesController   extends AppController {
                  {
                     $this->request->data['EarningGradePrisoner']['assignment_date']=date('Y-m-d',strtotime($this->data['EarningGradePrisoner']['assignment_date']));
                  }
+                 $this->request->data['EarningGradePrisoner']['status'] = 'Approved';
+                 //If grade A assigned CGP approval needed 
+                if($this->request->data['EarningGradePrisoner']['grade_id'] == Configure::read('GRADE-A'))
+                {
+                    $this->request->data['EarningGradePrisoner']['status'] = 'Draft';
+                }
                 $db = ConnectionManager::getDataSource('default');
                 $db->begin();  
                 if($this->EarningGradePrisoner->save($this->data))
@@ -377,7 +379,7 @@ class EarningRatesController   extends AppController {
                     {
                         $db->commit(); 
                         $this->Session->write('message_type','success');
-                        $this->Session->write('message','Deleted Successfully !');
+                        $this->Session->write('message','Earning Grade Prisoner Deleted Successfully!');
                         $this->redirect(array('action'=>'assignGrades'));
                     }
                     else 
@@ -426,16 +428,16 @@ class EarningRatesController   extends AppController {
                     'EarningGrade.name'
                 )
             ));  
-           $condition = array(
-                'Prisoner.is_enable'      => 1,
-                'Prisoner.is_trash'       => 0,
-                'Prisoner.present_status' => 1,
-                'Prisoner.transfer_id'    => 0,
-                //'EarningRatePrisoner.is_trash'  => 0,
-                'Prisoner.earning_grade_id !='   =>  0,
-                'Prisoner.earning_rate_id !='   =>  0,
-                //'Prisoner.prison_id'       => $prison_id
-            );
+           // $condition = array(
+           //      'Prisoner.is_enable'      => 1,
+           //      'Prisoner.is_trash'       => 0,
+           //      'Prisoner.present_status' => 1,
+           //      'Prisoner.transfer_id'    => 0,
+           //      //'EarningRatePrisoner.is_trash'  => 0,
+           //      'Prisoner.earning_grade_id !='   =>  0,
+           //      'Prisoner.earning_rate_id !='   =>  0,
+           //      'Prisoner.prison_id'       => $prison_id
+           //  );
            if ($this->Session->read('Auth.User.prison_id')!='') {
               
            
@@ -453,10 +455,16 @@ class EarningRatesController   extends AppController {
            //      ),
            //  ));
             $prisonerCondition = array(
-                'Prisoner.is_enable'    => 1,
-                'Prisoner.is_trash'     => 0,
-                'Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'),
-                'StagesAssign.id !=' => array(1,3)//stage I AND II
+                'Prisoner.is_enable'      => 1,
+                'Prisoner.is_trash'       => 0,
+                'Prisoner.present_status' => 1,
+                'Prisoner.is_death'       => 0,
+                'Prisoner.transfer_id'    => 0,
+                //'Prisoner.earning_grade_id !='   =>  0,
+                //'Prisoner.earning_rate_id !='   =>  0,
+                'Prisoner.prison_id'=> $prison_id,
+                'StagesAssign.id NOT IN ' => array(1,3)//stage I AND II
+                // 'AssignSkill.prisoner_id' => 
             );
             //check skilled prisoners -- START -- 
             $this->loadModel('AssignSkill');
@@ -477,8 +485,12 @@ class EarningRatesController   extends AppController {
                 'conditions'    => array(
                     'Prisoner.is_enable'      => 1,
                     'Prisoner.is_trash'       => 0,
-                    'AssignSkill.is_trash'       => 0,
-                    'Prisoner.prison_id'       => $prison_id
+                    'AssignSkill.is_trash'    => 0,
+                    'AssignSkill.is_conduct'  => 1,
+                    'Prisoner.prison_id'      => $prison_id,
+                    'Prisoner.present_status' => 1,
+                    'Prisoner.is_death'       => 0,
+                    'Prisoner.transfer_id'    => 0
                 ),
                 'order'         => array(
                     'Prisoner.prisoner_no'
@@ -490,6 +502,7 @@ class EarningRatesController   extends AppController {
                 $skillPrisoners = implode(',',$skillList);
                 $prisonerCondition += array("Prisoner.id in (".$skillPrisoners.")");
             }
+            
             //check skilled prisoners -- END -- 
             $prisonerlist=$this->Prisoner->find('list',array(
                     'recursive'     => -1,
@@ -505,8 +518,17 @@ class EarningRatesController   extends AppController {
                             "conditions" => array(
                             "Prisoner.id= StagesAssign.prisoner_id"
                             )
-                        )),
-
+                            
+                        ),
+                        array(
+                            "table" => "assign_skills",
+                            "alias" => "AssignSkill",
+                            "type" => "right",
+                            "conditions" => array(
+                            "Prisoner.id= AssignSkill.prisoner_id"
+                            )
+                        )
+                    ),
                     'conditions'    => $prisonerCondition,
                     'order'=>array(
                         'Prisoner.prisoner_no'
@@ -582,7 +604,9 @@ class EarningRatesController   extends AppController {
                     'EarningGradePrisoner.prisoner_stage_id'
                 ),
                 'conditions'    => array(
-                    'EarningGradePrisoner.prisoner_id'=>$prisoner_id
+                    'EarningGradePrisoner.prisoner_id'=>$prisoner_id,
+                    'EarningGradePrisoner.is_trash'=>0,
+                    'EarningGradePrisoner.status'=>'Approved'
                 ),
                 'order'         => array(
                     'EarningGradePrisoner.id'=>'DESC'
@@ -593,60 +617,37 @@ class EarningRatesController   extends AppController {
                 $currentGrade = $prisonerGrade['EarningGradePrisoner']['grade_id'];
             }
         }
+        $EarningRateCondition = array(
+            'EarningRate.is_enable'    => 1,
+            'EarningRate.is_trash'     => 0
+        );
         if($currentGrade > 0)
         {
-            $gradeslist=$this->EarningRate->find('list',array(
-                'recursive'     => -1,
-                'fields'        => array(
-                    'EarningRate.id',
-                    'EarningGrade.name',
-                ),
-                 "joins" => array(
-                    array(
-                        "table" => "earning_grades",
-                        "alias" => "EarningGrade",
-                        "type" => "LEFT",
-                        "conditions" => array(
-                        "EarningRate.earning_grade_id = EarningGrade.id"
-                        )
-                    )),
-                'conditions'    => array(
-                    'EarningRate.is_enable'    => 1,
-                    'EarningRate.is_trash'     => 0,
-                    'EarningGrade.id <'     => $currentGrade
-                ),
-                'order'=>array(
-                    'EarningGrade.name'
-                )
-            ));  
+            $EarningRateCondition += array(
+                'EarningGrade.id <'     => $currentGrade
+            ); 
         }
-        else 
-        {
-            $gradeslist=$this->EarningRate->find('list',array(
-                'recursive'     => -1,
-                'fields'        => array(
-                    'EarningRate.id',
-                    'EarningGrade.name',
-                ),
-                 "joins" => array(
-                    array(
-                        "table" => "earning_grades",
-                        "alias" => "EarningGrade",
-                        "type" => "LEFT",
-                        "conditions" => array(
-                        "EarningRate.earning_grade_id = EarningGrade.id"
-                        )
-                    )),
-                'conditions'    => array(
-                    'EarningRate.is_enable'    => 1,
-                    'EarningRate.is_trash'     => 0,
-                ),
-                'order'=>array(
-                    'EarningGrade.name'
-                )
-            ));  
-        }
-        $gradeHtml = '<option value="">-- Select Grade --</option>';
+        $gradeslist=$this->EarningRate->find('list',array(
+            'recursive'     => -1,
+            'fields'        => array(
+                'EarningRate.id',
+                'EarningGrade.name',
+            ),
+             "joins" => array(
+                array(
+                    "table" => "earning_grades",
+                    "alias" => "EarningGrade",
+                    "type" => "LEFT",
+                    "conditions" => array(
+                    "EarningRate.earning_grade_id = EarningGrade.id"
+                    )
+                )),
+            'conditions'    => $EarningRateCondition,
+            'order'=>array(
+                'EarningGrade.name'
+            )
+        ));
+        $gradeHtml = '<option value=""></option>';
         if(isset($gradeslist) && count($gradeslist) > 0)
         {
             foreach($gradeslist as $gradeslistKey=>$gradeslistVal)
@@ -689,5 +690,149 @@ class EarningRatesController   extends AppController {
                 'datas' =>$datas,
                 
             ));
+    }
+    //approve Prisoner assigned to grade A 
+    public function approveAssignedGrade()
+    {
+        $prison_id = $this->Session->read('Auth.User.prison_id');
+        $login_user_id = $this->Session->read('Auth.User.id');
+        $default_status = ''; $approvalStatusList = '';
+        $statusInfo = $this->getApprovalStatusInfo();
+        if(is_array($statusInfo) && count($statusInfo) > 0)
+        {
+            $default_status = $statusInfo['default_status']; 
+            $approvalStatusList = $statusInfo['statusList']; 
+        }
+        //save approval process 
+        if($this->request->is(array('post','put')))
+        {
+            //save approval status 
+            if(isset($this->request->data['ApprovalProcess']) && count($this->request->data['ApprovalProcess']) > 0)
+            {
+                $status = 'Saved'; 
+                $remark = '';
+                if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') || ($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE')))
+                {
+                    if(isset($this->request->data['ApprovalProcessForm']) && count($this->request->data['ApprovalProcessForm']) > 0)
+                    {
+                        $status = $this->request->data['ApprovalProcessForm']['type']; 
+                        $remark = $this->request->data['ApprovalProcessForm']['remark'];
+                    }
+                }
+                $items = $this->request->data['ApprovalProcess'];
+                $status = $this->setApprovalProcess($items, 'EarningGradePrisoner', $status, $remark);
+                if($status == 1)
+                {
+                    //notification on approval of payment list --START--
+                    if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+                    {
+                        $notification_msg = "Assigned Grade A list of prisoners are pending for approve.";
+                        $notifyUser = $this->User->find('first',array(
+                            'recursive'     => -1,
+                            'conditions'    => array(
+                                'User.usertype_id'    => Configure::read('COMMISSIONERGENERAL_USERTYPE'),
+                                'User.is_trash'     => 0,
+                                'User.is_enable'     => 1
+                            )
+                        ));
+                        if(isset($notifyUser['User']['id']))
+                        {
+                            $this->addNotification(array(                        
+                                "user_id"   => $notifyUser['User']['id'],                        
+                                "content"   => $notification_msg,                        
+                                "url_link"   => "earningRates/approveAssignedGrade",                    
+                            )); 
+                        }
+                    }
+                    //notification on approval of payment list --END--
+                    $this->Session->write('message_type','success');
+                    $this->Session->write('message','Saved Successfully !');
+                }
+                else 
+                {
+                    $this->Session->write('message_type','error');
+                    $this->Session->write('message','saving failed');
+                }
+            }
+        }
+        $this->set(array(
+            'default_status'      => $default_status,
+            'approvalStatusList'  => $approvalStatusList
+        ));
+    }
+    function assignedGradeAAjax()
+    {
+        $this->layout   = 'ajax';
+        $attendance_date = '';
+        $working_party_id = '';
+        $status = ''; $date_from = ''; $date_to = '';
+        $prison_id = $this->Session->read('Auth.User.prison_id');
+        $condition      = array(
+            'EarningGradePrisoner.prison_id'        => $prison_id,
+        );
+        $default_status = ''; $approvalStatusList = '';
+        $statusInfo = $this->getApprovalStatusInfo();
+        if(is_array($statusInfo) && count($statusInfo) > 0)
+        {
+            $default_status = $statusInfo['default_status']; 
+            $approvalStatusList = $statusInfo['statusList']; 
+        }
+
+        if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE'))
+        {
+            $condition      += array('EarningGradePrisoner.status !='=>'Draft');
+        }
+        //debug($this->params);
+        if(isset($this->params['data']['status']) && $this->params['data']['status'] != '' && $this->params['data']['status'] != '0')
+        { 
+            $status = $this->params['data']['status'];
+            $condition      += array('EarningGradePrisoner.status'=>$status);
+        }
+        // else 
+        // { 
+        //     if($default_status != '')
+        //     {
+        //         $condition      += array('EarningGradePrisoner.status'=>$default_status);
+        //     }
+        // }
+        
+        if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
+            if($this->params['named']['reqType']=='XLS'){
+                $this->layout='export_xls';
+                $this->set('file_type','xls');
+                $this->set('file_name','attendance_report_'.date('d_m_Y').'.xls');
+            }else if($this->params['named']['reqType']=='DOC'){
+                $this->layout='export_xls';
+                $this->set('file_type','doc');
+                $this->set('file_name','attendance_report_'.date('d_m_Y').'.doc');
+            }else if($this->params['named']['reqType']=='PDF'){
+                $this->layout='pdf';
+                $this->set('file_type','pdf');
+                $this->set('file_name','attendance_report_'.date('d_m_Y').'.pdf');
+            }else if($this->params['named']['reqType']=='PRINT'){
+                $this->layout='print';
+            }
+            $this->set('is_excel','Y');         
+            $limit = array('limit' => 2000,'maxLimit'   => 2000);
+        }else{
+            $limit = array('limit'  => 20);
+        }             
+       
+        debug($condition);          
+        $this->paginate = array(
+            'conditions'    => $condition,
+            'order'         => array(
+                'EarningGradePrisoner.id' => 'desc',
+            ),
+        )+$limit;
+        $datas = $this->paginate('EarningGradePrisoner');
+
+        $this->set(array(
+            'datas'         => $datas, 
+            'prison_id'=>$prison_id,
+            'date_from' =>  $date_from,
+            'date_to' =>  $date_to,
+            'status' =>  $status
+        ));
     }
  }

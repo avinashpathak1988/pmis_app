@@ -15,23 +15,13 @@
                                 <div class="row-fluid" style="padding-bottom: 14px;">
                                     <div class="span6">
                                         <div class="control-group">
-                                            <label class="control-label">From Date :</label>
+                                            <label class="control-label">Attendance Date :</label>
                                             <div class="controls">
                                                 <?php echo $this->Form->input('date_from',array('div'=>false,'label'=>false,'class'=>'form-control from_date mydate span11','type'=>'text', 'placeholder'=>'Select From Date ','required','readonly'=>'readonly','id'=>'date_from'));?>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="span6">
-                                            <div class="control-group">
-                                            <label class="control-label">To Date :</label>
-                                            <div class="controls">
-                                                <?php echo $this->Form->input('date_to',array('div'=>false,'label'=>false,'class'=>'form-control to_date mydate span11','type'=>'text', 'placeholder'=>'Select To Date ','required','readonly'=>'readonly','id'=>'date_to'));?>
-                                            </div>
-                                        </div>
-                                    </div> 
-                                </div>
-                                <div class="row-fluid">
-                                    <div class="span6">
+                                     <div class="span6">
                                         <div class="control-group">
                                             <label class="control-label">Working Party:</label>
                                             <div class="controls">
@@ -39,6 +29,9 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="row-fluid">
+                                   
                                     <div class="span6">
                                         <div class="control-group">
                                             <label class="control-label">Attendance Status :</label>
@@ -47,10 +40,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div> 
-                                <br>
-                                 <div class="row-fluid">
-                                    <div class="span6">
+                                     <div class="span6">
                                         <div class="control-group">
                                             <label class="control-label">Prisoner No:</label>
                                             <div class="controls">
@@ -58,6 +48,10 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div> 
+                                <br>
+                                 <div class="row-fluid">
+                                   
                                     <div class="span6">
                                         <div class="control-group">
                                             <label class="control-label">Prisoner Name :</label>
@@ -70,7 +64,7 @@
                                 <br>
                                 <div class="form-actions" align="center">
                                     <?php echo $this->Form->button('Search', array('type'=>'button', 'div'=>false,'label'=>false, 'class'=>'btn btn-success', 'formnovalidate'=>true, 'onclick'=>'javascript:showPrisonersList();'))?>
-                                    <?php echo $this->Form->input('Reset', array('type'=>'reset', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger', 'onclick'=>"resetData('SearchApproveAttendancesForm')"))?>
+                                    <?php echo $this->Form->input('Reset', array('type'=>'reset', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger', 'onclick'=>"resetData()"))?>
                                 </div>
                                 <?php echo $this->Form->end();?>
                                <div id="listingDiv"></div>
@@ -83,6 +77,12 @@
 <?php
 $ajaxUrl    = $this->Html->url(array('controller'=>'Earnings','action'=>'attendanceListAjax'));
 echo $this->Html->scriptBlock("
+
+    function resetData() {
+        // alert(1);
+         $('select').select2('val', '');
+         showPrisonersList();
+    }
     
     function showPrisonersList()
     {

@@ -72,6 +72,16 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="clearfix"></div>
+                                <div class="span6">
+                                    <div class="control-group">
+                                        <label class="control-label">Employment Type :</label>
+                                        <div class="controls">
+                                            <?php echo $this->Form->input('employment_type_id',array('div'=>false,'label'=>false,'class'=>'span11 pmis_select','type'=>'select','options'=>$employmentTypeList,'required'=>false, 'empty'=>'', 'style'=>'width:90%'));?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
                                 <div class="span12">
                                     <div class="form-actions" align="center">
                                         <?php echo $this->Form->button('Search', array('type'=>'button','class'=>'btn btn-primary','div'=>false,'label'=>false,'onclick'=>"showDataWorkingParty();"))?>
@@ -180,7 +190,16 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+                                <div class="clearfix"></div>
+                                <div class="span6">
+                                    <div class="control-group">
+                                        <label class="control-label">Employment Type :</label>
+                                        <div class="controls">
+                                            <?php echo $this->Form->input('employment_type_id',array('div'=>false,'label'=>false,'class'=>'span11 pmis_select','type'=>'select','options'=>$employmentTypeList,'required'=>false, 'empty'=>'', 'style'=>'width:90%', 'id'=>'employment_type_id'));?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
                                 <div class="span6 hidden">
                                     <div class="control-group">
                                         <label class="control-label">Is Enable?<?php echo $req; ?> :</label>

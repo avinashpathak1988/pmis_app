@@ -2,7 +2,7 @@
 App::uses('AppController', 'Controller');
 class EarningsController   extends AppController {
     public $layout='table';
-    public $uses=array('Prisoner','Earning','WorkingPartyPrisoner','WorkingParty','Item','PurchaseItem','PrisonerAttendance','PrisonerPaysheet', 'EarningRatePrisoner','EarningRate','ItemPriceHistory', 'EarningGradePrisoner','PrisonerPayment','WorkingPartyTransfer','WorkingPartyPrisonerApprove');
+    public $uses=array('Prisoner','Earning','WorkingPartyPrisoner','WorkingParty','Item','PurchaseItem','PrisonerAttendance','PrisonerPaysheet', 'EarningRatePrisoner','EarningRate','ItemPriceHistory', 'EarningGradePrisoner','PrisonerPayment','WorkingPartyTransfer','WorkingPartyPrisonerApprove','EmploymentType');
     public function index(){
 
         $this->request->data['Search']['start_date'] = date('Y-m-d'); 
@@ -271,11 +271,27 @@ class EarningsController   extends AppController {
                 'User.name'
             ),
         ));
+        //get employment type list 
+        $employmentTypeList = $this->EmploymentType->find('list', array(
+            'recursive'     => -1,
+            'fields'        => array(
+                'EmploymentType.id',
+                'EmploymentType.name',
+            ),
+            'conditions'    => array(
+                'EmploymentType.is_enable'      => 1,
+                'EmploymentType.is_trash'       => 0
+            ),
+            'order'         => array(
+                'EmploymentType.name'
+            ),
+        ));
         //echo '<pre>'; print_r($userList); exit;
         $this->set(array(
             'default_status'        => $default_status,
             'approvalStatusList'    => $approvalStatusList,
             'userList'              => $userList,
+            'employmentTypeList'    => $employmentTypeList,
             'isEdit'                => $isEdit
         ));
      }
@@ -314,6 +330,10 @@ class EarningsController   extends AppController {
         if(isset($this->params['named']['date_to']))
         {
             $this->request->params['data']['Search']['date_to'] = $this->params['named']['date_to'];
+        }
+        if(isset($this->params['named']['employment_type_id']))
+        {
+            $this->request->params['data']['Search']['employment_type_id'] = $this->params['named']['employment_type_id'];
         }
 
         if(isset($this->params['data']['Search']['status']) && $this->params['data']['Search']['status'] != '' && $this->params['data']['Search']['status'] != '0')
@@ -387,6 +407,11 @@ class EarningsController   extends AppController {
                 );
             }
         }
+        if(isset($this->params['data']['Search']['employment_type_id']) && $this->params['data']['Search']['employment_type_id'] != '' )
+        {
+            $employment_type_id = $this->params['data']['Search']['employment_type_id'];
+            $condition      += array('WorkingParty.employment_type_id'=>$employment_type_id);
+        }
         //echo '<pre>'; print_r($condition); exit;
         
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
@@ -429,7 +454,7 @@ class EarningsController   extends AppController {
             'date_to'=>$date_to    
         ));
      }
-     //working parties history start
+     //working parties history start partha
      function workingPartiesHistory(){
         $prisonList = $this->Prison->find('list', array(
             'fields'=>array(
@@ -484,6 +509,17 @@ class EarningsController   extends AppController {
                 'WorkingPartyPrisoner.id'
             ),
         ));
+        //    $prisonerList = $this->WorkingPartyPrisoner->find('list', array(
+        //     // 'recursive'     => -1,
+        //     'fields'        => array(
+        //         'WorkingPartyPrisoner.id',
+        //         'WorkingPartyPrisoner.prisoner_id',
+               
+        //     )
+            
+        // ));
+           // debug(explode(",", implode(",", $prisonerList)));exit;
+           
 
              $this->set(array(
             'prisonerNameList'    => $prisonerNameList,
@@ -566,7 +602,7 @@ class EarningsController   extends AppController {
         $this->paginate = array(
             'conditions'    => $condition,
             'order'         => array(
-                'WorkingPartyPrisoner.id' => 'desc',
+                'WorkingPartyPrisoner.id' => 'DESC',
             ),
         )+$limit;
         $datas = $this->paginate('WorkingPartyPrisoner');
@@ -1518,12 +1554,12 @@ class EarningsController   extends AppController {
                     // }
                     // else 
                     // {
-                        if(!$this->auditLog('PrisonerAttendance', 'prisoner_attendances', 0, 'Delete', json_encode($conds)))
-                        {
-                            $db->rollback();
-                            $this->Session->write('message_type','error');
-                            $this->Session->write('message','saving failed');
-                        }
+                        // if(!$this->auditLog('PrisonerAttendance', 'prisoner_attendances', 0, 'Delete', json_encode($conds)))
+                        // {
+                        //     $db->rollback();
+                        //     $this->Session->write('message_type','error');
+                        //     $this->Session->write('message','saving failed');
+                        // }
                     //}
                     $cnt = 0;
                     if(isset($prisonerAttendances['checkAll']))
@@ -2810,7 +2846,7 @@ class EarningsController   extends AppController {
     }
     function prisonerEarnings()
     {
-         $prison_id = $this->Session->read('Auth.User.prison_id');
+        $prison_id = $this->Session->read('Auth.User.prison_id');
         $prisonList = $prisonList = $this->Prison->find('list', array(
             'recursive'     => -1,
             'fields'        => array(
@@ -2863,6 +2899,55 @@ class EarningsController   extends AppController {
     }
     function freeWorkingPrisoner()
     {
+    	$prison_id = $this->Session->read('Auth.User.prison_id');
+        $prisonList = $prisonList = $this->Prison->find('list', array(
+            'recursive'     => -1,
+            'fields'        => array(
+                'Prison.id',
+                'Prison.code',
+            ),
+            'conditions'    => array(
+                'Prison.is_enable'      => 1,
+                'Prison.is_trash'       => 0
+            ),
+            'order'         => array(
+                'Prison.code'
+            ),
+        ));
+        $prisonerList = $this->WorkingPartyPrisoner->find('list', array(
+            'recursive'     => -1,
+            'joins' => array(
+                array(
+                    'table' => 'prisoners',
+                    'alias' => 'Prisoner',
+                    'type' => 'inner',
+                    'conditions'=> array('WorkingPartyPrisoner.prisoner_id = Prisoner.id')
+                ),
+            ), 
+            'fields'        => array(
+                'Prisoner.id',
+                'Prisoner.prisoner_no',
+            ),
+            'conditions'    => array(
+                'Prisoner.is_enable'      => 1,
+                'Prisoner.is_trash'       => 0,
+                'WorkingPartyPrisoner.is_enable'      => 1,
+                'WorkingPartyPrisoner.is_trash'       => 0,
+                'Prisoner.prison_id'       => $prison_id
+            ),
+            'order'         => array(
+                'Prisoner.prisoner_no'
+            ),
+        ));
+        //debug($prisonerList); exit;
+        $isAdmin = 0;
+        if($this->Session->read('Auth.User.usertype_id')==Configure::read('ADMIN_USERTYPE'))
+            $isAdmin = 1;
+        $this->set(array(
+            'prisonList'   =>  $prisonList,
+            'prisonerList' =>  $prisonerList,
+            'isAdmin'      => $isAdmin
+        ));
 
     }
     function freeWorkingPrisonerAjax()
@@ -3024,6 +3109,28 @@ class EarningsController   extends AppController {
             'prisoner_id'=>$prisoner_id,
             'datas'   => $datas
         ));
+    }
+    function freeWorking($pid){
+    	if($pid != '')
+        {
+            $prisonerData = $this->Prisoner->findByUuid($pid);
+            if(!empty($prisonerData))
+            {
+                $this->set(array(
+                    'prisoner_uuid'         => $pid,
+                    'prisoner_id'           => $prisonerData['Prisoner']['id'],
+                    'prisonerData'          => $prisonerData
+                ));
+            }
+            else 
+            {
+                $this->redirect(array('action'=>'freeWorkingPrisoner'));
+            }
+        }
+        else 
+        {
+            $this->redirect(array('action'=>'freeWorkingPrisoner'));
+        }
     }
     function prisonerEarningDetails($pid)
     {
@@ -3232,6 +3339,7 @@ class EarningsController   extends AppController {
         echo $total_amount;
         exit;
     }
+
     function payGratuityAmount()
     {
         $status = 0;
@@ -3627,20 +3735,38 @@ class EarningsController   extends AppController {
             }
         }
         //get working party list
-        $workingPartyList = $this->WorkingParty->find('list', array(
+        // $workingPartyList = $this->WorkingParty->find('list', array(
+        //     //'recursive'     => -1,
+        //     'fields'        => array(
+        //         'WorkingParty.id',
+        //         'WorkingParty.name',
+        //     ),
+        //     'conditions'    => array(
+        //         'WorkingParty.is_enable'      => 1,
+        //         'WorkingParty.is_trash'       => 0,
+        //         'WorkingParty.prison_id'       => $prison_id
+        //     ),
+        //     'order'         => array(
+        //         'WorkingParty.name'
+        //     ),
+        // ));
+        $workingPartyList = $this->PrisonerAttendance->find('list', array(
             //'recursive'     => -1,
-            'fields'        => array(
+           'joins' => array(
+                array(
+                'table' => 'working_parties',
+                'alias' => 'WorkingParty',
+                'type' => 'inner',
+                'conditions'=> array('PrisonerAttendance.working_party_id = WorkingParty.id'),
+                ),
+              
+            ), 
+             'fields'=>array(
                 'WorkingParty.id',
-                'WorkingParty.name',
-            ),
-            'conditions'    => array(
-                'WorkingParty.is_enable'      => 1,
-                'WorkingParty.is_trash'       => 0,
-                'WorkingParty.prison_id'       => $prison_id
-            ),
-            'order'         => array(
                 'WorkingParty.name'
             ),
+
+           
         ));
         $prisonerAttendanceList = $this->Prisoner->find('list', array(
             //'recursive'     => -1,
@@ -3683,7 +3809,7 @@ class EarningsController   extends AppController {
             ),
         ));
        
-        // debug($prisonerAttendanceNameList);
+        // debug($workingList);exit;
         
         $this->set(array(
             'workingPartyList'    => $workingPartyList,
@@ -3698,7 +3824,9 @@ class EarningsController   extends AppController {
         $this->layout   = 'ajax';
         $attendance_date = '';
         $working_party_id = '';
-        $status = ''; $date_from = ''; $date_to = '';
+        $status = ''; 
+        $date_from = ''; 
+        $date_to = '';
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $condition      = array(
             'PrisonerAttendance.prison_id'        => $prison_id,
@@ -3752,17 +3880,17 @@ class EarningsController   extends AppController {
         // debug($condition);
 
 
-        if(isset($this->params['data']['attendance_date']))
-            $attendance_date = $this->params['data']['attendance_date'];
+        if(isset($this->params['data']['date_from']))
+            $date_from = $this->params['data']['date_from'];
 
         if(isset($this->params['data']['working_party_id']))
             $working_party_id = $this->params['data']['working_party_id'];
         
-        if($attendance_date != '')
+        if($date_from != '')
         {
-            $attendance_date = date('Y-m-d', strtotime($attendance_date));
-            $attendance_date1 = $attendance_date.' 00:00:00';
-            $attendance_date2 = $attendance_date.' 23:59:59';
+            $date_from = date('Y-m-d', strtotime($date_from));
+            $attendance_date1 = $date_from.' 00:00:00';
+            $attendance_date2 = $date_from.' 23:59:59';
             $condition      += array(
                 'PrisonerAttendance.attendance_date <='    => $attendance_date2,
                 'PrisonerAttendance.attendance_date >='    => $attendance_date1,
@@ -3805,7 +3933,7 @@ class EarningsController   extends AppController {
             ),
         )+$limit;
         $datas = $this->paginate('PrisonerAttendance');
-        //debug($condition); 
+        // de bug($condition); 
         //get prisoner attendance 
         // $prisonerAttendanceList = $this->PrisonerAttendance->find('list', array(
         //     //'recursive'     => -1,
@@ -6017,7 +6145,7 @@ class EarningsController   extends AppController {
     {
         $this->loadModel('AssignSkill');
         $isEdit = 0; $isSearch = 0;
-
+        $prison_id = $this->Session->read('Auth.User.prison_id');
         if(isset($this->data['AssignSkill']) && is_array($this->data['AssignSkill']) && $this->data['AssignSkill']!='')
              {
                 //debug($this->data['EarningGradePrisoner']); exit;
@@ -6135,22 +6263,55 @@ class EarningsController   extends AppController {
                 'Prisoner.is_trash'       => 0,
                 'Prisoner.present_status' => 1,
                 'Prisoner.transfer_id'    => 0,
+                'Prisoner.is_death'    => 0,
                 //'EarningRatePrisoner.is_trash'  => 0,
-                'Prisoner.earning_grade_id !='   =>  0,
+                //'Prisoner.earning_grade_id !='   =>  0,
                 'Prisoner.earning_rate_id !='   =>  0,
-                //'Prisoner.prison_id'       => $prison_id
+                'Prisoner.prison_id'       => $prison_id
             );
+           //get assigned skill prisoners -- START --
+           $skillList = $this->AssignSkill->find('list', array(
+                'recursive'     => -1,
+                'joins' => array(
+                    array(
+                        'table' => 'prisoners',
+                        'alias' => 'Prisoner',
+                        'type' => 'inner',
+                        'conditions'=> array('AssignSkill.prisoner_id = Prisoner.id')
+                    ),
+                ), 
+                'fields'        => array(
+                    //'Prisoner.id',
+                    'AssignSkill.prisoner_id',
+                ),
+                'conditions'    => array(
+                    'Prisoner.is_enable'      => 1,
+                    'Prisoner.is_trash'       => 0,
+                    'AssignSkill.is_trash'    => 0,
+                    'AssignSkill.is_conduct'  => 1,
+                    'Prisoner.prison_id'      => $prison_id,
+                    'Prisoner.present_status' => 1,
+                    'Prisoner.is_death'       => 0,
+                    'Prisoner.transfer_id'    => 0
+                ),
+                'order'         => array(
+                    'Prisoner.prisoner_no'
+                ),
+                'group' => array('AssignSkill.prisoner_id')
+            ));
+            if(isset($skillList) && !empty($skillList))
+            {
+                $skillPrisoners = implode(',',$skillList);
+                $condition += array("Prisoner.id not in (".$skillPrisoners.")");
+            }
+           //get assigned skill prisoners -- END --
            $prisonerlist = $this->Prisoner->find('list', array(
                 'recursive'     => -1,
                 'fields'        => array(
                     'Prisoner.id',
                     'Prisoner.prisoner_no',
                 ),
-                    'conditions'    => array(
-                        'Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'),
-                        'Prisoner.prisoner_type_id != '      => Configure::read('DEBTOR'),            
-                        'Prisoner.prisoner_sub_type_id != '  => Configure::read('CONDEMNED')
-                    ),
+                    'conditions'    => $condition,
                     'order'         => array(
                     'Prisoner.prisoner_no'
                 ),
@@ -6179,8 +6340,6 @@ class EarningsController   extends AppController {
             $date = date('Y-m-d',strtotime($this->params['named']['assignment_date_search']));
             $condition += array("AssignSkill.assignment_date" => $date);
          } 
-         
-      
         $this->paginate=array(
             //'recursive'     => 2,
             'conditions' =>$condition,
@@ -6271,4 +6430,10 @@ class EarningsController   extends AppController {
             'date_to' =>  $to_date  
         ));
     }
+
+    // ATTENDANCE LIST PARTHA AUTHOR --START--
+
+    // function attendanceList(){}
+    // function attendanceListAjax(){}
+    // ATTENDANCE LIST PARTHA AUTHOR --END--
  }

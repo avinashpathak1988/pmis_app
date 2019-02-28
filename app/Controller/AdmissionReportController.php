@@ -138,7 +138,11 @@ class AdmissionReportController extends AppController {
         $state_id = ''; 
         $district_id = ''; 
         $prison_id = '';   
+        $condition = array();
+        if ($this->Session->read('Auth.User.prison_id')!='') {
+            
         $condition = array('Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'));
+        }
         $this->Prison->recursive = 0;
         // debug($this->params['named']);
     if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
@@ -318,9 +322,12 @@ class AdmissionReportController extends AppController {
         $name      = '';
         $state_id = ''; 
         $district_id = ''; 
-        $prison_id = '';   
-        $condition = array('Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'));
-        $this->Prison->recursive = 0;
+        $prison_id = '';  
+        $condition = array();
+        if($this->Session->read('Auth.User.prison_id')!=''){ 
+            $condition = array('Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'));
+        }
+        // $this->Prison->recursive = 0;
         // debug($this->params['named']);
     if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
         $state_id = $this->params['named']['state_id'];
@@ -340,6 +347,68 @@ class AdmissionReportController extends AppController {
             $condition += array('Prison.id' => $prison_id);
         }
      }
+      $fromDate = '';
+        $toDate = '';
+
+       if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id'] != '' ){
+             if(isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id'] != '' ){
+
+                $month = $this->params['named']['selected_month_id'];
+                if($month == '02'){
+                    $lastDay = '28';
+                }
+                elseif($month == '01' || $month == '03' || $month == '05' || $month == '07' || $month == '08' || $month == '10'|| $month == '12'){
+                    $lastDay = '31';
+                }else{
+                    $lastDay = '30';
+                }
+
+                $fromDate = '01-'.$this->params['named']['selected_month_id'].'-'.$this->params['named']['selected_year_id'];
+
+                $toDate = $lastDay.'-'.$this->params['named']['selected_month_id'].'-'.$this->params['named']['selected_year_id'];
+
+
+             }else{
+               if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '' ){
+                    $fromDate = $this->params['named']['from_date'];
+                    
+                 }
+                 if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '' ){
+                    $toDate = $this->params['named']['to_date'];
+                    
+                 }
+
+             }
+         }else{
+               if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '' ){
+                    $fromDate = $this->params['named']['from_date'];
+                    
+                 }
+                 if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '' ){
+                    $toDate = $this->params['named']['to_date'];
+                    
+                 }
+
+             }
+
+              if($fromDate != ''){
+                if($toDate != ''){
+                    $condition += array(
+                    "Prisoner.created between '".date("Y-m-d", strtotime($fromDate))."' and '".date("Y-m-d", strtotime($toDate))."'",
+                    );
+                }else{
+                    $condition += array(
+                    "Prisoner.created > '".date("Y-m-d", strtotime($fromDate))."'",
+                    );
+                }
+            }else{
+                if($toDate != ''){
+                    $condition += array(
+                    "Prisoner.created < '".date("Y-m-d", strtotime($fromDate))."'",
+                    );
+                }
+            }
+        
      // debug($condition);
      if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='XLS'){
@@ -487,7 +556,10 @@ class AdmissionReportController extends AppController {
         $state_id = ''; 
         $district_id = ''; 
         $prison_id = '';   
+        $condition = array();
+        if($this->Session->read('Auth.User.prison_id')!=''){
         $condition = array('Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'));
+         }
         $this->Prison->recursive = 0;
         // debug($this->params['named']);
     if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
@@ -508,6 +580,68 @@ class AdmissionReportController extends AppController {
             $condition += array('Prison.id' => $prison_id);
         }
      }
+      $fromDate = '';
+        $toDate = '';
+
+       if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id'] != '' ){
+             if(isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id'] != '' ){
+
+                $month = $this->params['named']['selected_month_id'];
+                if($month == '02'){
+                    $lastDay = '28';
+                }
+                elseif($month == '01' || $month == '03' || $month == '05' || $month == '07' || $month == '08' || $month == '10'|| $month == '12'){
+                    $lastDay = '31';
+                }else{
+                    $lastDay = '30';
+                }
+
+                $fromDate = '01-'.$this->params['named']['selected_month_id'].'-'.$this->params['named']['selected_year_id'];
+
+                $toDate = $lastDay.'-'.$this->params['named']['selected_month_id'].'-'.$this->params['named']['selected_year_id'];
+
+
+             }else{
+               if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '' ){
+                    $fromDate = $this->params['named']['from_date'];
+                    
+                 }
+                 if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '' ){
+                    $toDate = $this->params['named']['to_date'];
+                    
+                 }
+
+             }
+         }else{
+               if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '' ){
+                    $fromDate = $this->params['named']['from_date'];
+                    
+                 }
+                 if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '' ){
+                    $toDate = $this->params['named']['to_date'];
+                    
+                 }
+
+             }
+
+              if($fromDate != ''){
+                if($toDate != ''){
+                    $condition += array(
+                    "PrisonerChildDetail.created between '".date("Y-m-d", strtotime($fromDate))."' and '".date("Y-m-d", strtotime($toDate))."'",
+                    );
+                }else{
+                    $condition += array(
+                    "PrisonerChildDetail.created > '".date("Y-m-d", strtotime($fromDate))."'",
+                    );
+                }
+            }else{
+                if($toDate != ''){
+                    $condition += array(
+                    "PrisonerChildDetail.created < '".date("Y-m-d", strtotime($fromDate))."'",
+                    );
+                }
+            }
+        
      // debug($condition);
      if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='XLS'){
@@ -659,7 +793,10 @@ class AdmissionReportController extends AppController {
         $state_id = ''; 
         $district_id = ''; 
         $prison_id = '';   
+        $condition = array();
+        if($this->Session->read('Auth.User.prison_id')!=''){
         $condition = array('Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'));
+        }
         $this->Prison->recursive = 0;
         // debug($this->params['named']);
     if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
@@ -925,7 +1062,10 @@ class AdmissionReportController extends AppController {
         $district_id = ''; 
         $prison_id = '';   
         $prisoner_id ='';
+        $condition = array();
+        if($this->Session->read('Auth.User.prison_id')!=''){
         $condition = array('Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'));
+        }
         $this->Prison->recursive = 0;
          // debug($this->params['named']);
     if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
@@ -1225,7 +1365,11 @@ class AdmissionReportController extends AppController {
         $district_id = ''; 
         $prison_id = '';   
         $prisoner_id ='';
+        $condition = array();
+        if ($this->Session->read('Auth.User.prison_id')!='') {
+          
         $condition = array('Prison.id'=> $this->Session->read('Auth.User.prison_id'));
+    }
         $this->Prison->recursive = 0;
          // debug($this->params['named']);
     if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
@@ -1638,7 +1782,11 @@ class AdmissionReportController extends AppController {
         $district_id = ''; 
         $prison_id = '';   
         $prisoner_id ='';
+        $condition = array();
+        if ($this->Session->read('Auth.User.prison_id')!='') {
+          
         $condition = array('Prison.id'=> $this->Session->read('Auth.User.prison_id'));
+        }
         $this->Prison->recursive = 0;
          // debug($this->params['named']);
     if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){

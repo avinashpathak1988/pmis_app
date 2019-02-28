@@ -256,7 +256,7 @@ else{
                           if(!isset($is_excel)){
             
                   ?>
-                    <td><input type="checkbox" class="propertycheckclass" name="chk[]" value="<?php echo $val['id'] ?>"> &nbsp&nbsp Approved </td>
+                    <td>Approved </td>
                     <?php
                           }
                           else{
@@ -281,6 +281,10 @@ else{
 
                      <?php if($val["status"]=="Approved"){ ?>
 
+                     <?php if ($this->Session->read('Auth.User.usertype_id')==4) {
+                      
+                      ?>
+
 
                         <td>
                           <?php if($val["quantity_remaining"] == '' || $val["quantity_remaining"] == NULL ){ ?>
@@ -291,6 +295,7 @@ else{
                          
                            
                          </td>
+                         <?php } ?>
 
 
                     <?php }else{ ?>

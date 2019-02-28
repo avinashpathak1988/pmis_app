@@ -481,7 +481,7 @@ class LodgersController extends AppController {
                     "Prisoner.prison_id"    => $this->data['prison_id'],
                     'Prisoner.is_enable'            => 1,
                     'Prisoner.is_trash'             => 0,
-                    // 'Prisoner.present_status'       => 1,
+                    'Prisoner.present_status'       => 1,
                     'Prisoner.is_approve'           => 1,
                     'Prisoner.transfer_status !='   => 'Approved'
                 ),
@@ -493,6 +493,7 @@ class LodgersController extends AppController {
                     "Prisoner.prisoner_no"  => "asc",
                 ),
             ));
+            
             if(is_array($prisonernameList) && count($prisonernameList)>0){
                 echo '<option value="">--Select Prisoner--</option>';
                 foreach($prisonernameList as $key=>$val){
@@ -566,6 +567,8 @@ class LodgersController extends AppController {
             // debug($this->data);exit;
             $this->request->data['Lodger']['prison_id'] = $this->Session->read('Auth.User.prison_id');
             $this->request->data['Lodger']['in_date'] = date("Y-m-d H:i:s", strtotime($this->request->data['Lodger']['in_date']));
+            $this->request->data['Lodger']['escape_date'] = date("Y-m-d H:i:s", strtotime($this->request->data['Lodger']['escape_date']));
+            $this->request->data['Lodger']['recapture_date'] = date("Y-m-d", strtotime($this->request->data['Lodger']['recapture_date']));
             if ($this->Lodger->saveAll($this->request->data)) {
                 // echo "111111111";exit;
                 $this->Session->write('message_type','success');
@@ -683,30 +686,6 @@ class LodgersController extends AppController {
             return 'failure';
 
         }
-    }
-
-    public function escapedPrisonerAjax(){
-         $this->layout   = 'ajax';
-         // debug($this->data['prisoner_id']);
-
-         $data = $this->Discharge->find('first', array(
-           
-            'conditions'=>array(
-                'Discharge.prisoner_id'=> $this->data['prisoner_id'],
-                'Discharge.discharge_type_id'=> 5
-            )
-         ));
-
-        
-        
-         // debug($data);
-
-        $this->set(array(
-            'data'=>$data,
-            
-        ));
-
-
     }
 
     public function lodgerOutAdd() {
@@ -1370,6 +1349,19 @@ class LodgersController extends AppController {
                         $this->addNotification(array("user_id"=>$userData['User']['id'],"content"=>"Prisoner No ".$prisoner_no." is admitted as lodger, New prisoner no. is ".$prisoner_no."/L","url_link"=>"prisoners/details/".$prisonerData['Prisoner']['uuid']));
                     } 
                 }
+                // insert recapture details ===============================
+                $recaptureData['PrisonerRecaptureDetail'] = array(
+                    "escape_date"           => $lodgerData['Lodger']['escape_date'],
+                    "recapture_date"        => $lodgerData['Lodger']['recapture_date'],                   
+                    'prisoner_id'           => $lodgerData['Lodger']['prisoner_id'], 
+                    'escape_discharge_id'   => $this->Discharge->field("id",array("Discharge.prisoner_id" => $lodgerData['Lodger']['prisoner_id'])),
+                    'prisoner_no'           => $this->Prisoner->field("prisoner_no",array("Prisoner.id" => $lodgerData['Lodger']['prisoner_id'])),
+                    'place_of_recapture'    => $lodgerData['Lodger']['place_of_recapture'],
+                    'status'                => 'Approved',
+                );
+
+                $this->prisonerRecaptureDetail($recaptureData);
+                // ==================================================================
             }
         }
         // ===============================================
@@ -1765,4 +1757,130 @@ class LodgersController extends AppController {
         }
     }
 
+    public function prisonerRecaptureDetail($data)
+    {
+        $login_user_id = $this->Session->read('Auth.User.id');   
+        $data['PrisonerRecaptureDetail']['login_user_id'] = $login_user_id; 
+        if(isset($data['PrisonerRecaptureDetail']['prisoner_no']) && ($data['PrisonerRecaptureDetail']['prisoner_no'] != ''))
+        {
+            $uuid = $this->PrisonerChildDetail->query("select uuid() as code");
+            $puuid = $uuid[0][0]['code'];
+            $prisoner_id = $data['PrisonerRecaptureDetail']['prisoner_id'];
+            $doe = $data['PrisonerRecaptureDetail']['escape_date'];
+            $dor = $data['PrisonerRecaptureDetail']['recapture_date'];
+            $data['PrisonerRecaptureDetail']['escape_date']=date('Y-m-d',strtotime($doe));
+            $data['PrisonerRecaptureDetail']['recapture_date']=date('Y-m-d',strtotime($dor));
+            $db = ConnectionManager::getDataSource('default');
+            $db->begin(); 
+
+            if($this->PrisonerRecaptureDetail->save($data))
+            {
+                //update prisoner lpd, epd 
+                //calculate TAL
+                $tal = $this->calculateTAL($dor,$doe);
+                //check if any appeal exists 
+                
+                $isAppeal = $this->PrisonerSentenceAppeal->find('first', array(
+                    'conditions' => array(
+                        'PrisonerSentenceAppeal.prisoner_id' => $prisoner_id
+                    )
+                ));
+
+                if(isset($isAppeal) && count($isAppeal) > 0)
+                {
+                    if(isset($isAppeal['PrisonerSentenceAppeal']['type_of_appeallant']) && $isAppeal['PrisonerSentenceAppeal']['type_of_appeallant'] != 'Convicted')
+                    {
+                        $doc = $isAppeal['PrisonerSentenceAppeal']['date_of_conviction'];
+                        //appeal days = doc+42 days
+                        $appeal_days = date('Y-m-d', strtotime('$doc+42 day'));
+                        //if dor < appeal days.. TAL = 0
+                        if($dor < $appeal_days)
+                        {
+                            $tal = 0;
+                        }
+                        else 
+                        {
+                            //get appeal dismissal date 
+                            if(isset($isAppeal['PrisonerSentenceAppeal']['appeal_result']) && $isAppeal['PrisonerSentenceAppeal']['appeal_result'] != 'Dismissed')
+                            {
+                                if(isset($isAppeal['PrisonerSentenceAppeal']['date_of_dismissal_appeal']) && $isAppeal['PrisonerSentenceAppeal']['date_of_dismissal_appeal'] != '0000-00-00')
+                                {
+                                    $date_of_dismissal_appeal = $isAppeal['PrisonerSentenceAppeal']['date_of_dismissal_appeal'];
+                                    //if 
+                                    if($date_of_dismissal_appeal < $appeal_days)
+                                    {
+                                        $tal = $this->calculateTAL($dor,$date_of_dismissal_appeal);
+                                    }
+                                    else 
+                                    {
+                                        $ndoc = $appeal_days;
+                                        $tal = $this->calculateTAL($dor,$ndoc);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+                
+                if($tal > 0)
+                {
+                    $lpd = $this->getName($prisoner_id, 'Prisoner', 'lpd'); 
+                    $lpd2 = strtotime("+".$tal." days", strtotime($lpd));
+                    $remission = $this->getName($prisoner_id, 'Prisoner', 'remission');
+                    $remission = json_decode($remission);
+                    $lpd2 = date('Y-m-d', $lpd2); 
+                    $epd = $this->calculateEPD($lpd2, $remission);
+                }
+                
+                //update prisoner sentence detail 
+                $fields = array(
+                    'Prisoner.epd' => "'".$epd."'",
+                    'Prisoner.dor' => "'".$epd."'",
+                    'Prisoner.tal' => "'".$tal."'",
+                    //'Prisoner.sentence_length' => "'".$sentenceLengthText."'",
+                    //'Prisoner.remission' => "'".$remissionText."'",
+                );
+                $conds = array(
+                    'Prisoner.id'    => $prisoner_id
+                ); 
+                if($this->Prisoner->updateAll($fields, $conds))
+                {
+                    if($this->auditLog('PrisonerRecaptureDetail', 'prisoner_recapture_details', '', 'add', json_encode($data)))
+                    {
+                        $db->commit();
+                        return 1;
+                    }
+                    else 
+                    {
+                        $db->rollback();
+                        return 0;
+                    }
+                }
+                else 
+                {
+                    $db->rollback();
+                    return 0;
+                }
+            }
+            else{
+                $db->rollback();
+                return 0;
+            }
+        }           
+    }
+
+    public function escapedPrisonerAjax(){
+         $this->layout   = 'ajax';
+         $data = $this->Discharge->find('first', array(
+           
+            'conditions'=>array(
+                'Discharge.prisoner_id'         => $this->data['prisoner_id'],
+                'Discharge.discharge_type_id'   => 5
+            )
+         ));
+        $this->set(array(
+            'data'=>$data,
+        ));
+    }
 }

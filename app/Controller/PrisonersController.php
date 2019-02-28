@@ -996,6 +996,7 @@ class PrisonersController extends AppController{
         $prisoner_type_id = '';
         $prisoner_sub_type_id = '';
         $isSearched = 0;
+        $display_limit = 20;
         $condition      = array(
             'Prisoner.is_trash'         => 0,
             //'Prisoner.prison_id'        => $this->Auth->user('prison_id'),
@@ -1124,6 +1125,7 @@ class PrisonersController extends AppController{
             $prisoner_unique_no = $this->params['data']['Search']['prisoner_unique_no'];
             $condition += array(11 => "Prisoner.personal_no LIKE '%".$prisoner_unique_no."%'");
             $isSearched = 1;
+            $display_limit = 1;
         }
         if(isset($this->params['data']['Search']['assigned_ward_id']) && (int)$this->params['data']['Search']['assigned_ward_id'] > 0){
             $assigned_ward_id = $this->params['data']['Search']['assigned_ward_id'];
@@ -1205,9 +1207,11 @@ class PrisonersController extends AppController{
         }   
         if(isset($this->params['data']['Search']['sprisoner_no']) && ($this->params['data']['Search']['sprisoner_no'] == ''))
         {
+            $condition      += array('Prisoner.is_readmitted' => 0); 
             if($isSearched == 0)
                 $condition      += array('Prisoner.present_status' => 1);
-        }   
+        }  
+        //debug($condition);
         $this->paginate = array(
             'recursive'     => -1,
             'joins' => array(
@@ -1241,9 +1245,9 @@ class PrisonersController extends AppController{
                 'Prisoner.prisoner_unique_no'
             ),
             'order'         => array(
-                'Prisoner.modified'=>'Desc',
+                'Prisoner.id'=>'Desc',
             ),
-            'limit'         => 20,
+            'limit'         => $display_limit,
         );
         $datas = $this->paginate('Prisoner');
         //debug($condition); //exit;
@@ -1672,7 +1676,6 @@ class PrisonersController extends AppController{
             {
                 $this->request->data['Prisoner']['doa']= date('d-m-Y');
             }
-            debug($ex_prisoner_unique_no); exit;
             if($ex_prisoner_unique_no == '')
             {
                 unset($this->request->data['Prisoner']['exp_photo_name']);
@@ -1688,12 +1691,15 @@ class PrisonersController extends AppController{
                     $this->Prisoner->unBindModel(array('belongsTo' => array('Prison', 'Gender', 'Country', 'State', 'District')));
                     $extPrisonerData  = $this->Prisoner->find('first', array(
                         'conditions'    => array(
-                            'Prisoner.prisoner_unique_no'   => $this->data['Prisoner']['prisoner_unique_no']
+                            'Prisoner.prisoner_unique_no'   => $this->data['Prisoner']['prisoner_unique_no'],
+                            'Prisoner.is_trash'             => 0
                         ),
                         'order'         => array(
                             'Prisoner.created'  => 'DESC',
                         ),
                     ));
+                    //debug($this->data['Prisoner']['prisoner_unique_no']); 
+                    //debug($extPrisonerData); exit;
                     if(is_array($extPrisonerData) && count($extPrisonerData)>0)
                     {
                         //get existing prisoner admission details 
@@ -1844,7 +1850,7 @@ class PrisonersController extends AppController{
                     $this->request->data['Prisoner']['verify_by'] = $this->Session->read('Auth.User.id');
                     $this->request->data['Prisoner']['status'] = 'Reviewed';
                 }
-                //debug($this->request->data['Prisoner']); exit;
+                //debug($this->request->data); exit;
                 if(($this->data['Prisoner']['country_id'] > 0) && $this->Prisoner->saveAll($this->data)){
                     $prisoner_id    = $this->Prisoner->id;
                      /*
@@ -1889,6 +1895,23 @@ class PrisonersController extends AppController{
                     //====================================               
                     if($this->Prisoner->updateAll($fields, $conds))
                     {
+                        //If re-admitted update all old prisoner details set is_admitted =1 -- START --
+                        if(isset($this->data['Prisoner']['is_ext']) && $this->data['Prisoner']['is_ext'] == 1) 
+                        {
+                            $personal_no = $this->data['Prisoner']['personal_no'];
+                            $prev_prisoner_fields = array(
+                                'Prisoner.is_readmitted'  => 1
+                            );
+                            $prev_prisoner_conds = array(
+                                'Prisoner.personal_no'  => $personal_no,
+                                'Prisoner.id !='        => $prisoner_id
+                            ); 
+                            if($this->Prisoner->updateAll($prev_prisoner_fields, $prev_prisoner_conds))
+                            {
+
+                            }
+                        }
+                        //If re-admitted update all old prisoner details set is_admitted =1  -- END -- 
                         //notify to oc for review -- START --
                         if($this->Session->read('Auth.User.usertype_id') == Configure::read('RECEPTIONIST_USERTYPE'))
                         {

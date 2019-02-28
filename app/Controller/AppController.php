@@ -3487,7 +3487,7 @@ class AppController extends Controller {
                     'EarningGradePrisoner.prisoner_id' => $prisoner_id,
                     'EarningGradePrisoner.is_trash' => 0,
                     'EarningRate.start_date <=' => $cdate,
-                    'EarningRate.end_date >=' => $cdate,
+                    //'EarningRate.end_date >=' => $cdate,
                     'EarningGradePrisoner.assignment_date <=' => $cdate,
                     'Prisoner.earning_grade_id !='   =>  0,
                     'Prisoner.earning_rate_id !='   =>  0,
@@ -4724,14 +4724,14 @@ class AppController extends Controller {
                     'PrisonerSentence.sentence_of'  => 4,
                     'PrisonerSentence.prisoner_id'  => $prisoner_id
                 )
-            ));
+            )); 
             // $fields = array(
             //     'Prisoner.prisoner_sub_type_id'    => Configure::read('CONDEMNED'),
             // );
             // $conds = array(
             //     'Prisoner.id'    => $prisoner_id,
             // );
-            // $this->PrisonerIdDetail->updateAll($fields, $conds);
+            // $this->Prisoner->updateAll($fields, $conds);
         }
         return $result;
     }
