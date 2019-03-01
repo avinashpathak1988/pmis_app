@@ -12,7 +12,7 @@
                 <div class="widget-content nopadding">
                     <?php echo $this->Form->create('VisitorDay',array('class'=>'form-horizontal'));?>
                     <?php echo $this->Form->input('id', array('type'=>'hidden'))?>
-                 <!--    <?php //echo $this->Form->input('prison_id', array('type'=>'hidden', value=>$this->Session->read('Auth.User.prison_id'))) ?> -->
+                     <?php echo $this->Form->input('prison_id', array('type'=>'hidden', 'value'=>$this->Session->read('Auth.User.prison_id'))) ?> 
                      
                     <div class="row-fluid">
 

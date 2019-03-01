@@ -30,7 +30,8 @@ class VisitorDaysController extends AppController{
         }   
         $datas=$this->VisitorDay->find('all',array(
             'conditions'    => array(
-                'VisitorDay.is_trash' => 0
+                'VisitorDay.is_trash' => 0,
+                'VisitorDay.prison_id' => $this->Session->read('Auth.User.prison_id')
             ),
             'order'         => array(
                 'VisitorDay.id'

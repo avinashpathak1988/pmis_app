@@ -131,7 +131,7 @@ echo $this->Paginator->counter(array(
 <?php
 //pagination start 
 
-}else{
+} else{
 echo Configure::read('NO-RECORD');   
 }
 $ajaxUrl    = $this->Html->url(array('controller'=>'Earnings','action'=>'attendanceListAjax '));

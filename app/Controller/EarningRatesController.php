@@ -771,6 +771,17 @@ class EarningRatesController   extends AppController {
             'EarningGradePrisoner.prison_id'        => $prison_id,
         );
         $default_status = ''; $approvalStatusList = '';
+         debug($this->params['named']);
+        
+         if(isset($this->params['named']['date_from']) && $this->params['named']['date_from'] != ''){
+            $start_date = $this->params['named']['date_from'];
+            $condition += array("EarningGradePrisoner.created" => $start_date);
+         } 
+         if(isset($this->params['named']['date_to']) && $this->params['named']['date_to'] != ''){
+            $enddate = $this->params['named']['date_to'];
+            $condition += array("EarningGradePrisoner.modified"=> $enddate);
+         } 
+        
         $statusInfo = $this->getApprovalStatusInfo();
         if(is_array($statusInfo) && count($statusInfo) > 0)
         {
@@ -788,14 +799,7 @@ class EarningRatesController   extends AppController {
             $status = $this->params['data']['status'];
             $condition      += array('EarningGradePrisoner.status'=>$status);
         }
-        // else 
-        // { 
-        //     if($default_status != '')
-        //     {
-        //         $condition      += array('EarningGradePrisoner.status'=>$default_status);
-        //     }
-        // }
-        
+       
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='XLS'){
                 $this->layout='export_xls';
@@ -822,7 +826,7 @@ class EarningRatesController   extends AppController {
         $this->paginate = array(
             'conditions'    => $condition,
             'order'         => array(
-                'EarningGradePrisoner.id' => 'desc',
+                'EarningGradePrisoner.id' => 'DESC',
             ),
         )+$limit;
         $datas = $this->paginate('EarningGradePrisoner');

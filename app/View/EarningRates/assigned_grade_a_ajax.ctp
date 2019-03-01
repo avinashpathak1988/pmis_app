@@ -1,4 +1,4 @@
-<?php //echo '<pre>'; print_r($datas); exit; 
+<?php //echo '<pre>'; print_r($datas); //exit; 
 if(is_array($datas) && count($datas)>0){
 $btnName = Configure::read('SAVE');
 $isModal = 0;
@@ -33,19 +33,11 @@ echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal',
             </th>
             <th>SL#</th>
             <th>Prisoner Number</th>
-            <th>
-                <?php 
-                echo $this->Paginator->sort('EarningGradePrisoner.grade_id','Assigned Grade',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'Earnings','action' => 'assignedGradeAAjax', 'status' => $status, 'date_from' => $date_from, 'date_to' => $date_to)));
-                ?>
-            </th>
-            <th>
-                <?php 
-                echo $this->Paginator->sort('Prisoner.name','Prisoner Name',array('update'=>'#listingDiv','evalScripts' => true,'url'=>array('controller' => 'Earnings','action' => 'attendanceAjax', 'status' => $status, 'working_party_id'=>$working_party_id, 'date_from' => $date_from, 'date_to' => $date_to)));
-                ?>
-            </th>
-            <th>Present Status</th>
-            <th>Working party</th>
-            <th>Approve Status</th>
+            <th>Assigned Grade</th>
+            <th>Prisoner Name</th>
+            <th>Assignment Date</th>
+            <th>Remarks</th>
+            <th>Status</th>
         </tr>
     </thead>
     <tbody>
@@ -81,11 +73,14 @@ echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal',
             </td>
             <?php } ?>
             <td><?php echo $rowCnt; ?></td>
-            <td><?php echo date('d-m-Y', strtotime($data['EarningGradePrisoner']['attendance_date'])); ?></td>
             <td><?php echo $data['Prisoner']['prisoner_no']; ?></td>
-            <td><?php echo $data['Prisoner']['fullname']; ?></td>
-            <td><?php echo isset($data['EarningGradePrisoner']['is_present']) && $data['EarningGradePrisoner']['is_present']==1?'Present':'Absent'; ?></td>
-            <td><?php echo $data['WorkingParty']['name']; ?></td>
+            <td><?php echo $data['EarningGrade']['name']; ?></td> 
+            <td><?php echo $data['Prisoner']['fullname']; ?></td> 
+            <td><?php echo date('d-m-Y',strtotime($data['EarningGradePrisoner']['assignment_date'])); ?></td> 
+            <td><?php echo $data['EarningGradePrisoner']['remarks']; ?></td> 
+            
+           
+       
             <td>
                 <?php if($data[$modelName]['status'] == 'Draft')
                 {
@@ -111,10 +106,14 @@ echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal',
     </tbody>
 </table>
 <?php echo $this->Form->end();?>
+<?php }else{
+echo Configure::read('NO-RECORD');   
+} ?>
 <?php
 //pagination start 
 if(!isset($is_excel)){
 ?>
+
 <div class="row">
     <div class="col-sm-5">
         <ul class="pagination">
@@ -162,9 +161,7 @@ echo $this->Paginator->counter(array(
 <?php
     }
 //pagination end 
-}else{
-echo Configure::read('NO-RECORD');   
-}
+
 $ajaxUrl    = $this->Html->url(array('controller'=>'Earnings','action'=>'attendances'));
 ?> 
 <?php if(@$file_type != 'pdf'){?>
