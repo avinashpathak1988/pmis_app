@@ -7,7 +7,16 @@ class ReceiptionBoardController extends AppController{
 
 	public function index(){
 
-		
+		$menuId = $this->getMenuId("/ReceiptionBoard");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $modelName = 'WelfareDetail';
         $default_status = '';
@@ -196,6 +205,16 @@ class ReceiptionBoardController extends AppController{
     }
 
     function add($id=''){
+        $menuId = $this->getMenuId("/ReceiptionBoard");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $prisonerId = $id;
         if($id == ''){
@@ -292,6 +311,16 @@ class ReceiptionBoardController extends AppController{
         
     }
      function viewReport($id=''){
+        $menuId = $this->getMenuId("/ReceiptionBoard");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $prisonerId = $id;
         if($id == ''){

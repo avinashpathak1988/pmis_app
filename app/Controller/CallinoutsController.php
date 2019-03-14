@@ -3,6 +3,14 @@ App::uses('AppController', 'Controller');
 class CallinoutsController   extends AppController {
 	public $layout='table';
 	public function index() {
+        $menuId = $this->getMenuId("/callinouts");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$this->loadModel('Callinout'); 
 		
         $prisonerListData = $this->Callinout->find('list', array(
@@ -171,6 +179,14 @@ class CallinoutsController   extends AppController {
 
     }
 	public function add() { 
+         $menuId = $this->getMenuId("/callinouts");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$this->loadModel('Callinout');
 		
         if(isset($this->request->data['ApprovalProcess']) && count($this->request->data['ApprovalProcess']) > 0)

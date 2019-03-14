@@ -13,10 +13,12 @@ if(is_array($Prisoner) && count($Prisoner)>0){
         'url'                       => array(
             'controller'            => 'Report',
             'action'                => 'alertReleaseDateConvictAjax',
-            'name'             => $name,
-            'state_id'		   => $state_id,
-            'district_id'	   => $district_id,
-            'prison_id'		   => $prison_id,
+            'name'             		=> $name,
+            'geographical_id'  		=> $geographical_id,
+            'state_id'		   		=> $state_id,
+            'district_id'  	   		=> $district_id,
+            'prison_id'		   		=> $prison_id,
+            'geographical_region_id'=> $geographical_region_id,
 
         )
     ));         

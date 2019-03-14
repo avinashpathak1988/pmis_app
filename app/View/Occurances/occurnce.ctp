@@ -41,11 +41,19 @@
                                     </div>
                                 </div>
                                 </div>
+                                 <div class="span6">
+                                    <div class="control-group">
+                                        <label class="control-label">Status</label>
+                                        <div class="controls">
+                                            <?php echo $this->Form->input('status',array('div'=>false,'label'=>false,'type'=>'select','empty'=>'','options'=>$sttusListData, 'class'=>'span11 pmis_select','required', 'id'=>'status','default'=>$default_status));?>
+                                        </div>
+                                    </div>
+                                </div>
                                 
                                 <div class="clearfix"></div> 
                             </div>
                             <div class="form-actions" align="center">
-                            <button id="btnsearchcash" class="btn btn-success" type="button" formnovalidate="formnovalidate" onclick="showData()">Search</button>
+                            <button id="btnsearchcash" class="btn btn-success" type="button" formnovalidate="formnovalidate">Search</button>
                                 
                             </div>
                             <?php echo $this->Form->end();?>
@@ -65,18 +73,83 @@
 <?php
 $ajaxUrl        = $this->Html->url(array('controller'=>'Occurances','action'=>'occuranceAjax'));
 echo $this->Html->scriptBlock("
-    $(document).ready(function(){
-        showData();
-    });
+    // $(document).ready(function(){
+    //     showData();
+    // });
     function showData(){
         var url   = '".$ajaxUrl."';
         url = url + '/date:'+$('#date').val();
         url = url + '/prisons_id:'+$('#prisons_id').val();
-        $.post(url, {}, function(res) {
-           
+       $.post(url, {}, function(res) {
             $('#listingDiv').html(res);
+            var usertype_id='".$this->Session->read('Auth.User.usertype_id')."';
+            var user_typercpt='".Configure::read('RECEPTIONIST_USERTYPE')."';
+            var user_typepoi='".Configure::read('PRINCIPALOFFICER_USERTYPE')."';
+            var user_typeoiu='".Configure::read('OFFICERINCHARGE_USERTYPE')."';
+            var user_typegk='".Configure::read('GATEKEEPER_USERTYPE')."';
+         
+         if(usertype_id==user_typercpt)
+         {
+            if($('#status').val()=='Saved' || $('#status').val()=='Approved' || $('#status').val()=='Approve-Rejected'){
+                 $('td:first-child').each(function() {
+                       $(this).remove();
+                });
+                 $('th:first-child').each(function() {
+                       $(this).remove();
+                });
+            }
+         }
+         if(usertype_id==user_typepoi)
+         {
+            if($('#status').val()=='Saved' || $('#status').val()=='Approved' || $('#status').val()=='Approve-Rejected'){
+                 $('td:first-child').each(function() {
+                       $(this).remove();
+                });
+                 $('th:first-child').each(function() {
+                       $(this).remove();
+                });
+            }
+         }
+         if(usertype_id==user_typegk)
+         {
+            if($('#status').val()=='Saved' || $('#status').val()=='Approved' || $('#status').val()=='Approve-Rejected'){
+                 $('td:first-child').each(function() {
+                       $(this).remove();
+                });
+                 $('th:first-child').each(function() {
+                       $(this).remove();
+                });
+            }
+         }
+         if(usertype_id==user_typeoiu)
+         {
+            if($('#status').val()=='Approved'){
+                 $('td:first-child').each(function() {
+                       $(this).remove();
+                });
+                 $('th:first-child').each(function() {
+                       $(this).remove();
+                });
+            }
+         }
         });           
     }
+     $('.mytime').datetimepicker({ dateFormat: 'yy-mm-dd' });
 ",array('inline'=>false));
 ?>
+<script type="text/javascript">
+ $(document).ready(function(){
+    $('#prisoner_id').select2('val', '');
+    var defaultStatus = '<?php echo $default_status;?>';
+    $('#status').select2('val', defaultStatus);
+    $('#status option[value='+defaultStatus+']').attr('selected','selected');
 
+    //$('#prisoner_id').select2('val', '');
+    //$('#prisoner_id option[value='']').attr('selected','selected');
+        showData();
+        
+    });
+    $(document).on('click',"#btnsearchcash", function () { // button name
+        showData();
+    });
+</script>

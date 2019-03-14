@@ -5,6 +5,17 @@ class SocialReintegrationController extends AppController{
 	public $uses=array('User','Prisoner','SocialReintegrationAssessment');
 
 	public function index(){
+
+        $menuId = $this->getMenuId("/SocialReintegration");
+                $moduleId = $this->getModuleId("social_rehabilitation");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+                //echo $moduleId;exit;
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$prison_id = $this->Session->read('Auth.User.prison_id');
 		
 		$prisonersList = $this->Prisoner->find('list',array(
@@ -68,6 +79,16 @@ class SocialReintegrationController extends AppController{
 
 
        public function add(){
+       	$menuId = $this->getMenuId("/SocialReintegration");
+                $moduleId = $this->getModuleId("social_rehabilitation");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+                //echo $moduleId;exit;
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -117,6 +138,17 @@ class SocialReintegrationController extends AppController{
         );
         
         if(isset($this->request->data['SocialReintegrationAssessmentEdit']['id'])){
+        	$menuId = $this->getMenuId("/SocialReintegration");
+                $moduleId = $this->getModuleId("social_rehabilitation");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+
+                //echo $moduleId;exit;
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+                
             $this->request->data=$this->SocialReintegrationAssessment->findById($this->data["SocialReintegrationAssessmentEdit"]["id"]);
             $board_members = explode(',',$this->request->data['SocialReintegrationAssessment']['board_members']);
             $boardArray =array();

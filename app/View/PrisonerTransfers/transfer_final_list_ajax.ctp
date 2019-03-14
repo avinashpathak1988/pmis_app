@@ -488,8 +488,13 @@ if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERR
                                                 <label class="control-label">Physical Property<?php //echo $req; ?> :</label>
                                                 <div class="controls uradioBtn">
                                                 <?php
+
+
                                                 $physicalPropertyList = $funcall->getPropertyDetails($data["PrisonerTransfer"]["prisoner_id"]);
+                                                if ($physicalPropertyList!=array()) {
+                                                    
                                                 if(isset($physicalPropertyList) && is_array($physicalPropertyList) && count($physicalPropertyList)>0){
+                                                     // debug($physicalPropertyList);
                                                 ?>
                                                 <table class="table table-bordered data-table table-responsive">
                                                     <tr>
@@ -512,6 +517,9 @@ if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERR
                                                 </table>
                                                 <?php
                                                 }
+                                                }else{
+                                                    echo Configure::read('NA');
+                                                }
                                                 ?>
                                                 </div>
                                             </div>
@@ -522,6 +530,8 @@ if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERR
                                                 <div class="controls uradioBtn">
                                                 <?php
                                                 $cashPropertyList = $funcall->getCashPropertyDetails($data["PrisonerTransfer"]["prisoner_id"]);
+                                                if ($cashPropertyList!=array()) {
+                                                    
                                                 if(isset($cashPropertyList) && is_array($cashPropertyList) && count($cashPropertyList)>0){
                                                 ?>
                                                 <table class="table table-bordered data-table table-responsive">
@@ -544,6 +554,9 @@ if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERR
                                                     ?>
                                                 </table>
                                                 <?php
+                                                }
+                                                }else{
+                                                    echo Configure::read('NA');
                                                 }
                                                 ?>
                                                 </div>

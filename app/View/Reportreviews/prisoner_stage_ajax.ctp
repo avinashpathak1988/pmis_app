@@ -94,8 +94,9 @@ echo $this->Paginator->counter(array(
 		<?php
 		  $lpd = (isset($data['Prisoner']['sentence_length']) && $data['Prisoner']['sentence_length']!='') ? json_decode($data['Prisoner']['sentence_length']) : '';
             $remission = array();
+            // debug($lpd);
 
-            if(isset($lpd->sentence_type) &&  $lpd->sentence_type!=''){
+            if(isset($lpd->days) &&  $lpd->days !=''){
                 foreach ($lpd as $key => $value) {
                     if($key == 'days'){
                         if($value > 0)
@@ -110,6 +111,7 @@ echo $this->Paginator->counter(array(
                             $remission[1] = $value * 30;
                     }                        
                 }
+                // debug($remission);
                 $finalSenDays = array_sum($remission) - $finalDays;
 
                 $finalYear = intval($finalSenDays/(30*12));

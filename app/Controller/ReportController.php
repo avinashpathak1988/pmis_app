@@ -5,6 +5,190 @@ class ReportController extends AppController {
     public function index(){
 
     }
+
+    public function getGeographicalListMain(){
+        $this->loadModel('GeographicalRegion');
+          $geographical=$this->GeographicalRegion->find('list',array(
+                'conditions'=>array(
+                  'GeographicalRegion.is_enable'=>1,
+                  'GeographicalRegion.is_trash'=>0,
+                ),
+                'order'=>array(
+                  'GeographicalRegion.name'
+                )
+          ));
+          return $geographical;
+     }
+
+    
+     public function getgeodistrictAjax()
+    {
+        $this->autoRender = false;
+        $district_id  = '';
+        $this->loadModel("GeographicalDistrict"); 
+      
+        if(isset($this->params['named']['district_id']) && (int)$this->params['named']['district_id'] != 0){
+            $district_id = $this->params['named']['district_id'];
+            $condition = array('GeographicalDistrict.district_id' => $district_id );
+            $geodistrict = $this->GeographicalDistrict->find('list', array(
+              'fields'          => array('id','name'),
+              'conditions'      => $condition,  
+            ));
+
+          if(is_array($geodistrict) && count($geodistrict)>0){
+                echo '<option value="">--Select Geographical District--</option>';
+                foreach($geodistrict as $key=>$val){
+                    echo '<option value="'.$key.'">'.$val.'</option>';
+                }
+            }else{
+                echo '<option value="">--Select Geographical District--</option>';
+            }
+        }else
+        {
+            echo '<option value="">--Select Geographical District--</option>';
+        }
+        
+    }
+
+    /*public function getgeographicalAjax()
+    {
+        $this->autoRender = false;
+        $geographicalr_id  = '';
+        $this->loadModel("GeographicalRegion"); 
+      
+        if(isset($this->params['named']['geographicalr_id']) && (int)$this->params['named']['geographicalr_id'] != 0){
+            $geographicalr_id = $this->params['named']['geographicalr_id'];
+            $condition = array('GeographicalRegion.id' => $geographicalr_id );
+            $georegion = $this->GeographicalRegion->find('list', array(
+              'fields'          => array('id','name'),
+              'conditions'      => $condition,  
+            ));
+
+          if(is_array($georegion) && count($georegion)>0){
+                echo '<option value="">--Select UPS Region--</option>';
+                foreach($georegion as $key=>$val){
+                    echo '<option value="'.$key.'">'.$val.'</option>';
+                }
+            }else{
+                echo '<option value="">--Select UPS Region--</option>';
+            }
+        }else
+        {
+            echo '<option value="">--Select UPS Region--</option>';
+        }
+        
+    }*/
+ public function getgeographicalAjax()
+    {
+        $this->autoRender = false;
+        //$id  = '';
+        $this->loadModel("State"); 
+      
+        if(isset($this->params['named']['geographical_region_id']) && (int)$this->params['named']['geographical_region_id'] != 0){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            $condition = array('State.geographical_region_id' => $geographical_region_id);
+            if($this->Session->read('Auth.User.usertype_id')==Configure::read('RPCS_USERTYPE')){
+                $condition += array('State.id'=>$this->Session->read('Auth.User.state_id'));
+            }
+            $upsregion = $this->State->find('list', array(
+              'fields'          => array('id','name'),
+              'conditions'      => $condition,  
+            ));
+
+          if(is_array($upsregion) && count($upsregion)>0){
+                echo '<option value="">--Select UPS Region--</option>';
+                foreach($upsregion as $key=>$val){
+                    echo '<option value="'.$key.'">'.$val.'</option>';
+                }
+            }else{
+                echo '<option value="">--Select UPS Region--</option>';
+            }
+        }else
+        {
+            echo '<option value="">--Select UPS Region--</option>';
+        }
+        
+    }
+    public function getdistrictAjax()
+    {
+        $this->autoRender = false;
+        $this->loadModel("PrisonDistrict"); 
+       if(isset($this->params['named']['state_id']) && (int)$this->params['named']['state_id'] != 0){
+            $condition = array('PrisonDistrict.state_id' => $this->params['named']['state_id'] );
+            $district = $this->PrisonDistrict->find('list', array(
+              'fields'          => array('id','name'),
+              'conditions'      => $condition,  
+            ));
+
+          if(is_array($district) && count($district)>0){
+                echo '<option value="">--Select PrisonDistrict--</option>';
+                foreach($district as $key=>$val){
+                    echo '<option value="'.$key.'">'.$val.'</option>';
+                }
+            }else{
+                echo '<option value="">--Select PrisonDistrict--</option>';
+            }
+        }else
+        {
+            echo '<option value="">--Select PrisonDistrict--</option>';
+        }
+        
+    } 
+
+    public function getDistrictPrisonAjax()
+    {
+        $this->autoRender = false;
+        $district_id  = '';
+        $this->loadModel("Prison"); 
+      
+        if(isset($this->params['named']['district_id']) && (int)$this->params['named']['district_id'] != 0){
+            $district_id = $this->params['named']['district_id'];
+            $condition = array('Prison.geographical_id' => $district_id );
+            $prisons = $this->Prison->find('list', array(
+              'fields'          => array('id','name'),
+              'conditions'      => $condition,  
+            ));
+
+          if(is_array($prisons) && count($prisons)>0){
+                echo '<option value="">--Select Prison--</option>';
+                foreach($prisons as $key=>$val){
+                    echo '<option value="'.$key.'">'.$val.'</option>';
+                }
+            }else{
+                echo '<option value="">--Select Prison--</option>';
+            }
+        }else
+        {
+            echo '<option value="">--Select Prison--</option>';
+        }
+        
+    }
+
+    public function getPrisoners(){
+       $this->layout='ajax';
+        $this->loadModel('Prisoner');   
+        $prisoners = $this->Prisoner->find('list',array(
+            'recursive'=>-1,
+            'fields'=>array(
+                'Prisoner.id',
+                'Prisoner.prisoner_no'
+            ),
+            'conditions' => array(
+                'Prisoner.prison_id'=>$this->request->data['prisonId'],
+                'Prisoner.is_trash'=>0,
+                'Prisoner.is_approve'=>1,
+                'Prisoner.is_enable'=>1,
+            )
+        ));
+
+        $data = '';
+        foreach ($prisoners as $key => $value) {
+            $data .= '<option value="'.$key.'">'.$value.'</option>';
+        }
+
+        echo $data;exit;
+            //report by aakash end
+    }
     public function prisonerCustodyDemographic(){
         $this->loadModel('Prison');
         $prisonList = $this->Prison->find('list', array(
@@ -152,6 +336,93 @@ class ReportController extends AppController {
 
 
 /*START code by Aishwarya*/
+ public function getReportAjaxCondition(){
+        $this->loadModel('Prison');
+
+        $condition      = array( 'Prison.is_enable'  => 1,'Prison.is_trash'=> 0);
+
+
+        if($this->Session->read('Auth.User.usertype_id')==Configure::read('ADMIN_USERTYPE') || $this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE')){
+               if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != ''){
+                    $prison_id = $this->params['named']['prison_id'];
+                    $condition += array('Prison.id' => $prison_id );
+                }
+        }else if($this->Session->read('Auth.User.usertype_id')==Configure::read('RPCS_USERTYPE')){
+
+            $condition += array(
+                    'Prison.state_id'=>$this->Session->read('Auth.User.state_id'),
+                );
+        }
+        else{
+            $condition += array(
+                    'Prison.id'=>$this->Session->read('Auth.User.prison_id'),
+                );
+        }
+
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+                $state_id = $this->params['named']['state_id'];
+                    if($state_id !=0){
+                        $condition += array('Prison.state_id' => $state_id);
+                    }
+                }
+        if(isset($this->params['named']['ups_district_id']) && $this->params['named']['ups_district_id'] != '' ){
+                $ups_district_id = $this->params['named']['ups_district_id'];
+                    if($ups_district_id !=0){
+                        $condition += array('Prison.district_id' => $ups_district_id);
+                    }
+                }
+        if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+                $geographical_id = $this->params['named']['geographical_id'];
+                    if($geographical_id !=0){
+                        $condition += array('Prison.geographical_id' => $geographical_id);
+                    }
+                }
+        
+
+        $fromDate = '';
+        $toDate = '';
+
+        
+
+        if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id'] != '' ){
+             if(isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id'] != '' ){
+
+                $month = $this->params['named']['selected_month_id'];
+                if($month == '02'){
+                    $lastDay = '28';
+                }
+                else if($month == '01' || $month == '03' || $month == '05' || $month == '07' || $month == '08' || $month == '10'|| $month == '12'){
+                    $lastDay = '31';
+                }else{
+                    $lastDay = '30';
+                }
+
+                $fromDate = '01-'.$this->params['named']['selected_month_id'].'-'.$this->params['named']['selected_year_id'];
+                
+                $toDate = $lastDay.'-'.$this->params['named']['selected_month_id'].'-'.$this->params['named']['selected_year_id'];
+
+             }else{
+                if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '' ){
+                     $fromDate =    $this->params['named']['from_date'];
+                }
+                if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '' ){
+                     $toDate =    $this->params['named']['to_date'];
+                }
+             }
+        }else{
+                if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '' ){
+                     $fromDate =    $this->params['named']['from_date'];
+                }
+                if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '' ){
+                     $toDate =    $this->params['named']['to_date'];
+                }
+             }
+
+       
+
+        return array('conditions'=>$condition,'from_date'=>$fromDate,'to_date'=>$toDate);
+
+    }
 
 public function monthlyMedicalReport(){
        
@@ -162,79 +433,13 @@ public function monthlyMedicalReportAjax(){
         $this->loadModel('Prisoner');
         
     }
-    public function monthlyDeathList(){
+    public function monthlyDeathList(){       
 
-        $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        ));   
-       
-        $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
+             $otherFields = array();
 
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'countryList'     => $countryList,
-            'districtList'    => $districtList,
-            'regionList'      => $regionList,
-            'prisonList'      => $prisonList,
-            'reporttitle'     => "Monthly Death List for Remands, Convicts, Debtor & Condemned"
+             $this->set(array(           
+                'otherFields'   => $otherFields,
+                'reporttitle'     => "Monthly Death List for Remands, Convicts, Debtor & Condemned"
         ));
     }
 public function monthlyDeathListAjax(){
@@ -242,32 +447,58 @@ public function monthlyDeathListAjax(){
         $this->loadModel('Prisoner');
         $this->loadModel('MedicalDeathRecord');
         $name      = '';
-        $country_id = ''; 
+        $geographical_region_id = ''; 
         $state_id = ''; 
         $district_id = ''; 
-        $prison_id = '';  
+        $prison_id = ''; 
+        $geographical_id = ''; 
         $from_date = ''; 
         $to_date = '';  
-        $condition = array('MedicalDeathRecord.is_trash' => 0);
+        $condition = array('MedicalDeathRecord.is_trash' => 0);       
         $this->Prison->recursive = 0;
 
-        if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+
+        if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
             }
+        }        
+        debug($this->params['named']);
+
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+            $district_id = $this->params['named']['district_id'];
+            // if($district_id !=0){
+                $condition += array('Prison.district_id' => $district_id);
+                 // $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+
+            // }
         }
 
         if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
             $state_id = $this->params['named']['state_id'];
             if($state_id !=0){
-                $condition += array('Prison.state_id' => $state_id);
+                /*$condition += array('Prison.state_id' => $state_id);*/
+                 $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
             }
         }
 
-     if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['year']!=''){
-        $condition += array('month(MedicalDeathRecord.check_up_date)' => $this->params['named']['month']);
-        $condition += array('year(MedicalDeathRecord.check_up_date)' => $this->params['named']['year']);
+      if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+        $geographical_id = $this->params['named']['geographical_id'];
+        if($geographical_id !=0){
+            $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+        }
+     }
+     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+           // $condition += array('Prison.id' => $prison_id);
+             $condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
+     if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(MedicalDeathRecord.check_up_date)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(MedicalDeathRecord.check_up_date)' => $this->params['named']['selected_year_id']);
 
         // ====
         /*$from_date = date("Y-m-01", strtotime("01-".$this->params['named']['month']."-".$this->params['named']['year']));
@@ -298,19 +529,8 @@ public function monthlyDeathListAjax(){
           $condition += array("MedicalDeathRecord.check_up_date <=" => $td);
       }
 
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
-     // debug($condition);
+      
+      //debug($condition);
         $this->paginate = array(
            'conditions' => $condition,
            'recursive'=> -1,
@@ -328,6 +548,7 @@ public function monthlyDeathListAjax(){
                 'type' => 'inner',
                 array('Prisoner.gender_id = Gender.id')
                 ),
+
                  array(
                 'table' => 'prisons',
                 'alias' => 'Prison',
@@ -369,133 +590,27 @@ public function monthlyDeathListAjax(){
                ),   
             'limit'         => 10
         );
-        $MedicalDeathRecord = $this->paginate('MedicalDeathRecord');
-        // $MedicalDeathRecord = $this->MedicalDeathRecord->find('all',array(
-        //    'recursive'=>-1,
-        //      'joins' => array(
-               
-        //          array(
-        //             'table'         => 'prisoners',
-        //             'alias'         => 'Prisoner',
-        //             'type'          => 'inner',
-        //             'conditions'    => array('MedicalDeathRecord.prisoner_id = Prisoner.id')
-        //         ),
-        //          array(
-        //         'table' => 'genders',
-        //         'alias' => 'Gender',
-        //         'type' => 'inner',
-        //         array('Prisoner.gender_id = Gender.id')
-        //         ),
-        //          array(
-        //         'table' => 'prisons',
-        //         'alias' => 'Prison',
-        //         'type' => 'inner',
-        //         array('MedicalDeathRecord.prison_id = Prison.id')
-        //         )
-        //     ),  
-        //    'fields' => array(
-        //          'MedicalDeathRecord.death_cause',
-        //          'MedicalDeathRecord.death_place',
-        //          'MedicalDeathRecord.status',
-        //          'MedicalDeathRecord.prisoner_id',
-        //          'MedicalDeathRecord.check_up_date',
-        //          'Prisoner.gender_id',
-        //          'Gender.id',
-        //          'Gender.name',
-        //          'Prisoner.first_name',
-        //          'Prisoner.prisoner_no',
-        //          'Prison.name',
-        //          'Prison.district_id'
-        //        )   
-
-        //     ));
-            //debug($MedicalDeathRecord);exit;
+        $MedicalDeathRecord = $this->paginate('MedicalDeathRecord');        
         $this->set(array(
             'MedicalDeathRecord'          => $MedicalDeathRecord,
             'funcall'                     => $this,
             'name'                        => $name,
             'state_id'                    => $state_id,
-            'country_id'                  => $country_id,
             'district_id'                 => $district_id,
+            'geographical_id'             => $geographical_id,
+            'geographical_region_id'      => $geographical_region_id,
             'prison_id'                   => $prison_id,
             'from_date'                   => $from_date,
             'to_date'                     => $to_date
         ));
     }
-    public function releaseOnMedicalGround(){
+    public function releaseOnMedicalGround(){            
+        
+             $otherFields = array();
 
-            $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        ));   
-
-             $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'countryList'   => $countryList,
-            'districtList'  => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
-            'reporttitle'   => "Recommendation for release of Prisoner on Medical Grounds                   
-"
+             $this->set(array(            
+            'otherFields'   => $otherFields,         
+            'reporttitle'   => "Recommendation for release of Prisoner on Medical Grounds"
         ));
        
         
@@ -505,27 +620,62 @@ public function monthlyDeathListAjax(){
         $this->loadModel('Prisoner');
         $this->loadModel('MedicalSeriousIllRecord');
         $name      = '';
+        $geographical_region_id = ''; 
         $state_id = ''; 
         $district_id = ''; 
-        $country_id = ''; 
         $prison_id = ''; 
+        $geographical_id = ''; 
         $from_date = ''; 
-        $to_date = '';    
+        $to_date = ''; 
+
         $condition = array();
+
+       
         $this->Prison->recursive = 0;
 
-     if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+     if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
             }
         }
 
-      if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['year']!=''){
-        $condition += array('month(MedicalSeriousIllRecord.check_up_date)' => $this->params['named']['month']);
-        $condition += array('year(MedicalSeriousIllRecord.check_up_date)' => $this->params['named']['year']);
+     if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+            $geographical_id = $this->params['named']['geographical_id'];
+            if($geographical_id !=0){                
+                 $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+            }
+        }
+
+    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+        $state_id = $this->params['named']['state_id'];
+        if($state_id !=0){
+            //$condition += array('Prison.state_id' => $state_id);
+             $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
+        }
+     }
+    
+    if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+        $district_id = $this->params['named']['district_id'];
+        if($district_id !=0){
+            //$condition += array('Prison.district_id' => $district_id);
+             $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+        }
+     }
+    
+    if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+            //$condition += array('Prison.id' => $prison_id);
+             $condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
+
+     if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(MedicalSeriousIllRecord.check_up_date)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(MedicalSeriousIllRecord.check_up_date)' => $this->params['named']['selected_year_id']);
         }   
- if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != ''){
+    if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != ''){
           $from_date = $this->params['named']['from_date'];
           $fd=explode('-',$from_date);
           $fd=$fd[2].'-'.$fd[1].'-'.$fd[0].' 00:00:00';
@@ -538,24 +688,7 @@ public function monthlyDeathListAjax(){
           $condition += array("MedicalSeriousIllRecord.check_up_date <=" => $td);
       }
 
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+    
      //debug($condition);
         $this->paginate = array(
            'conditions' => $condition,
@@ -569,15 +702,15 @@ public function monthlyDeathListAjax(){
                     'conditions'    => array('MedicalSeriousIllRecord.prisoner_id = Prisoner.id')
                 ),
                  array(
-                'table' => 'genders',
-                'alias' => 'Gender',
-                'type' => 'inner',
+                    'table' => 'genders',
+                    'alias' => 'Gender',
+                    'type' => 'inner',
                 array('Prisoner.gender_id = Gender.id')
                 ),
                  array(
-                'table' => 'prisons',
-                'alias' => 'Prison',
-                'type' => 'inner',
+                    'table' => 'prisons',
+                    'alias' => 'Prison',
+                    'type' => 'inner',
                 array('MedicalSeriousIllRecord.prison_id = Prison.id')
                 ),
                 array(
@@ -611,9 +744,10 @@ public function monthlyDeathListAjax(){
             'funcall'                     => $this,
             'name'                        => $name,
             'state_id'                    => $state_id,
-            'country_id'                  => $country_id,
+            'geographical_id'             => $geographical_id,
             'district_id'                 => $district_id,
             'prison_id'                   => $prison_id,
+            'geographical_region_id'      => $geographical_region_id,
             'from_date'                   => $from_date,
             'to_date'                     => $to_date
            
@@ -621,77 +755,9 @@ public function monthlyDeathListAjax(){
     }
 public function remandPrisonerReleased(){
 
-     $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        ));   
-       
-
-     $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-             'countryList'  => $countryList,
-            'districtList'  => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
+             $otherFields = array();
+             $this->set(array(            
+            'otherFields'   => $otherFields,            
             'reporttitle'   => "List of Remand Prisoners Released  from Custody During the month"
         ));
     
@@ -706,25 +772,58 @@ public function remandPrisonerReleased(){
         $this->loadModel('PrisonerCaseFile');
         $this->loadModel('Discharge');
         $name      = '';
+        $geographical_region_id = ''; 
         $state_id = ''; 
-        $country_id = ''; 
         $district_id = ''; 
-        $prison_id = '';  
+        $prison_id = ''; 
+        $geographical_id = ''; 
         $from_date = ''; 
-        $to_date = '';   
+        $to_date = '';    
         $condition = array();
+    
         $this->Prison->recursive = 0;
 
-     if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+    if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
+            }
+        }        
+
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+            $district_id = $this->params['named']['district_id'];
+            if($district_id !=0){
+               /* $condition += array('Prisoner.ups_district_id' => $ups_district_id);*/
+                 $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+
             }
         }
 
-    if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['month']!=''){
-        $condition += array('month(Discharge.discharge_date)' => $this->params['named']['month']);
-        $condition += array('year(Discharge.discharge_date)' => $this->params['named']['year']);       
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+            $state_id = $this->params['named']['state_id'];
+            if($state_id !=0){
+                /*$condition += array('Prison.state_id' => $state_id);*/
+                 $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
+            }
+        }
+
+      if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+        $geographical_id = $this->params['named']['geographical_id'];
+        if($geographical_id !=0){
+            $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+        }
+     }
+     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+           // $condition += array('Prison.id' => $prison_id);
+             $condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
+
+     if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(Discharge.discharge_date)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(Discharge.discharge_date)'  => $this->params['named']['selected_year_id']);       
      }
 
     if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != ''){
@@ -740,24 +839,7 @@ public function remandPrisonerReleased(){
           $condition += array("Discharge.discharge_date <=" => $td);
       }
 
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+    
      //debug($prison_id );
         $this->paginate = array(
            'conditions' => $condition,
@@ -833,10 +915,10 @@ public function remandPrisonerReleased(){
             'funcall'                     => $this,
             'name'                        => $name,
             'state_id'                    => $state_id,
-            'country_id'                  => $country_id,
             'district_id'                 => $district_id,
+            'geographical_id'             => $geographical_id,
+            'geographical_region_id'      => $geographical_region_id,
             'prison_id'                   => $prison_id,
-            'funcall'                     => $this,
             'from_date'                   => $from_date,
             'to_date'                     => $to_date
            
@@ -911,80 +993,13 @@ public function remandPrisonerReleased(){
         
     }
 
-public function debtorPrisonerReleased(){
-
-     $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        ));   
-
-     $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
+public function debtorPrisonerReleased(){   
 
 
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'countryList'     => $countryList,
-            'districtList'  => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
-            'reporttitle' => "List of Debtor Prisoners Released  from Custody During the month                    
-"
+            $otherFields = array();
+             $this->set(array(           
+             'otherFields'   => $otherFields,            
+             'reporttitle'   => "List of Debtor Prisoners Released  from Custody During the month"
         ));
     
        
@@ -996,22 +1011,57 @@ public function debtorPrisonerReleasedAjax(){
         $this->loadModel('PrisonerCaseFile');
         $this->loadModel('Discharge');
         $name      = '';
+        $geographical_region_id = ''; 
         $state_id = ''; 
-        $country_id = ''; 
         $district_id = ''; 
-        $prison_id = '';   
+        $prison_id = ''; 
+        $geographical_id = ''; 
+        $from_date = ''; 
+        $to_date = '';  
         $condition = array();
+        
         $this->Prison->recursive = 0;
 
-     if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+    if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
+            }
+        }        
+
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+            $district_id = $this->params['named']['district_id'];
+            if($district_id !=0){
+               /* $condition += array('Prisoner.ups_district_id' => $ups_district_id);*/
+                 $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+
             }
         }
-    if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['month']!=''){
-        $condition += array('month(Discharge.discharge_date)' => $this->params['named']['month']);
-        $condition += array('year(Discharge.discharge_date)' => $this->params['named']['year']);
+
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+            $state_id = $this->params['named']['state_id'];
+            if($state_id !=0){
+                /*$condition += array('Prison.state_id' => $state_id);*/
+                 $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
+            }
+        }
+
+      if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+        $geographical_id = $this->params['named']['geographical_id'];
+        if($geographical_id !=0){
+            $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+        }
+     }
+     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+           // $condition += array('Prison.id' => $prison_id);
+             $condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
+     if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(Discharge.discharge_date)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(Discharge.discharge_date)' => $this->params['named']['selected_year_id']);
     }
     if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != ''){
           $from_date = $this->params['named']['from_date'];
@@ -1026,53 +1076,36 @@ public function debtorPrisonerReleasedAjax(){
           $condition += array("Discharge.discharge_date <=" => $td);     }
        
     
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+    
      //debug($prison_id );
         $this->paginate = array(
            'conditions' => $condition,
            'recursive'=>  -1,
              'joins' => array(
                
-                 array(
+                array(
                     'table'         => 'prisoner_case_files',
                     'alias'         => 'PrisonerCaseFile',
                     'type'          => 'inner',
-                    'conditions'    => array('Prisoner.id = PrisonerCaseFile.prisoner_id ')
+                    'conditions'    =>  array('Prisoner.id = PrisonerCaseFile.prisoner_id ')
                 ),
                 array(
                     'table'         => 'courtlevels',
                     'alias'         => 'Courtlevel',
                     'type'          => 'inner',
-                    'conditions'    => array('PrisonerCaseFile.courtlevel_id = Courtlevel.id')
+                    'conditions'    =>  array('PrisonerCaseFile.courtlevel_id = Courtlevel.id')
                 ),
                  array(
                     'table'         => 'courts',
                     'alias'         => 'Court',
                     'type'          => 'inner',
-                    'conditions'    => array('PrisonerCaseFile.court_id = Court.id')
+                    'conditions'    =>  array('PrisonerCaseFile.court_id = Court.id')
                 ),
                  array(
                 'table' => 'genders',
                 'alias' => 'Gender',
                 'type' => 'inner',
-                array('Prisoner.gender_id = Gender.id')
+                  array('Prisoner.gender_id = Gender.id')
                 ),  
                  array(
                 'table' => 'prisons',
@@ -1119,87 +1152,23 @@ public function debtorPrisonerReleasedAjax(){
             'Prisoner'                    => $Prisoner,
             'funcall'                     => $this,
             'name'                        => $name,
-             'country_id'                  => $country_id,
             'state_id'                    => $state_id,
             'district_id'                 => $district_id,
+            'geographical_id'             => $geographical_id,
+            'geographical_region_id'      => $geographical_region_id,
             'prison_id'                   => $prison_id,
-            'funcall'                     => $this
+            'from_date'                   => $from_date,
+            'to_date'                     => $to_date
            
         ));
     }
 
 public function alertConvictPrisonerReleased(){
 
-     $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        ));   
-
-     $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'countryList'   => $countryList,
-            'districtList'  => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
+    
+    $otherFields = array();
+             $this->set(array(           
+            'otherFields'   => $otherFields,          
             'reporttitle'   => "Alert for convict Prisoner about to release held far from place of arrest"
         ));
     
@@ -1210,25 +1179,60 @@ public function alertConvictPrisonerReleased(){
         $this->layout = 'ajax';            
         $this->loadModel('Prisoner');       
         $name      = '';
-        $country_id = ''; 
+        $geographical_region_id = ''; 
         $state_id = ''; 
         $district_id = ''; 
         $prison_id = ''; 
+        $geographical_id = ''; 
         $from_date = ''; 
-        $to_date = '';    
+        $to_date = ''; 
+
         $condition = array();
+
+       
         $this->Prison->recursive = 0;
 
-         if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+         if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
+            }
+        }        
+
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+            $district_id = $this->params['named']['district_id'];
+            if($district_id !=0){
+               /* $condition += array('Prisoner.ups_district_id' => $ups_district_id);*/
+                 $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+
             }
         }
 
-        if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['year']!=''){
-        $condition += array('month(Prisoner.dor)' => $this->params['named']['month']);
-        $condition += array('year(Prisoner.dor)' => $this->params['named']['year']);
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+            $state_id = $this->params['named']['state_id'];
+            if($state_id !=0){
+                /*$condition += array('Prison.state_id' => $state_id);*/
+                 $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
+            }
+        }
+
+      if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+        $geographical_id = $this->params['named']['geographical_id'];
+        if($geographical_id !=0){
+            $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+        }
+     }
+     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+           // $condition += array('Prison.id' => $prison_id);
+             $condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
+
+         if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(Prisoner.dor)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(Prisoner.dor)' => $this->params['named']['selected_year_id']);
        
         }   
 
@@ -1245,26 +1249,7 @@ public function alertConvictPrisonerReleased(){
           $condition += array("Prisoner.dor <=" => $td);
       }
 
-
-
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+    
      //debug($prison_id );
         $this->paginate = array(
            'conditions' => $condition,
@@ -1280,7 +1265,7 @@ public function alertConvictPrisonerReleased(){
                  array(
                 'table' => 'prisons',
                 'alias' => 'Prison',
-                'type' => 'inner',
+                'type'  => 'inner',
                 array('Prisoner.prison_id = Prison.id')
                 )
                  
@@ -1311,9 +1296,9 @@ public function alertConvictPrisonerReleased(){
             'name'                        => $name,
             'state_id'                    => $state_id,
             'district_id'                 => $district_id,
+            'geographical_id'             => $geographical_id,
+            'geographical_region_id'      => $geographical_region_id,
             'prison_id'                   => $prison_id,
-            'country_id'                  => $country_id,
-            'funcall'                     => $this,
             'from_date'                   => $from_date,
             'to_date'                     => $to_date
            
@@ -1322,78 +1307,14 @@ public function alertConvictPrisonerReleased(){
 
     public function alertReleaseDateConvict(){
 
-      $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        ));   
       
-
-     $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
+             $otherFields = array();
 
              $this->set(array(
-            'countryList'     => $countryList,
-            'districtList'  => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
-            'reporttitle' => "Alert of Prisoner about to reach release date for convict"
+            
+             'otherFields'  => $otherFields,
+            
+            'reporttitle'   => "Alert of Prisoner about to reach release date for convict"
         ));
     
        
@@ -1403,25 +1324,59 @@ public function alertConvictPrisonerReleased(){
         $this->layout = 'ajax';            
         $this->loadModel('Prisoner');    
         $name      = '';
-        $country_id = ''; 
+        $geographical_region_id = ''; 
         $state_id = ''; 
         $district_id = ''; 
-        $prison_id = '';   
+        $prison_id = ''; 
+        $geographical_id = ''; 
         $from_date = ''; 
         $to_date = '';  
-        $condition = array();
+
+         $condition = array();
+        
         $this->Prison->recursive = 0;
 
-     if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+    if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
+            }
+        }        
+
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+            $district_id = $this->params['named']['district_id'];
+            if($district_id !=0){
+               /* $condition += array('Prisoner.ups_district_id' => $ups_district_id);*/
+                 $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+
             }
         }
 
-    if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['year']!=''){
-        $condition += array('month(Prisoner.dor)' => $this->params['named']['month']);
-        $condition += array('year(Prisoner.dor)' => $this->params['named']['year']);       
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+            $state_id = $this->params['named']['state_id'];
+            if($state_id !=0){
+                /*$condition += array('Prison.state_id' => $state_id);*/
+                 $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
+            }
+        }
+
+      if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+        $geographical_id = $this->params['named']['geographical_id'];
+        if($geographical_id !=0){
+            $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+        }
+     }
+     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+           // $condition += array('Prison.id' => $prison_id);
+             $condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
+
+    if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(Prisoner.dor)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(Prisoner.dor)' => $this->params['named']['selected_year_id']);       
         }
    
 
@@ -1439,24 +1394,7 @@ public function alertConvictPrisonerReleased(){
       }
 
 
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+    
      //debug($prison_id );
         $this->paginate = array(
            'conditions' => $condition,
@@ -1502,15 +1440,17 @@ public function alertConvictPrisonerReleased(){
             'limit'         => 10
         );
         $Prisoner = $this->paginate('Prisoner');
-        
+        $otherFields = array();
+
         $this->set(array(
             'Prisoner'                    => $Prisoner,
             'funcall'                     => $this,
             'name'                        => $name,
             'state_id'                    => $state_id,
             'district_id'                 => $district_id,
+            'geographical_id'             => $geographical_id,
+            'geographical_region_id'      => $geographical_region_id,
             'prison_id'                   => $prison_id,
-            'funcall'                     => $this,
             'from_date'                   => $from_date,
             'to_date'                     => $to_date
            
@@ -1537,79 +1477,12 @@ function gePrisonerTermType($sentenceLength)
         return $is_long_term_prisoner;
     }
 
-public function convictPrisonerReleased(){
+public function convictPrisonerReleased(){    
 
-     $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        ));   
-
-     $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'countryList'   => $countryList,   
-            'districtList'  => $districtList,
-            'regionList'    => $regionList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
+             $otherFields = array();
+             $this->set(array(         
+            
+            'otherFields'   => $otherFields,            
             'reporttitle'   => "List of Convicts Prisoners Released  from Custody During the month"
         ));
     
@@ -1621,27 +1494,62 @@ public function convictPrisonerReleasedAjax(){
         $this->loadModel('PrisonerCaseFile');
         $this->loadModel('Discharge');
         $name      = '';
+        $geographical_region_id = ''; 
         $state_id = ''; 
         $district_id = ''; 
-        $country_id = ''; 
         $prison_id = ''; 
+        $geographical_id = ''; 
         $from_date = ''; 
-        $to_date = '';   
+        $to_date = '';  
         $total_sentence_length ='';
         $condition = array();
+
         $this->Prison->recursive = 0;
 
-        if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['year']!=''){
-        $condition += array('month(Discharge.discharge_date)' => $this->params['named']['month']);
-        $condition += array('year(Discharge.discharge_date)' => $this->params['named']['year']);
-        
-        }
-     if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+        if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
+            }
+        }        
+
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+            $district_id = $this->params['named']['district_id'];
+            if($district_id !=0){
+               /* $condition += array('Prisoner.ups_district_id' => $ups_district_id);*/
+                 $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+
             }
         }
+
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+            $state_id = $this->params['named']['state_id'];
+            if($state_id !=0){
+                /*$condition += array('Prison.state_id' => $state_id);*/
+                 $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
+            }
+        }
+
+      if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+        $geographical_id = $this->params['named']['geographical_id'];
+        if($geographical_id !=0){
+            $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+        }
+     }
+     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+            $condition += array('Prison.id' => $prison_id);
+             //$condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
+
+         if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(Discharge.discharge_date)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(Discharge.discharge_date)' => $this->params['named']['selected_year_id']);
+        
+        }
+     
 
     if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != ''){
           $from_date = $this->params['named']['from_date'];
@@ -1656,24 +1564,7 @@ public function convictPrisonerReleasedAjax(){
           $condition += array("Discharge.discharge_date <=" => $td);
       }
 
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+   
      //debug($prison_id );
         $this->paginate = array(
            'conditions' => $condition,
@@ -1788,16 +1679,16 @@ public function convictPrisonerReleasedAjax(){
                             'Prisoner'                    => $Prisoner,
                             'funcall'                     => $this,
                             'name'                        => $name,
-                            'country_id'                  => $country_id,
                             'state_id'                    => $state_id,
                             'district_id'                 => $district_id,
+                            'geographical_id'             => $geographical_id,
+                            'geographical_region_id'      => $geographical_region_id,
                             'prison_id'                   => $prison_id,
-                            'funcall'                     => $this,
+                            'from_date'                   => $from_date,
+                            'to_date'                     => $to_date,
                             'total_sentence_length'       => $total_sentence_length,
                             'total_sentence'              => $total_sentence,
-                            'sentenceLength'              => $sentenceLength,
-                            'from_date'                   => $from_date,
-                            'to_date'                     => $to_date
+                            'sentenceLength'              => $sentenceLength,                         
 
                            
                         ));
@@ -1807,76 +1698,13 @@ public function convictPrisonerReleasedAjax(){
     }
 
 public function escapedAndRecapturedPrisoners(){
-     $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        ));   
-
-     $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
+    
+              $otherFields = array();
+       
              $this->set(array(
-            'countryList'   => $countryList,
-            'districtList'  => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
+           
+            'otherFields'   => $otherFields,
+           
             'reporttitle' => "Monthly list of Escape and Recaptured"
         ));
     
@@ -1889,25 +1717,59 @@ public function escapedAndRecapturedPrisonersAjax(){
         $this->loadModel('PrisonerCaseFile');
         $this->loadModel('Discharge');
         $name      = '';
+        $geographical_region_id = ''; 
         $state_id = ''; 
-        $country_id = ''; 
         $district_id = ''; 
         $prison_id = ''; 
-        $from_date = '';
-        $to_date = '';         
+        $geographical_id = ''; 
+        $from_date = ''; 
+        $to_date = '';  
+
         $condition = array();
+        
         $this->Prison->recursive = 0;
 
-     if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+     if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
+            }
+        }        
+
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+            $district_id = $this->params['named']['district_id'];
+            if($district_id !=0){
+               /* $condition += array('Prisoner.ups_district_id' => $ups_district_id);*/
+                 $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+
             }
         }
 
-      if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['year']!=''){
-        $condition += array('month(Discharge.escape_date)' => $this->params['named']['month']);
-        $condition += array('year(Discharge.escape_date)' => $this->params['named']['year']);
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+            $state_id = $this->params['named']['state_id'];
+            if($state_id !=0){
+                /*$condition += array('Prison.state_id' => $state_id);*/
+                 $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
+            }
+        }
+
+      if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+        $geographical_id = $this->params['named']['geographical_id'];
+        if($geographical_id !=0){
+            $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+        }
+     }
+     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+           // $condition += array('Prison.id' => $prison_id);
+             $condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
+
+     if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(Discharge.escape_date)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(Discharge.escape_date)' => $this->params['named']['selected_year_id']);
        
         }
 
@@ -1925,24 +1787,7 @@ public function escapedAndRecapturedPrisonersAjax(){
           $condition += array("Discharge.escape_date <=" => $td);
       }
 
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+   
      //debug($prison_id );
         $this->paginate = array(
            'conditions' => $condition,
@@ -1964,25 +1809,25 @@ public function escapedAndRecapturedPrisonersAjax(){
                  array(
                 'table' => 'genders',
                 'alias' => 'Gender',
-                'type' => 'inner',
+                'type' =>  'inner',
                 array('Prisoner.gender_id = Gender.id')
                 ),  
                  array(
                 'table' => 'prisons',
                 'alias' => 'Prison',
-                'type' => 'inner',
+                'type' =>  'inner',
                 array('Prisoner.prison_id = Prison.id')
                 ),  
                  array(
                 'table' => 'discharges',
                 'alias' => 'Discharge',
-                'type' => 'inner',
+                'type' =>  'inner',
                 array('Prisoner.id = Discharge.prisoner_id')
                 ),               
                 array(
                 'table' => 'prisoner_offences',
                 'alias' => 'PrisonerOffence',
-                'type' => 'inner',
+                'type' =>  'inner',
                 array('Prisoner.id = PrisonerOffence.prisoner_id')
                 )
             ),  
@@ -2004,7 +1849,7 @@ public function escapedAndRecapturedPrisonersAjax(){
                  'Prison.district_id',
                  'Prison.state_id',
                  'PrisonerOffence.offence',
-                'Discharge.discharge_type_id'
+                 'Discharge.discharge_type_id'
                 
                ),  
                'conditions'    => array(
@@ -2013,21 +1858,19 @@ public function escapedAndRecapturedPrisonersAjax(){
             ), 
             'limit'         => 10
         );
-        $Prisoner = $this->paginate('Prisoner');  
-       
-
+        $Prisoner = $this->paginate('Prisoner'); 
           
                  $this->set(array(
                             'Prisoner'                    => $Prisoner,
                             'funcall'                     => $this,
                             'name'                        => $name,
                             'state_id'                    => $state_id,
-                            'country_id'                  => $country_id,
                             'district_id'                 => $district_id,
+                            'geographical_id'             => $geographical_id,
+                            'geographical_region_id'      => $geographical_region_id,
                             'prison_id'                   => $prison_id,
-                            'funcall'                     => $this  ,
                             'from_date'                   => $from_date,
-                            'to_date'                     => $to_date                          
+                            'to_date'                     => $to_date                        
 
                         ));
 
@@ -2038,77 +1881,13 @@ public function escapedAndRecapturedPrisonersAjax(){
 
 public function sentenceReviewReport(){
 
-     $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        ));   
-       
+     
 
-     $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
+             $otherFields = array();
              $this->set(array(
-            'countryList'   => $countryList,
-            'districtList'  => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
+            
+             'otherFields'   => $otherFields,
+          
             'reporttitle'   => "Sentence Review Report"
         ));
     
@@ -2120,26 +1899,60 @@ public function sentenceReviewReportAjax(){
         $this->loadModel('PrisonerCaseFile');
         $this->loadModel('Discharge');
         $name      = '';
+        $geographical_region_id = ''; 
         $state_id = ''; 
-        $country_id = ''; 
         $district_id = ''; 
-        $prison_id = '';  
+        $prison_id = ''; 
+        $geographical_id = ''; 
         $from_date = ''; 
         $to_date = '';  
         $total_sentence_length ='';
-        $condition = array();
+         $condition = array();
+
+        
         $this->Prison->recursive = 0;
 
-     if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+    if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
+            }
+        }        
+
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+            $district_id = $this->params['named']['district_id'];
+            if($district_id !=0){
+               /* $condition += array('Prisoner.ups_district_id' => $ups_district_id);*/
+                 $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+
             }
         }
 
-      if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['month']!=''){
-        $condition += array('month(Prisoner.epd)' => $this->params['named']['month']);
-        $condition += array('year(Prisoner.epd)' => $this->params['named']['year']);
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+            $state_id = $this->params['named']['state_id'];
+            if($state_id !=0){
+                /*$condition += array('Prison.state_id' => $state_id);*/
+                 $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
+            }
+        }
+
+      if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+        $geographical_id = $this->params['named']['geographical_id'];
+        if($geographical_id !=0){
+            $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+        }
+     }
+     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+           // $condition += array('Prison.id' => $prison_id);
+             $condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
+
+      if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(Prisoner.epd)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(Prisoner.epd)' => $this->params['named']['selected_year_id']);
        
         }      
 
@@ -2156,24 +1969,7 @@ public function sentenceReviewReportAjax(){
           $condition += array("Prisoner.epd <=" => $td);
       }
 
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+    
      //debug($prison_id );
         $this->paginate = array(
            'conditions' => $condition,
@@ -2279,11 +2075,11 @@ public function sentenceReviewReportAjax(){
                             'Prisoner'                    => $Prisoner,
                             'funcall'                     => $this,
                             'name'                        => $name,
-                            'country_id'                  => $country_id,
                             'state_id'                    => $state_id,
                             'district_id'                 => $district_id,
+                            'geographical_id'             => $geographical_id,
+                            'geographical_region_id'      => $geographical_region_id,
                             'prison_id'                   => $prison_id,
-                            'funcall'                     => $this,
                             'from_date'                   => $from_date,
                             'to_date'                     => $to_date,
                             'total_sentence_length'       => $total_sentence_length,
@@ -2300,76 +2096,11 @@ public function sentenceReviewReportAjax(){
 
     public function sentenceReviewReportEmployment(){
 
-    $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        ));   
-
-     $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'countryList'     => $countryList,
-            'districtList'  => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
+    
+             $otherFields = array();
+             $this->set(array(         
+           
+            'otherFields'   => $otherFields,
             'reporttitle'   => "Sentence Review Report Employment"
         ));
     
@@ -2381,27 +2112,61 @@ public function sentenceReviewReportEmploymentAjax(){
         $this->loadModel('PrisonerCaseFile');
         $this->loadModel('Discharge');
         $name      = '';
+        $geographical_region_id = ''; 
         $state_id = ''; 
-        $country_id = ''; 
         $district_id = ''; 
-        $prison_id = '';
+        $prison_id = ''; 
+        $geographical_id = ''; 
         $from_date = ''; 
-        $to_date = '';     
+        $to_date = '';      
         $total_sentence_length ='';
+
         $condition = array();
+
+       
         $this->Prison->recursive = 0;
 
+ if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
+            }
+        }        
 
-         if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+            $district_id = $this->params['named']['district_id'];
+            if($district_id !=0){
+               /* $condition += array('Prisoner.ups_district_id' => $ups_district_id);*/
+                 $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+
             }
         }
+
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+            $state_id = $this->params['named']['state_id'];
+            if($state_id !=0){
+                /*$condition += array('Prison.state_id' => $state_id);*/
+                 $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
+            }
+        }
+
+      if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+        $geographical_id = $this->params['named']['geographical_id'];
+        if($geographical_id !=0){
+            $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+        }
+     }
+     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+           // $condition += array('Prison.id' => $prison_id);
+             $condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
         
-        if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['month']!=''){
-        $condition += array('month(Prisoner.epd)' => $this->params['named']['month']);
-        $condition += array('year(Prisoner.epd)' => $this->params['named']['year']);
+         if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(Prisoner.epd)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(Prisoner.epd)' => $this->params['named']['selected_year_id']);
        
         }
 
@@ -2419,24 +2184,7 @@ public function sentenceReviewReportEmploymentAjax(){
       }
 
 
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+   
      //debug($prison_id );
         $this->paginate = array(
            'conditions' => $condition,
@@ -2463,9 +2211,9 @@ public function sentenceReviewReportEmploymentAjax(){
                 array('Prisoner.gender_id = Gender.id')
                 ),  
                  array(
-                'table' => 'prisons',
-                'alias' => 'Prison',
-                'type' => 'inner',
+                    'table' => 'prisons',
+                    'alias' => 'Prison',
+                    'type' => 'inner',
                 array('Prisoner.prison_id = Prison.id')
                 ),  
                  array(
@@ -2548,11 +2296,13 @@ public function sentenceReviewReportEmploymentAjax(){
                             'Prisoner'                    => $Prisoner,
                             'funcall'                     => $this,
                             'name'                        => $name,
-                            'country_id'                  => $country_id,
                             'state_id'                    => $state_id,
                             'district_id'                 => $district_id,
+                            'geographical_id'             => $geographical_id,
+                            'geographical_region_id'      => $geographical_region_id,
                             'prison_id'                   => $prison_id,
-                            'funcall'                     => $this,
+                            'from_date'                   => $from_date,
+                            'to_date'                     => $to_date,
                             'total_sentence_length'       => $total_sentence_length,
                             'total_sentence'              => $total_sentence,
                             'sentenceLength'              => $sentenceLength
@@ -2567,76 +2317,10 @@ public function sentenceReviewReportEmploymentAjax(){
 
      public function alertOnEvents(){
 
-     $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        ));   
-
-     $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'countryList'     => $countryList,
-            'districtList'  => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
+     
+         $otherFields = array();
+             $this->set(array(           
+            'otherFields'   => $otherFields,
             'reporttitle'   => "Alerts on events (Attemped Escapes, Attempted Suicide, Strikes)"
         ));
     
@@ -2649,27 +2333,65 @@ public function alertOnEventsAjax(){
         $this->loadModel('Discharge');
         $this->loadModel('IncidentManagement');
         $name      = '';
-        $country_id = '';
+        $geographical_region_id = ''; 
         $state_id = ''; 
         $district_id = ''; 
-        $prison_id = '';   
+        $prison_id = ''; 
+        $geographical_id = ''; 
         $from_date = ''; 
         $to_date = '';  
         $total_sentence_length ='';
-        $condition = array();
+
+       $condition = array();
+
+       
         $this->Prison->recursive = 0;
 
-      if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['year']!=''){
-        $condition += array('month(IncidentManagement.date)' => $this->params['named']['month']);
-        $condition += array('year(IncidentManagement.date)' => $this->params['named']['year']);
-       
-        }
-      if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+         if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
+            }
+        }        
+
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+            $district_id = $this->params['named']['district_id'];
+            if($district_id !=0){
+               /* $condition += array('Prisoner.ups_district_id' => $ups_district_id);*/
+                 $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+
             }
         }
+
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+            $state_id = $this->params['named']['state_id'];
+            if($state_id !=0){
+                /*$condition += array('Prison.state_id' => $state_id);*/
+                 $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
+            }
+        }
+
+      if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+        $geographical_id = $this->params['named']['geographical_id'];
+        if($geographical_id !=0){
+            $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+        }
+     }
+     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+           // $condition += array('Prison.id' => $prison_id);
+             $condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
+
+
+       if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(IncidentManagement.date)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(IncidentManagement.date)' => $this->params['named']['selected_year_id']);
+       
+        }
+      
 
     if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != ''){
           $from_date = $this->params['named']['from_date'];
@@ -2684,25 +2406,8 @@ public function alertOnEventsAjax(){
           $condition += array("IncidentManagement.date <=" => $td);
       }
 
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
-     //debug($condition );
+    
+     debug($condition );
         $this->paginate = array(
            'conditions' => $condition,
            'recursive'=>  -1,
@@ -2781,13 +2486,13 @@ public function alertOnEventsAjax(){
                             'funcall'                     => $this,
                             'name'                        => $name,
                             'state_id'                    => $state_id,
-                            'country_id'                  => $country_id,
                             'district_id'                 => $district_id,
+                            'geographical_id'             => $geographical_id,
+                            'geographical_region_id'      => $geographical_region_id,
                             'prison_id'                   => $prison_id,
-                            'funcall'                     => $this,
                             'from_date'                   => $from_date,
                             'to_date'                     => $to_date
-                            
+                                            
 
                            
                         ));
@@ -2797,76 +2502,10 @@ public function alertOnEventsAjax(){
     }
      public function prisonerVisitorBook(){
 
-     $this->loadModel('Country');
-             $countryList = $this->Country->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Country.id',
-                'Country.name',
-            ),
-            'conditions'    => array(
-                'Country.is_enable'  => 1,
-                'Country.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Country.name'       => 'ASC',
-            ),
-        )); 
-
-     $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'countryList'   => $countryList,
-            'districtList'  => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
+     
+             $otherFields = array();
+             $this->set(array(            
+            'otherFields'   => $otherFields,
             'reporttitle'   => "Prisoner visitor book"
         ));
     
@@ -2877,25 +2516,60 @@ public function prisonerVisitorBookAjax(){
         $this->loadModel('Prisoner');
         $this->loadModel('PrisonerCaseFile');
         $this->loadModel('Visitor');
+        
         $name      = '';
+        $geographical_region_id = ''; 
         $state_id = ''; 
-        $country_id = ''; 
         $district_id = ''; 
-        $prison_id = '';   
+        $prison_id = ''; 
+        $geographical_id = ''; 
         $from_date = ''; 
         $to_date = '';  
-        $condition = array();
+
+         $condition = array();
+       
         $this->Prison->recursive = 0;
 
-         if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '' ){
-            $country_id = $this->params['named']['country_id'];
-            if($country_id !=0){
-                $condition += array('Prisoner.country_id' => $country_id);
+        if(isset($this->params['named']['geographical_region_id']) && $this->params['named']['geographical_region_id'] != '' ){
+            $geographical_region_id = $this->params['named']['geographical_region_id'];
+            if($geographical_region_id !=0){                
+                 $condition += array('Prison.geographical_region_id IN (?)'=>array(implode("','", explode(",", $geographical_region_id))));
+            }
+        }        
+
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
+            $district_id = $this->params['named']['district_id'];
+            if($district_id !=0){
+               /* $condition += array('Prisoner.ups_district_id' => $ups_district_id);*/
+                 $condition += array('Prison.district_id IN (?)'=>array(implode("','", explode(",", $district_id))));
+
             }
         }
-        if(isset($this->params['named']['month']) && $this->params['named']['month']!='' && isset($this->params['named']['year']) && $this->params['named']['month']!=''){
-        $condition += array('month(Visitor.date)' => $this->params['named']['month']);
-        $condition += array('year(Visitor.date)' => $this->params['named']['year']);
+
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+            $state_id = $this->params['named']['state_id'];
+            if($state_id !=0){
+                /*$condition += array('Prison.state_id' => $state_id);*/
+                 $condition += array('Prison.state_id IN (?)'=>array(implode("','", explode(",", $state_id))));
+            }
+        }
+
+      if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+        $geographical_id = $this->params['named']['geographical_id'];
+        if($geographical_id !=0){
+            $condition += array('Prison.geographical_id IN (?)'=>array(implode("','", explode(",", $geographical_id))));
+        }
+     }
+     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
+        $prison_id = $this->params['named']['prison_id'];
+        if($prison_id !=0){
+           // $condition += array('Prison.id' => $prison_id);
+             $condition += array('Prison.id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+     }
+        if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id']!='' && isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id']!=''){
+        $condition += array('month(Visitor.date)' => $this->params['named']['selected_month_id']);
+        $condition += array('year(Visitor.date)' => $this->params['named']['selected_year_id']);
        
         }        
 
@@ -2912,24 +2586,7 @@ public function prisonerVisitorBookAjax(){
           $condition += array("Visitor.date <=" => $td);
       }
 
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+    
      //debug($prison_id );
         $this->paginate = array(
            'conditions' => $condition,
@@ -3011,9 +2668,10 @@ public function prisonerVisitorBookAjax(){
                             'Prisoner'                    => $Prisoner,
                             'funcall'                     => $this,
                             'name'                        => $name,
-                            'country_id'                  => $country_id,
                             'state_id'                    => $state_id,
                             'district_id'                 => $district_id,
+                            'geographical_id'             => $geographical_id,
+                            'geographical_region_id'      => $geographical_region_id,
                             'prison_id'                   => $prison_id,
                             'from_date'                   => $from_date,
                             'to_date'                     => $to_date
@@ -5251,6 +4909,14 @@ public function sppaAjax(){
      * [UR-65]. Records of Discharge of prisoners
      */
     public function discharge(){
+        $menuId = $this->getMenuId("/Report/discharge");
+                $moduleId = $this->getModuleId("discharge");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->loadModel('Prison');
         $this->loadModel('Gender');
        
@@ -5340,6 +5006,14 @@ public function sppaAjax(){
      * [FR-106] Prisoner Whereabouts
      */
     public function whereabouts(){
+         $menuId = $this->getMenuId("/Report/whereabouts");
+                $moduleId = $this->getModuleId("report");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->loadModel('Prison');
         $this->loadModel('Gender');
         $prisonList = $this->Prison->find('list', array(
@@ -5413,6 +5087,14 @@ public function sppaAjax(){
      * [UR-65]. Records of Discharge of prisoners
      */
     public function dischargeLong(){
+         $menuId = $this->getMenuId("/Report/dischargeLong");
+                $moduleId = $this->getModuleId("discharge");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->loadModel('Prison');
         $this->loadModel('Gender');
         $prisonList = $this->Prison->find('list', array(
@@ -5529,6 +5211,14 @@ public function sppaAjax(){
      * @return [type] [description]
      */
     public function dangerousPrisoner(){
+        $menuId = $this->getMenuId("/Report/dangerousPrisoner");
+                $moduleId = $this->getModuleId("report");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->loadModel('Prison');
         $this->loadModel('Gender');
         if($this->Session->read('Auth.User.prison_id')!=''){

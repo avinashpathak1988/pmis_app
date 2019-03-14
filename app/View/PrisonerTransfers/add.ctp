@@ -32,6 +32,7 @@ if(isset($this->request->data['PrisonerTransfer']['transfer_date']) && $this->re
                                         <label class="control-label">Original Station <?php echo $req; ?>:</label>
                                         <div class="controls">
                                             <?php 
+
                                             $originPrisonList = $prisonList;
                                             if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE')){
                                                 $originPrisonList = array($this->Session->read('Auth.User.prison_id')=>$funcall->getName($this->Session->read('Auth.User.prison_id'),"Prison","name"));
@@ -47,7 +48,8 @@ if(isset($this->request->data['PrisonerTransfer']['transfer_date']) && $this->re
                                     <div class="control-group">
                                         <label class="control-label">Prisoner Number <?php echo $req; ?>:</label>
                                         <div class="controls">
-                                            <?php echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','empty'=>'','type'=>'select','options'=>array(), 'required','id'=>'prisoner_id','title'=>"Please select prisoner number",'onchange'=>'showPrisonerDetails(this.value)'));?>
+                                            <?php 
+                                            echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','empty'=>'','type'=>'select','options'=>array(), 'required','id'=>'prisoner_id','onchange'=>'showPrisonerDetails(this.value)'));?>
                                         </div>
                                     </div>
                                 </div>
@@ -113,7 +115,7 @@ if(isset($this->request->data['PrisonerTransfer']['transfer_date']) && $this->re
                             <?php echo $this->Form->input('Submit', array('type'=>'submit','div'=>false,'class'=>'btn btn-success pull-left','label'=>false,'id'=>'submit','formnovalidate'=>true,'onclick'=>"javascript:return validateForm();","style"=>"margin-right:10px;"))?>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <?php
-                        echo $this->Html->link('Reset',"javascript:;",array('escape'=>false,'class'=>'btn btn-danger pull-left','onclick'=>"resetData('PrisonerTransferAddForm');")); 
+                       // echo $this->Html->link('Reset',"javascript:;",array('escape'=>false,'class'=>'btn btn-danger pull-left','onclick'=>"resetData('PrisonerTransferAddForm');")); 
                         ?>
                         </div>
                         

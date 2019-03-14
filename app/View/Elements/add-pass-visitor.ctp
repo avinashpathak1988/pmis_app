@@ -202,7 +202,7 @@ $(function()
         var nat_id_type_id = "PassVisitor"+scount+"relation";
         $('#visitorItemsDiv select[name*="relation"]:last').attr('name',nat_id_type_name);
         $('#visitorItemsDiv select[name*="relation"]:last').attr('id',nat_id_type_id);
-        $('#visitorItemsDiv select[name*="relation"]:last').attr('required','required');
+        //$('#visitorItemsDiv select[name*="relation"]:last').attr('required','required');
         
         $('#'+nat_id_type_id).val('');
         

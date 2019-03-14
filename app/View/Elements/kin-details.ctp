@@ -77,13 +77,24 @@ $(function()
             .html('<span class="icon icon-minus"></span>');
 
         //change name of inputs 
-        scount = parseInt($('.scountDiv33 input[name*="name"]').length);
+        scount = parseInt($('.scountDiv33 input[name*="[name]"]').length);
         scount = scount-1; 
-
+        //alert(scount);
         var name = "data[VisitorName]["+scount+"][name]";
         var name_id = "VisitorName"+scount+"name";
-        $('.scountDiv33 input[name*="name"]:last').attr('name',name);
-        $('.scountDiv33 input[name*="name"]:last').attr('id',name_id);
+        $('.scountDiv33 input[name*="[name]"]:last').attr('name',name);
+        $('.scountDiv33 input[name*="[name]"]:last').attr('id',name_id);
+
+        var name = "data[VisitorName]["+scount+"][mname]";
+        var name_id = "VisitorName"+scount+"mname";
+        $('.scountDiv33 input[name*="mname"]:last').attr('name',name);
+        $('.scountDiv33 input[name*="mname"]:last').attr('id',name_id);
+
+
+        var name = "data[VisitorName]["+scount+"][lname]";
+        var name_id = "VisitorName"+scount+"lname";
+        $('.scountDiv33 input[name*="lname"]:last').attr('name',name);
+        $('.scountDiv33 input[name*="lname"]:last').attr('id',name_id);
 
         var relation = "data[VisitorName]["+scount+"][relation]";
         var relation_id = "VisitorName"+scount+"relation";
@@ -93,7 +104,14 @@ $(function()
         $('#'+relation_id).val('');
 
         
-
+        var natIdType = "data[VisitorName]["+scount+"][nat_id_type]";
+        var natIdType_id = "VisitorName"+scount+"nat_id_type";
+        $('.scountDiv33 select[name*="nat_id_type"]:last').attr('name',natIdType);
+        $('.scountDiv33 select[name*="nat_id_type"]:last').attr('id',natIdType_id);
+        $('.scountDiv33 select[name*="nat_id_type"]:last').attr('required','required');
+        $('#'+natIdType_id).val('');
+        
+        
         var photo = "data[VisitorName]["+scount+"][photo]";
         var photo_id = "VisitorName"+scount+"photo";
         $('.scountDiv33 input[name*="photo"]:last').attr('name',photo);

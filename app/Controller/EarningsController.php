@@ -5,6 +5,16 @@ class EarningsController   extends AppController {
     public $uses=array('Prisoner','Earning','WorkingPartyPrisoner','WorkingParty','Item','PurchaseItem','PrisonerAttendance','PrisonerPaysheet', 'EarningRatePrisoner','EarningRate','ItemPriceHistory', 'EarningGradePrisoner','PrisonerPayment','WorkingPartyTransfer','WorkingPartyPrisonerApprove','EmploymentType');
     public function index(){
 
+        $menuId = $this->getMenuId("/earnings");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $this->request->data['Search']['start_date'] = date('Y-m-d'); 
         $this->request->data['Search']['end_date'] = date('Y-m-d');
         
@@ -74,7 +84,7 @@ class EarningsController   extends AppController {
                 $this->set('file_type','doc');
                 $this->set('file_name','earning_mis_report_'.date('d_m_Y').'.doc');
             }else if($this->params['named']['reqType']=='PDF'){
-				$this->layout='pdf';
+                $this->layout='pdf';
                 $this->set('file_type','pdf');
                 $this->set('file_name','earning_mis_report_'.date('d_m_Y').'.pdf');
             }
@@ -110,6 +120,15 @@ class EarningsController   extends AppController {
      //Date  : 12-09-2017
      public function  workingParties()
      {
+
+        $menuId = $this->getMenuId("/earnings/workingParties   ");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $isEdit = 0; $isSearch = 0;
         //echo '<pre>'; print_r($this); exit;
         $default_status = ''; $approvalStatusList = '';
@@ -219,6 +238,15 @@ class EarningsController   extends AppController {
                     //debug($this->request->data); exit;
                     $db = ConnectionManager::getDataSource('default');
                     $db->begin();
+                    $menuId = $this->getMenuId("/earnings/workingParties");
+                    $moduleId = $this->getModuleId("earning");
+                    $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                    if($isAccess != 1){
+                            $this->Session->write('message_type','error');
+                            $this->Session->write('message','Not Authorized!');
+                            $this->redirect(array('action'=>'../sites/dashboard')); 
+                    }     
+
                     if($this->WorkingParty->save($this->request->data))
                     {
                         $refId = 0;
@@ -456,6 +484,14 @@ class EarningsController   extends AppController {
      }
      //working parties history start partha
      function workingPartiesHistory(){
+                    $menuId = $this->getMenuId("/earnings/workingPartiesHistory");
+                    $moduleId = $this->getModuleId("earning");
+                    $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                    if($isAccess != 1){
+                            $this->Session->write('message_type','error');
+                            $this->Session->write('message','Not Authorized!');
+                            $this->redirect(array('action'=>'../sites/dashboard')); 
+                    }
         $prisonList = $this->Prison->find('list', array(
             'fields'=>array(
                 'Prison.id',
@@ -750,6 +786,17 @@ class EarningsController   extends AppController {
     //Assign working party prisoner -- START --
     public function assignPrionsers()
     {
+
+        $menuId = $this->getMenuId("/earnings/assignPrionsers");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $isEdit = 0; 
         $default_status = ''; $approvalStatusList = '';
         $assigned_prisoners  = '';
@@ -782,20 +829,20 @@ class EarningsController   extends AppController {
                     $rejectedList=array();
                     $working_party_prisoner_id='';
                     foreach ($this->data['ApprovalProcess'] as $key => $value) {
-                    	 if(isset($value['fid']) && $value['fid']!=''){
-                    	 	$working_party_prisoner_id=$value['fid'];
-                    	 	if($status != 'Saved'){
-                    	 		foreach ($value['WorkingPartyPrisonerApprove'] as $key1 => $value1) {
-		                            if($value1['is_approve'] == 2){
-		                             $rejectedList[]=$value1['prisoner_id'];
-		                            }
-		                         }
-                    	 	}	                         
-	                         
-	                         //$this->updateWorkingPartyPrisoner($rejectedList,$working_party_prisoner_id);
-                    	 }else{
-                    	 	unset($this->request->data['ApprovalProcess'][$key]);
-                    	 }
+                         if(isset($value['fid']) && $value['fid']!=''){
+                            $working_party_prisoner_id=$value['fid'];
+                            if($status != 'Saved'){
+                                foreach ($value['WorkingPartyPrisonerApprove'] as $key1 => $value1) {
+                                    if($value1['is_approve'] == 2){
+                                     $rejectedList[]=$value1['prisoner_id'];
+                                    }
+                                 }
+                            }                            
+                             
+                             //$this->updateWorkingPartyPrisoner($rejectedList,$working_party_prisoner_id);
+                         }else{
+                            unset($this->request->data['ApprovalProcess'][$key]);
+                         }
                          
                     }
                     //debug($this->request->data);exit;
@@ -803,7 +850,7 @@ class EarningsController   extends AppController {
                     
                     $approveProcess = $this->setApprovalProcess($items, 'WorkingPartyPrisoner', $status, $remark);
                     if(is_array($rejectedList) && count($rejectedList)>0 && $working_party_prisoner_id!=''){
-                    	$this->updateWorkingPartyPrisoner($rejectedList,$working_party_prisoner_id);
+                        $this->updateWorkingPartyPrisoner($rejectedList,$working_party_prisoner_id);
                     }
                     
                     if($approveProcess == 1)
@@ -914,6 +961,15 @@ class EarningsController   extends AppController {
                     //echo $isCapacity; exit;
                     if($isCapacity == 1)
                     {
+
+                        $menuId = $this->getMenuId("/earnings/assignPrionsers");
+                        $moduleId = $this->getModuleId("earning");
+                        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                        if($isAccess != 1){
+                                $this->Session->write('message_type','error');
+                                $this->Session->write('message','Not Authorized!');
+                                $this->redirect(array('action'=>'../sites/dashboard')); 
+                        }
                         $db = ConnectionManager::getDataSource('default');
                         $db->begin();  
                         if($this->WorkingPartyPrisoner->save($this->request->data)){
@@ -1305,7 +1361,7 @@ class EarningsController   extends AppController {
                 $this->set('file_type','doc');
                 $this->set('file_name','workingparty_report_'.date('d_m_Y').'.doc');
             }else if($this->params['named']['reqType']=='PDF'){
-				$this->layout='pdf';
+                $this->layout='pdf';
                 $this->set('file_type','pdf');
                 $this->set('file_name','workingparty_report_'.date('d_m_Y').'.pdf');
             }else if($this->params['named']['reqType']=='PRINT'){
@@ -1517,6 +1573,17 @@ class EarningsController   extends AppController {
     //Assign working party prisoner -- END --
     public function attendances()
     {
+
+         $menuId = $this->getMenuId("/earnings/attendances");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $login_user_id = $this->Session->read('Auth.User.id');
         if($this->request->is(array('post','put'))){
@@ -1600,7 +1667,18 @@ class EarningsController   extends AppController {
                         $prisonerAttendanceData['PrisonerAttendance']['login_user_id'] = $login_user_id;
                         if(isset($prisonerAttendance['less_than_3'])){
                             $prisonerAttendanceData['PrisonerAttendance']['less_than_3'] = 1; 
-                        }                       
+                        }      
+
+                        $menuId = $this->getMenuId("/earnings/attendances");
+                        $moduleId = $this->getModuleId("earning");
+                        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+                        //echo $moduleId;exit;
+                        if($isAccess != 1){
+                                $this->Session->write('message_type','error');
+                                $this->Session->write('message','Not Authorized!');
+                                $this->redirect(array('action'=>'../sites/dashboard')); 
+                        }                 
                         //debug($prisonerAttendanceData); exit;                   
                         if($this->PrisonerAttendance->saveAll($prisonerAttendanceData))
                         {
@@ -1662,6 +1740,17 @@ class EarningsController   extends AppController {
      // create article/item -- START --
      public function createarticle()
      {
+
+        $menuId = $this->getMenuId("/Earnings/itemList");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         if($this->request->is(array('post','put'))){
 
            if(isset($this->request->data['itemEdit']['id']))
@@ -1749,6 +1838,16 @@ class EarningsController   extends AppController {
      //item list 
      function itemList()
      {
+        $menuId = $this->getMenuId("/Earnings/itemList");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId .','.$menuId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         if($this->request->is(array('post','put')))
         {
            if(isset($this->request->data['Item']) && count($this->request->data['Item']) > 0) 
@@ -1885,6 +1984,16 @@ class EarningsController   extends AppController {
         ));
      }
      public function itemPriceHistory(){
+        $menuId = $this->getMenuId("/Earnings/itemPriceHistory");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
      }
      //Item ajax listing 
      public function itemPriceHistoryAjax(){
@@ -1912,7 +2021,7 @@ class EarningsController   extends AppController {
                 $this->set('file_name','mis_report_'.date('d_m_Y').'.pdf');
             }else if($this->params['named']['reqType']=='PRINT'){
                 $this->layout='print';
-				$this->set('file_type','print');
+                $this->set('file_type','print');
             }
             $this->set('is_excel','Y');         
             $limit = array('limit' => 2000,'maxLimit'   => 2000);
@@ -2033,6 +2142,14 @@ class EarningsController   extends AppController {
      }
      public function itemReceivedByPriosner()
      {
+        $menuId = $this->getMenuId("/earnings/itemReceivedByPriosner");
+                $moduleId = $this->getModuleId("earning");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $isEdit = 0; 
         $default_status = ''; $approvalStatusList = '';
         $statusInfo = $this->getApprovalStatusInfo();
@@ -2095,7 +2212,17 @@ class EarningsController   extends AppController {
                          $this->request->data['PurchaseItem']['uuid'] = $uuid;
                     }  
                     $db = ConnectionManager::getDataSource('default');
-                    $db->begin();  
+                    $db->begin(); 
+
+                    $menuId = $this->getMenuId("/earnings/itemReceivedByPriosner");
+                    $moduleId = $this->getModuleId("earning");
+                    $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                    if($isAccess != 1){
+                            $this->Session->write('message_type','error');
+                            $this->Session->write('message','Not Authorized!');
+                            $this->redirect(array('action'=>'../sites/dashboard')); 
+                    }
+
                     if($this->PurchaseItem->save($this->request->data)){
                         $refId = 0;
                         $action = 'Edit';
@@ -2349,6 +2476,17 @@ class EarningsController   extends AppController {
      }
      public function paysheet()
      {
+
+        $menuId = $this->getMenuId("/Earnings/paysheet");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
 
           if($this->request->is(array('post','put'))){
@@ -2846,6 +2984,16 @@ class EarningsController   extends AppController {
     }
     function prisonerEarnings()
     {
+        $menuId = $this->getMenuId("/earnings/prisonerEarnings");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $prisonList = $prisonList = $this->Prison->find('list', array(
             'recursive'     => -1,
@@ -2899,7 +3047,15 @@ class EarningsController   extends AppController {
     }
     function freeWorkingPrisoner()
     {
-    	$prison_id = $this->Session->read('Auth.User.prison_id');
+                    $menuId = $this->getMenuId("/earnings/freeWorkingPrisoner");
+                    $moduleId = $this->getModuleId("earning");
+                    $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                    if($isAccess != 1){
+                            $this->Session->write('message_type','error');
+                            $this->Session->write('message','Not Authorized!');
+                            $this->redirect(array('action'=>'../sites/dashboard')); 
+                    }
+        $prison_id = $this->Session->read('Auth.User.prison_id');
         $prisonList = $prisonList = $this->Prison->find('list', array(
             'recursive'     => -1,
             'fields'        => array(
@@ -3111,7 +3267,7 @@ class EarningsController   extends AppController {
         ));
     }
     function freeWorking($pid){
-    	if($pid != '')
+        if($pid != '')
         {
             $prisonerData = $this->Prisoner->findByUuid($pid);
             if(!empty($prisonerData))
@@ -3134,6 +3290,17 @@ class EarningsController   extends AppController {
     }
     function prisonerEarningDetails($pid)
     {
+
+        $menuId = $this->getMenuId("/earnings/prisonerEarnings");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         if($pid != '')
         {
             $prisonerData = $this->Prisoner->findByUuid($pid);
@@ -3423,6 +3590,17 @@ class EarningsController   extends AppController {
     //approve attendance start
     public function approveAttendances()
     {
+
+        $menuId = $this->getMenuId("/earnings/approveAttendances");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $login_user_id = $this->Session->read('Auth.User.id');
         $default_status = ''; $approvalStatusList = '';
@@ -3590,8 +3768,8 @@ class EarningsController   extends AppController {
                 'PrisonerAttendance.working_party_id'    => $working_party_id,
             ); 
         }
-		
-		if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
+        
+        if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='XLS'){
                 $this->layout='export_xls';
                 $this->set('file_type','xls');
@@ -3601,7 +3779,7 @@ class EarningsController   extends AppController {
                 $this->set('file_type','doc');
                 $this->set('file_name','attendance_report_'.date('d_m_Y').'.doc');
             }else if($this->params['named']['reqType']=='PDF'){
-				$this->layout='pdf';
+                $this->layout='pdf';
                 $this->set('file_type','pdf');
                 $this->set('file_name','attendance_report_'.date('d_m_Y').'.pdf');
             }else if($this->params['named']['reqType']=='PRINT'){
@@ -3651,6 +3829,14 @@ class EarningsController   extends AppController {
     //approve attendance end 
     //attendance start partha
     public function attendanceList(){
+                       $menuId = $this->getMenuId("/earnings/attendanceList");
+                    $moduleId = $this->getModuleId("earning");
+                    $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                    if($isAccess != 1){
+                            $this->Session->write('message_type','error');
+                            $this->Session->write('message','Not Authorized!');
+                            $this->redirect(array('action'=>'../sites/dashboard')); 
+                    }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $login_user_id = $this->Session->read('Auth.User.id');
         $default_status = ''; $approvalStatusList = '';
@@ -3964,6 +4150,16 @@ class EarningsController   extends AppController {
     ////approve payment start
     public function approvePayments()
     {
+        $menuId = $this->getMenuId("/Earnings/approvePayments");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $login_user_id = $this->Session->read('Auth.User.id');
         $default_status = ''; $approvalStatusList = '';
@@ -4226,6 +4422,17 @@ class EarningsController   extends AppController {
     ////approve payment start
     public function approveGratuityPayments()
     {
+
+        $menuId = $this->getMenuId("/earnings/approveGratuityPayments");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
          $prison_id = $this->Session->read('Auth.User.prison_id');
         $login_user_id = $this->Session->read('Auth.User.id');
         $default_status = ''; $approvalStatusList = '';
@@ -4428,6 +4635,15 @@ class EarningsController   extends AppController {
     //get prisoners to generate gate pass
     function gatepass()
     {
+
+                    $menuId = $this->getMenuId("/Earnings/gatepass");
+                    $moduleId = $this->getModuleId("earning");
+                    $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                    if($isAccess != 1){
+                            $this->Session->write('message_type','error');
+                            $this->Session->write('message','Not Authorized!');
+                            $this->redirect(array('action'=>'../sites/dashboard')); 
+                    }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $login_user_id = $this->Session->read('Auth.User.id');
         if($this->request->is(array('post','put'))){
@@ -5069,6 +5285,17 @@ class EarningsController   extends AppController {
     }
     function approveWorkingPartyTransfers()
     {
+
+        $menuId = $this->getMenuId("/earnings/approveWorkingPartyTransfers");
+        $moduleId = $this->getModuleId("earning");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
          if(isset($this->request->data['ApprovalProcess']) && count($this->request->data['ApprovalProcess']) > 0)
         {
             $status = 'Saved'; 
@@ -5302,6 +5529,16 @@ class EarningsController   extends AppController {
 
     // listing for process the withdraw approval
     public function withdrawList(){
+
+        $menuId = $this->getMenuId("/Earnings/withdrawList");
+                $moduleId = $this->getModuleId("earning");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -5616,6 +5853,7 @@ class EarningsController   extends AppController {
                 'Prisoner.is_trash'       => 0,
                 'Prisoner.present_status' => 1,
                 'Prisoner.transfer_id' => 0,
+                'Prisoner.is_death' => 0,
                 //'EarningRatePrisoner.is_trash'  => 0,
                 // 'Prisoner.earning_grade_id !='   =>  0,
                 // 'Prisoner.earning_rate_id !='   =>  0,
@@ -5940,6 +6178,17 @@ class EarningsController   extends AppController {
 
     // }
     function approveWorkingPartyRejects(){
+
+
+                    $menuId = $this->getMenuId("/earnings/approveWorkingPartyRejects");
+                    $moduleId = $this->getModuleId("earning");
+                    $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                    if($isAccess != 1){
+                            $this->Session->write('message_type','error');
+                            $this->Session->write('message','Not Authorized!');
+                            $this->redirect(array('action'=>'../sites/dashboard')); 
+                    }
+
         if(isset($this->request->data['ApprovalProcess']) && count($this->request->data['ApprovalProcess']) > 0)
         {
             $status = 'Saved'; 
@@ -6153,6 +6402,7 @@ class EarningsController   extends AppController {
                  {
                     $this->request->data['AssignSkill']['assignment_date']=date('Y-m-d',strtotime($this->data['AssignSkill']['assignment_date']));
                  }
+                 $this->request->data['AssignSkill']['prison_id'] = $this->Session->read('Auth.User.prison_id');
                
                 $db = ConnectionManager::getDataSource('default');
                 $db->begin();  
@@ -6240,8 +6490,106 @@ class EarningsController   extends AppController {
                     {
                         $this->request->data['AssignSkill']['assign_skill_id']=($this->data['AssignSkill']['assign_skill_id']);
                     } 
+                    $prisonerlist = $this->Prisoner->find('list', array(
+                        'recursive'     => -1,
+                        'fields'        => array(
+                            'Prisoner.id',
+                            'Prisoner.prisoner_no',
+                        ),
+                            'conditions'    => array(
+                                'Prisoner.id' => $this->data['AssignSkill']['prisoner_id']
+                            ),
+                            'order'         => array(
+                            'Prisoner.prisoner_no'
+                        ),
+                    ));
                 }
-        }
+            }
+            else 
+            {
+                $condition = array(
+                    'Prisoner.is_enable'      => 1,
+                    'Prisoner.is_trash'       => 0,
+                    'Prisoner.present_status' => 1,
+                    'Prisoner.transfer_id'    => 0,
+                    'Prisoner.is_death'    => 0,
+                    //'EarningRatePrisoner.is_trash'  => 0,
+                    //'Prisoner.earning_grade_id !='   =>  0,
+                    //'Prisoner.earning_rate_id !='   =>  0,
+                    'Prisoner.prison_id'       => $prison_id
+                );
+                $condition += array(
+                    'Prisoner.prisoner_type_id != '      => Configure::read('DEBTOR'),
+                    'Prisoner.prisoner_sub_type_id != '  => Configure::read('CONDEMNED')
+                );
+                //get assigned skill prisoners -- START --
+                $skillList = $this->AssignSkill->find('list', array(
+                    'recursive'     => -1,
+                    'joins' => array(
+                        array(
+                            'table' => 'prisoners',
+                            'alias' => 'Prisoner',
+                            'type' => 'inner',
+                            'conditions'=> array('AssignSkill.prisoner_id = Prisoner.id')
+                        ),
+                    ), 
+                    'fields'        => array(
+                        //'Prisoner.id',
+                        'AssignSkill.prisoner_id',
+                    ),
+                    'conditions'    => array(
+                        'Prisoner.is_enable'      => 1,
+                        'Prisoner.is_trash'       => 0,
+                        'AssignSkill.is_trash'    => 0,
+                        //'AssignSkill.is_conduct'  => 1,
+                        'Prisoner.prison_id'      => $prison_id,
+                        'Prisoner.present_status' => 1,
+                        'Prisoner.is_death'       => 0,
+                        'Prisoner.transfer_id'    => 0
+                    ),
+                    'order'         => array(
+                        'Prisoner.prisoner_no'
+                    ),
+                    'group' => array('AssignSkill.prisoner_id')
+                ));
+                if(isset($skillList) && !empty($skillList))
+                {
+                    $skillPrisoners = implode(',',$skillList);
+                    $condition += array("Prisoner.id not in (".$skillPrisoners.")");
+                }
+               //get assigned skill prisoners -- END --
+               $prisonerlist = $this->Prisoner->find('list', array(
+                    'recursive'     => -1,
+                    'fields'        => array(
+                        'Prisoner.id',
+                        'Prisoner.prisoner_no',
+                    ),
+                        'conditions'    => $condition,
+                        'order'         => array(
+                        'Prisoner.prisoner_no'
+                    ),
+                ));
+            }
+
+             $prisonerlistSearch = $this->Prisoner->find('list', array(
+                    'recursive'     => -1,
+                    'fields'        => array(
+                        'Prisoner.id',
+                        'Prisoner.prisoner_no',
+                    ),
+                        'conditions'    => array(
+                             'Prisoner.is_enable'      => 1,
+                             'Prisoner.is_trash'       => 0,
+                             'Prisoner.present_status' => 1,
+                             'Prisoner.transfer_id'    => 0,
+                             'Prisoner.is_death'    => 0,
+                             'Prisoner.prison_id'    => $this->Session->read('Auth.User.prison_id'),
+                             'Prisoner.prisoner_type_id != '      => Configure::read('DEBTOR'),
+                              'Prisoner.prisoner_sub_type_id != '  => Configure::read('CONDEMNED')
+                        ),
+                        
+                ));
+             // debug($prisonerlistSearch); exit;
             $this->loadModel('SkillSet');
             $gradeslist=$this->SkillSet->find('list',array(
                 
@@ -6258,73 +6606,18 @@ class EarningsController   extends AppController {
                     'SkillSet.name'
                 )
             ));  
-           $condition = array(
-                'Prisoner.is_enable'      => 1,
-                'Prisoner.is_trash'       => 0,
-                'Prisoner.present_status' => 1,
-                'Prisoner.transfer_id'    => 0,
-                'Prisoner.is_death'    => 0,
-                //'EarningRatePrisoner.is_trash'  => 0,
-                //'Prisoner.earning_grade_id !='   =>  0,
-                'Prisoner.earning_rate_id !='   =>  0,
-                'Prisoner.prison_id'       => $prison_id
-            );
-           //get assigned skill prisoners -- START --
-           $skillList = $this->AssignSkill->find('list', array(
-                'recursive'     => -1,
-                'joins' => array(
-                    array(
-                        'table' => 'prisoners',
-                        'alias' => 'Prisoner',
-                        'type' => 'inner',
-                        'conditions'=> array('AssignSkill.prisoner_id = Prisoner.id')
-                    ),
-                ), 
-                'fields'        => array(
-                    //'Prisoner.id',
-                    'AssignSkill.prisoner_id',
-                ),
-                'conditions'    => array(
-                    'Prisoner.is_enable'      => 1,
-                    'Prisoner.is_trash'       => 0,
-                    'AssignSkill.is_trash'    => 0,
-                    'AssignSkill.is_conduct'  => 1,
-                    'Prisoner.prison_id'      => $prison_id,
-                    'Prisoner.present_status' => 1,
-                    'Prisoner.is_death'       => 0,
-                    'Prisoner.transfer_id'    => 0
-                ),
-                'order'         => array(
-                    'Prisoner.prisoner_no'
-                ),
-                'group' => array('AssignSkill.prisoner_id')
-            ));
-            if(isset($skillList) && !empty($skillList))
-            {
-                $skillPrisoners = implode(',',$skillList);
-                $condition += array("Prisoner.id not in (".$skillPrisoners.")");
-            }
-           //get assigned skill prisoners -- END --
-           $prisonerlist = $this->Prisoner->find('list', array(
-                'recursive'     => -1,
-                'fields'        => array(
-                    'Prisoner.id',
-                    'Prisoner.prisoner_no',
-                ),
-                    'conditions'    => $condition,
-                    'order'         => array(
-                    'Prisoner.prisoner_no'
-                ),
-            ));
-            $this->set(compact('gradeslist','prisonerlist','isEdit'));
+            $this->set(compact('gradeslist','prisonerlist','isEdit', 'prisonerlistSearch'));
      }
      // assined skilled ajax partha 
 
      public function assignSkillAjax() {
         $this->loadModel('AssignSkill');
          $this->layout='ajax'; 
-        $condition=array('AssignSkill.is_trash'=> 0);
-        //debug($this->params['named']);
+        $condition=array(
+            'AssignSkill.is_trash'=> 0,
+            'AssignSkill.prison_id'=> $this->Session->read('Auth.User.prison_id')
+        );
+        // debug($this->params['named']);
 
          if(isset($this->params['named']['prisoner_id_search']) && $this->params['named']['prisoner_id_search'] != ''){
             $date = ($this->params['named']['prisoner_id_search']);
@@ -6350,7 +6643,7 @@ class EarningsController   extends AppController {
             );
 
          $datas=$this->paginate('AssignSkill');
-         //debug($datas); //exit;
+         // debug($condition); //exit;
          $this->set(array(
                 'datas' =>$datas,
                 

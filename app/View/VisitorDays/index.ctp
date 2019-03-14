@@ -20,7 +20,7 @@
                                     <th>Vistors Days</th>
                                     <th>Is Enable ?</th>
                                     <th class="text-center">Edit</th>
-                                    <th class="text-center">Delete</th>
+                                    <!-- <th class="text-center">Delete</th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -56,11 +56,11 @@
                                         <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['VisitorDay']['id'])); ?>
                                         <?php echo $this->Form->end(array('label'=>'Edit','class'=>'btn btn-mini btn-primary','div'=>false, 'onclick'=>"javascript:return confirm('Are you sure want to edit?')")); ?> 
                                     </td>
-                                       <td>
+                                     <!--   <td>
                                         <?php echo $this->Form->create('VisitorDayDelete',array('url'=>'/VisitorDays/index','admin'=>false));?> 
                                         <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['VisitorDay']['id'])); ?>
                                         <?php echo $this->Form->end(array('label'=>'Delete','class'=>'btn btn-mini btn-danger','div'=>false, 'onclick'=>"javascript:return confirm('Are you sure want to delete?')")); ?>
-                                    </td>
+                                    </td> -->
                                 </tr>
 <?php
     }

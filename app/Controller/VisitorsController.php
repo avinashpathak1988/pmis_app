@@ -4,9 +4,17 @@ class VisitorsController   extends AppController {
 	public $layout='table';
    // public $uses=array('VisitorPrisonerItem');
 	public function index() {
+        $menuId = $this->getMenuId("/visitors");
+        $moduleId = $this->getModuleId("visitor");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
 		$this->loadModel('Visitor'); 
-		//debug($this->data['RecordStaffDelete']['id']);
-		//return false;
+
         if($this->request->is(array('post','put')))
         {
             if(isset($this->request->data['ApprovalProcess']) && count($this->request->data['ApprovalProcess']) > 0)
@@ -88,6 +96,14 @@ class VisitorsController   extends AppController {
         }
         if(isset($this->data['VisitorDelete']['id']) && (int)$this->data['VisitorDelete']['id'] != 0){
         	
+            $menuId = $this->getMenuId("/visitors");
+            $moduleId = $this->getModuleId("visitor");
+            $isAccess = $this->isAccess($moduleId,$menuId,'is_delete');
+            if($isAccess != 1){
+                    $this->Session->write('message_type','error');
+                    $this->Session->write('message','Not Authorized!');
+                    $this->redirect(array('action'=>'../sites/dashboard')); 
+            }
             $this->Visitor->id=$this->data['VisitorDelete']['id'];
             $db = ConnectionManager::getDataSource('default');
             $db->begin();
@@ -257,7 +273,7 @@ class VisitorsController   extends AppController {
         $prisoner = $this->Prisoner->find('first', array(
             //'recursive'     => -1,
             'conditions'    => array(
-                'Prisoner.prisoner_no'      => $this->data['RecieveItemCash']['prisoner_no']
+                'Prisoner.prisoner_no'      => $visitor['Visitor']['prisoner_no']
             ),
         ));
         /*aakash recieve prisoner item*/
@@ -751,13 +767,21 @@ class VisitorsController   extends AppController {
 
     }
 
-    public function view($prison_id = ''){
+    public function view($visitor_id = ''){
+        $menuId = $this->getMenuId("/visitors");
+        $moduleId = $this->getModuleId("visitor");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $visitorList = $this->Visitor->find('all', array(
             'recursive'     => 2,
             'conditions'    => array(
                 //'Visitor.is_enable'      => 1,
                 'Visitor.is_trash'       => 0,
-                'Visitor.id'      => $prison_id
+                'Visitor.id'      => $visitor_id
             ),
             'order'         => array(
                 'Visitor.prisoner_no'
@@ -781,6 +805,7 @@ class VisitorsController   extends AppController {
             }
             
         }
+
         $this->set(array(
             'visitorList'         => $visitorList,
             'propertyItemList'=>$propertyItemList
@@ -789,6 +814,14 @@ class VisitorsController   extends AppController {
     }
 
 	public function add() { 
+        $menuId = $this->getMenuId("/visitors");
+        $moduleId = $this->getModuleId("visitor");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
 
         $this->loadModel('Visitor');
         $this->loadModel('PPCash');
@@ -803,11 +836,27 @@ class VisitorsController   extends AppController {
         $this->loadModel('User');
         $this->loadModel('Prisoner');
         $this->loadModel('VisitorName');
-
+        //debug($this->request->data);exit;
            
            //edit data
-           
+        $menuId = $this->getMenuId("/Visitors");
+        $moduleId = $this->getModuleId("visitor");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         if(isset($this->data['VisitorEdit']['id']) && (int)$this->data['VisitorEdit']['id'] != 0){
+            $menuId = $this->getMenuId("/visitors");
+            $moduleId = $this->getModuleId("visitor");
+            $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+            if($isAccess != 1){
+                    $this->Session->write('message_type','error');
+                    $this->Session->write('message','Not Authorized!');
+                    $this->redirect(array('action'=>'../sites/dashboard')); 
+            }
+
             if($this->Visitor->exists($this->data['VisitorEdit']['id'])){
                 $this->request->data = $this->Visitor->findById($this->data['VisitorEdit']['id']);
                 $this->loadModel('VisitorName');
@@ -850,7 +899,34 @@ class VisitorsController   extends AppController {
                 $this->request->data['Visitor']['status'] = 'Gate IN';
             }
             $visitor= $this->data;
-
+            if(count($visitor['VisitorItem'])>0){
+                foreach ($visitor['VisitorItem'] as $key => $item) {
+                   // debug($item);
+                    if($item['quantity'] == ''){
+                        unset($visitor['VisitorItem'][$key]);
+                    }
+                }
+            }
+            if(count($visitor['VisitorPrisonerCashItem'])>0){
+                foreach ($visitor['VisitorPrisonerCashItem'] as $key => $item) {
+                   // debug($item);
+                    if($item['pp_amount'] == ''){
+                        unset($visitor['VisitorPrisonerCashItem'][$key]);
+                    }
+                }
+            }
+            if(count($visitor['VisitorPrisonerItem'])>0){
+                foreach ($visitor['VisitorPrisonerItem'] as $key => $item) {
+                   // debug($item);
+                    if($item['quantity'] == ''){
+                        unset($visitor['VisitorPrisonerItem'][$key]);
+                    }
+                }
+            }
+            
+            
+           //debug($visitor);
+           //exit;
             if(isset($this->data['Visitor']['id'])){
             
                 $updateFields = array(
@@ -898,7 +974,7 @@ class VisitorsController   extends AppController {
                     
                 }
             }
-            //debug($allAllowed);exit;
+            //debug($this->data['VisitorPrisonerItem']);exit;
 
             if($allAllowed == 1){
 
@@ -938,8 +1014,8 @@ class VisitorsController   extends AppController {
                                                 //debug($prisonerItem);
 
                                                 $visitorPrisonerItem=array();
-                                                $visitorPrisonerItem['VisitorPrisonerItem']['item_type'] =$prisonerItem['item_type'];
-                                                $visitorPrisonerItem['VisitorPrisonerItem']['quantity'] =$prisonerItem['quantity'];
+                                                if(isset($prisonerItem['quantity']) && $prisonerItem['quantity'] != ''){
+                                                    $visitorPrisonerItem['VisitorPrisonerItem']['item_type'] =$prisonerItem['item_type'];
                                                 $visitorPrisonerItem['VisitorPrisonerItem']['quantity'] =$prisonerItem['quantity'];
                                                 $visitorPrisonerItem['VisitorPrisonerItem']['weight'] =$prisonerItem['weight'];
                                                 $visitorPrisonerItem['VisitorPrisonerItem']['weight_unit'] =$prisonerItem['weight_unit'];
@@ -972,6 +1048,8 @@ class VisitorsController   extends AppController {
                                                 $visitorPrisonerItem['VisitorPrisonerItem']['prisoner_id'] =$prisonerToVisit['Prisoner']['id'];
                                                 $visitorPrisonerItem['VisitorPrisonerItem']['visitor_id'] =$this->Visitor->id;
                                                 $this->VisitorPrisonerItem->saveAll($visitorPrisonerItem['VisitorPrisonerItem']);
+                                                }
+                                                
 
                                             }
                                         }
@@ -1006,15 +1084,17 @@ class VisitorsController   extends AppController {
                                             foreach ($this->data['VisitorPrisonerCashItem'] as $prisonerItem) {
                                                 //debug($prisonerItem);
                                              
-                                                
+                                                if(isset($prisonerItem['pp_amount']) && $prisonerItem['pp_amount'] != ''){
+
                                                 $visitorPrisonerItem=array();
                                                 $visitorPrisonerItem['VisitorPrisonerCashItem']['cash_details'] =$prisonerItem['cash_details'];
                                                 $visitorPrisonerItem['VisitorPrisonerCashItem']['pp_cash'] =$prisonerItem['pp_cash'];
                                                 $visitorPrisonerItem['VisitorPrisonerCashItem']['pp_amount'] =$prisonerItem['pp_amount'];
                                                 $visitorPrisonerItem['VisitorPrisonerCashItem']['visitor_id'] =$this->Visitor->id;
                                                 $this->VisitorPrisonerCashItem->saveAll($visitorPrisonerItem['VisitorPrisonerCashItem']);
+                                                }
 
-                                            }
+                                                }
                                             }
                                             
                                         }
@@ -1107,7 +1187,8 @@ class VisitorsController   extends AppController {
                                             
                                             foreach ($this->data['VehicleItem'] as $vehicleItm) {
                                                 //debug($prisonerItem);
-                                             
+                                                if(isset($vehicleItm['quantity']) && $vehicleItm['quantity'] != ''){
+                                                    
                                                 $vehicleItem=array();
                                                 $vehicleItem['VehicleItem']['voucher_no'] =$vehicleItm['voucher_no'];
                                                 $vehicleItem['VehicleItem']['item'] =$vehicleItm['item'];
@@ -1117,6 +1198,7 @@ class VisitorsController   extends AppController {
                                               
                                                 $vehicleItem['VehicleItem']['visitor_id'] =$this->Visitor->id;
                                                 $this->VehicleItem->saveAll($vehicleItem['VehicleItem']);
+                                                }
 
                                             }
                                         }
@@ -1436,13 +1518,16 @@ public function getPropertyTypeNew($id=''){
         /*aakash recieve prisoner item*/
         $visitorPrisonerItems  = $this->VisitorPrisonerItem->find('all',array(
             'conditions'    => array(
-                'VisitorPrisonerItem.visitor_id'      => $visitor_id
+                'VisitorPrisonerItem.visitor_id'      => $visitor_id,
+                'VisitorPrisonerItem.is_trash'  =>0
             ),
         ));
 
         $visitorPrisonerCashItems = $this->VisitorPrisonerCashItem->find('all',array(
             'conditions'    => array(
-                'VisitorPrisonerCashItem.visitor_id'      => $visitor_id
+                'VisitorPrisonerCashItem.visitor_id'      => $visitor_id,
+                'VisitorPrisonerCashItem.is_trash'  =>0
+
             ),
         ));
         $physicalProperty=array();
@@ -1547,6 +1632,7 @@ public function getPropertyTypeNew($id=''){
                                     $cashItem['CashItem']['amount']=$visitorPrisonerItem['VisitorPrisonerCashItem']['pp_amount'];
                                     $cashItem['CashItem']['currency_id']=$visitorPrisonerItem['VisitorPrisonerCashItem']['pp_cash'];
                                     $cashItem['CashItem']['status']='Draft';
+                                    $cashItem['CashItem']['prison_id'] =$this->Session->read('Auth.User.prison_id');
 
                                     if($this->CashItem->saveAll($cashItem)){
                                         $visitorPrisonerItem['VisitorPrisonerCashItem']['is_collected']=1;
@@ -2036,6 +2122,7 @@ public function gateBookReportAjax(){
                 "Prisoner.prison_id"    => $this->data['prison_id'],
                 "Prisoner.is_trash"    => 0,
                 "Prisoner.is_enable"    => 1,
+                "Prisoner.is_approve"    => 1,
                 "Prisoner.present_status"    => 1,
                 'Prisoner.transfer_status !='        => 'Approved',
                 'Prisoner.status'        => 'Approved',
@@ -2178,7 +2265,7 @@ public function gateBookReportAjax(){
                 "conditions"    => array(
                     "InPrisonPunishment.prisoner_id"    => $prisoner_id,
                     "InPrisonPunishment.is_trash"       => 0,
-                    "InPrisonPunishment.status"         => 'Approved',
+                    "InPrisonPunishment.status"         => 'Final-Approved',
                     "InPrisonPunishment.internal_punishment_id"         => 6,
                     "'".date("Y-m-d")."' between InPrisonPunishment.punishment_start_date and InPrisonPunishment.punishment_end_date"
                 ),
@@ -2294,9 +2381,16 @@ public function gateBookReportAjax(){
                         }
                     }
 
-
+                if($prisoner['Prisoner']['prisoner_type_id'] == Configure::read('CONVICTED')){
+                    if($allowed == 'true'){
+                        $stageData = $this->getStageValidate($prisoner_id);
+                        if($stageData != ''){
+                            $allowed='stageNa';
+                        }
+                    }
+                }
                     //check pass
-                if($allowed == 'false'){
+                if($allowed != 'true'){
                     if(isset($natIdType) && $natIdType != '' && isset($natId) && $natId != ''){
                         $this->loadModel('VisitorPass');
                         $this->loadModel('PassVisitor');
@@ -2318,7 +2412,7 @@ public function gateBookReportAjax(){
                                 ));
 
                             foreach ($passVisitors as $pass_visitor) {
-
+                                    //debug($pass_visitor);
                                     if($pass_visitor['PassVisitor']['nat_id_type'] == $natIdType && $pass_visitor['PassVisitor']['nat_id'] ==  $natId){
                                         if($pass['VisitorPass']['is_valid'] == 1){
                                             if($pass['VisitorPass']['is_suspended'] == 1){
@@ -2335,19 +2429,13 @@ public function gateBookReportAjax(){
                                            
                                         }
                                 }
+                                //exit;
                         }
                         //debug($visitorPasses);exit;
                     }
                 }
 
-                if($prisoner['Prisoner']['prisoner_type_id'] == Configure::read('CONVICTED')){
-                    if($allowed == 'true'){
-                        $stageData = $this->getStageValidate($prisoner_id);
-                        if($stageData != ''){
-                            $allowed='stageNa';
-                        }
-                    }
-                }
+                
                 
             }
 
@@ -2431,9 +2519,17 @@ public function gateBookReportAjax(){
                     }
                 }
 
+                if($prisoner['Prisoner']['prisoner_type_id'] == Configure::read('CONVICTED')){
+                    if($allowed == 'true'){
+                        $stageData = $this->getStageValidate($prisoner_id);
+                        if($stageData != ''){
+                            $allowed='stageNa';
+                        }
+                    }
+                }
 
                 //check pass
-                if($allowed == 'false'){
+                if($allowed != 'true'){
                     if(isset($natIdType) && $natIdType != '' && isset($natId) && $natId != ''){
                         $this->loadModel('VisitorPass');
                         $this->loadModel('PassVisitor');
@@ -2477,16 +2573,7 @@ public function gateBookReportAjax(){
                     }
                 }
 
-                if($prisoner['Prisoner']['prisoner_type_id'] == Configure::read('CONVICTED')){
-                    if($allowed == 'true'){
-                        $stageData = $this->getStageValidate($prisoner_id);
-                        if($stageData != ''){
-                            $allowed='false';
-                            return 3;
-
-                        }
-                    }
-                }
+                
 
         }
         //debug($natIdType);exit;
@@ -2506,7 +2593,11 @@ public function gateBookReportAjax(){
                 $allowed ="false";
                 return 2;
             }else{
-                return 1;
+                if($allowed=='stageNa'){
+                    return 3;
+                }else{
+                    return 1;
+                }
             }
         }
         else{
@@ -2522,13 +2613,17 @@ public function gateBookReportAjax(){
 
         $visitor_id =$data['Visitor']['visitor_id'];
         foreach ($data['CanteenFoodItem'] as $food) {
-            $canteenfoodItem['CanteenFoodItem']['visitor_id'] =  $visitor_id;
-            $canteenfoodItem['CanteenFoodItem']['food_item'] =  $food['food_item'];
-            $canteenfoodItem['CanteenFoodItem']['quantity'] =  $food['quantity'];
-            $this->CanteenFoodItem->saveAll($canteenfoodItem);
+            if($food['food_item'] != '' && $food['quantity'] != ''){
+                    
+                $canteenfoodItem['CanteenFoodItem']['visitor_id'] =  $visitor_id;
+                $canteenfoodItem['CanteenFoodItem']['food_item'] =  $food['food_item'];
+                $canteenfoodItem['CanteenFoodItem']['quantity'] =  $food['quantity'];
+                $this->CanteenFoodItem->saveAll($canteenfoodItem);
+
+                $this->Session->write('message_type','success');
+                $this->Session->write('message','Canteen Food Items Saved Successfully !');
+            }
         }
-        $this->Session->write('message_type','success');
-        $this->Session->write('message','Canteen Food Items Saved Successfully !');
         echo 'success';
         exit;
     }

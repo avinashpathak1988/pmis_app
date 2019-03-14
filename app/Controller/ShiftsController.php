@@ -46,6 +46,27 @@ class ShiftsController  extends AppController {
             ),            
             'limit'         => 20,
         );
+        if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
+            if($this->params['named']['reqType']=='XLS'){
+                $this->layout='export_xls';
+                $this->set('file_type','xls');
+                $this->set('file_name','shift_mis_report_'.date('d_m_Y').'.xls');
+            }else if($this->params['named']['reqType']=='DOC'){
+                $this->layout='export_xls';
+                $this->set('file_type','doc');
+                $this->set('file_name','shift_mis_report_'.date('d_m_Y').'.doc');
+            }else if($this->params['named']['reqType']=='PDF'){
+                $this->layout='pdf';
+                $this->set('file_type','pdf');
+                $this->set('file_name','shift_mis_report_'.date('d_m_Y').'.pdf');
+            }else if($this->params['named']['reqType']=='PRINT'){
+                $this->layout='print';
+            }
+            $this->set('is_excel','Y');         
+            $limit = array('limit' => 2000,'maxLimit'   => 2000);
+        }else{
+            $limit = array('limit'  => 20);
+        }  
         $datas  = $this->paginate('Shift');
         $this->set(array(
             'name'  => $name,

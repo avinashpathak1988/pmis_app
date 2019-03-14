@@ -3,6 +3,14 @@ App::uses('AppController', 'Controller');
 class PropertyitemsController extends AppController {
 	public $layout='table';
 	public function index() {
+        $menuId = $this->getMenuId("/Propertyitems");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$this->loadModel('Propertyitem'); 
         if(isset($this->data['PropertyitemDelete']['id']) && (int)$this->data['PropertyitemDelete']['id'] != 0){
         	if($this->Propertyitem->exists($this->data['PropertyitemDelete']['id'])){
@@ -224,7 +232,14 @@ class PropertyitemsController extends AppController {
         )); 
     }
 	public function add() { 
-
+        $menuId = $this->getMenuId("/Propertyitems");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$this->loadModel('Propertyitem');
         if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE'))
         {

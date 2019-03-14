@@ -8,6 +8,8 @@ if(is_array($datas) && count($datas)>0){
     </div>
 </div>
 <?php
+//debug($finalLockupDataList);
+if(isset($finalLockupDataList) && is_array($finalLockupDataList) && count($finalLockupDataList)>0){
 foreach($finalLockupDataList as $key1=>$lockuplist){
   //debug($rows);
 ?>
@@ -20,7 +22,7 @@ foreach($finalLockupDataList as $key1=>$lockuplist){
   }
   else 
   {?>
-    <table id="districtTable" class="table table-bordered">
+    <table id="districtTable" class="table table-bordered table-responsive formal-edu">
       <thead>
         <tr>
         <th rowspan="2" colspan="2"></th>
@@ -28,13 +30,23 @@ foreach($finalLockupDataList as $key1=>$lockuplist){
           /*foreach($datas as $key=>$rows){debug($rows);
             }*/
         ?>
-        <th colspan="3">Convict</th>
-        <th colspan="3">Condemned</th>
         <th colspan="3">Remand</th>
-        <th colspan="3">Debtor</th>
-        <th colspan="3">Lodger</th>
+        <th colspan="3">Convicts</th>
+
+        <th colspan="3">Condemned</th>
+        <th colspan="3">Debtors</th>
+        <th colspan="3">Lodgers</th>
+        <th colspan="3">Children</th>
+        <th colspan="3">Intransit</th>
+
     </tr>
     <tr style="background-color: rosybrown;">
+        <td>Male</td>
+        <td>Female</td>
+        <td>Total</td>
+        <td>Male</td>
+        <td>Female</td>
+        <td>Total</td>
         <td>Male</td>
         <td>Female</td>
         <td>Total</td>
@@ -55,7 +67,8 @@ foreach($finalLockupDataList as $key1=>$lockuplist){
     <tbody>
     <?php //debug($lockuplist);
     $i='';
-      foreach ($lockuplist as $lockuplistchildkey => $lockuplistchildvalue) {//debug($lockuplistchildvalue);
+      foreach ($lockuplist as $lockuplistchildkey => $lockuplistchildvalue) {
+        //debug($lockuplistchildvalue);
         foreach ($lockuplistchildvalue as $newkey => $value) {
        //debug($value);
           
@@ -69,25 +82,63 @@ foreach($finalLockupDataList as $key1=>$lockuplist){
         <?php }?>
 
         <td><?php echo $newkey;?></td>
-        <?php //foreach ($value as $newkey1 => $newvalue) {//
-         // debug($value);?>
-            <td><?php echo isset($value[2]['Male'])?$value[2]['Male']:'';?></td>
-            <td><?php echo isset($value[2]['Female'])?$value[2]['Female']:'';?></td>
-            <td><?php echo isset($value[2]['Total'])?$value[2]['Total']:'';?></td>
-            <td><?php echo isset($value[4]['Male'])?$value[4]['Male']:'';?></td>
-            <td><?php echo isset($value[4]['Female'])?$value[4]['Female']:'';?></td>
-            <td><?php echo isset($value[4]['Total'])?$value[4]['Total']:'';?></td>
+        
             <td><?php echo isset($value[1]['Male'])?$value[1]['Male']:'';?></td>
             <td><?php echo isset($value[1]['Female'])?$value[1]['Female']:'';?></td>
             <td><?php echo isset($value[1]['Total'])?$value[1]['Total']:'';?></td>
+            <td><?php echo isset($value[2]['Male'])?$value[2]['Male']:'';?></td>
+            <td><?php echo isset($value[2]['Female'])?$value[2]['Female']:'';?></td>
+            <td><?php echo isset($value[2]['Total'])?$value[2]['Total']:'';?></td>
             <td><?php echo isset($value[3]['Male'])?$value[3]['Male']:'';?></td>
             <td><?php echo isset($value[3]['Female'])?$value[3]['Female']:'';?></td>
             <td><?php echo isset($value[3]['Total'])?$value[3]['Total']:'';?></td>
+            <td><?php echo isset($value[4]['Male'])?$value[4]['Male']:'';?></td>
+            <td><?php echo isset($value[4]['Female'])?$value[4]['Female']:'';?></td>
+            <td><?php echo isset($value[4]['Total'])?$value[4]['Total']:'';?></td>
             <td><?php echo isset($value[5]['Male'])?$value[5]['Male']:'';?></td>
             <td><?php echo isset($value[5]['Female'])?$value[5]['Female']:'';?></td>
             <td><?php echo isset($value[5]['Total'])?$value[5]['Total']:'';?></td>
-        <?php //}?>
+            <td><?php echo isset($value[6]['Male'])?$value[6]['Male']:'';?></td>
+            <td><?php echo isset($value[6]['Female'])?$value[6]['Female']:'';?></td>
+            <td><?php echo isset($value[6]['Total'])?$value[6]['Total']:'';?></td>
+            <td><?php echo isset($value[7]['Male'])?$value[7]['Male']:'';?></td>
+            <td><?php echo isset($value[7]['Female'])?$value[7]['Female']:'';?></td>
+            <td><?php echo isset($value[7]['Total'])?$value[7]['Total']:'';?></td>
+
       </tr> 
+      <?php if(count($lockuplistchildvalue) ==1){ ?>
+        <tr>
+       
+              <td>Physical</td>
+
+              <td>0</td>
+        
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+
+      
+
+      </tr> 
+      <?php } ?>
+
     <?php $i=$lockuplistchildkey;
   }
         
@@ -97,9 +148,15 @@ foreach($finalLockupDataList as $key1=>$lockuplist){
     </table>
 
   <?php }
-    }?>
+    }
+  }else{
+?>
+<span style="color:red;font-weight:bold;">No Record Found!!</span>
+<?php    
+}
+    ?>
 <?php
-}else{
+}else{  
 ?>
 <span style="color:red;font-weight:bold;">No Record Found!!</span>
 <?php    

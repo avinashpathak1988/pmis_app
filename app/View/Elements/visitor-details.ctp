@@ -220,8 +220,6 @@ $(function()
 
         $('#'+relation_id).val('');
 
-        
-
         var photo = "data[VisitorName]["+scount+"][photo]";
         var photo_id = "VisitorName"+scount+"photo";
         $('.scountDiv3 input[name*="photo"]:last').attr('name',photo);
@@ -232,8 +230,12 @@ $(function()
         $('.scountDiv3 input[name*="nat_id"]:last').attr('name',nat_id);
         $('.scountDiv3 input[name*="nat_id"]:last').attr('id',nat_id_id);
        
-
-        
+        //code by Itishree Visitor details-- START --
+        var nat_id_type = "data[VisitorName]["+scount+"][nat_id_type]";
+        var nat_id_type_id = "VisitorName"+scount+"nat_id_type";
+        $('.scountDiv3 select[name*="nat_id_type"]:last').attr('name',nat_id_type);
+        $('.scountDiv3 select[name*="nat_id_type"]:last').attr('id',nat_id_type_id);
+        //code by Itishree -- END --
 
         $('.scountDiv3 select[name*="currency_id"]:last option:selected').removeAttr("selected");
 

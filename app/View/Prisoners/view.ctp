@@ -778,20 +778,13 @@ table.viewHalf label{display:inline-block;color: #A03230}
 
                                                     </td>
                                                 </tr>
-
-
-                                               	</tbody>
-                                               </table>
-
-                                               <table class="table viewHalf detail table-bordered table-responsive">
-                                               	<tbody>
-                                               		<tr>
+                                                <tr>
                                                     <td>
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Deformities :    
-																</label>
+                                                                Deformities :    
+                                                                </label>
                                                                  <?php if($data['Prisoner']['deformities']!=''){echo $data['Prisoner']['deformities'];
                                                                     }else{echo Configure::read('NA');} ?>
                                                           
@@ -817,8 +810,8 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Age On Admission :    
-																</label>
+                                                                Age On Admission :    
+                                                                </label>
                                                            <?php echo $data['Prisoner']['age_on_admission']; ?>
                                                            
                                                         </div>
@@ -840,14 +833,14 @@ table.viewHalf label{display:inline-block;color: #A03230}
                                                     <div class="span6">
                                                         <div class="control-group">
                                                             <label class="control-label">
-																Resident Address :    
-																</label>
+                                                                Resident Address :    
+                                                                </label>
                                                            <?php
                                                            if ($data['Prisoner']['resident_address']!='') {
-                                                            	
+                                                                
                                                            echo $data['Prisoner']['resident_address'];}
                                                            else{
-                                                           	echo Configure::read('NA');
+                                                            echo Configure::read('NA');
                                                            }
                                                             ?>
                                                            
@@ -866,17 +859,12 @@ table.viewHalf label{display:inline-block;color: #A03230}
 
                                                     </td>
                                                 </tr>
+
+
                                                	</tbody>
                                                </table>
 
-
-
-
-
-
-
-                                                
-                                               
+                                             
 
                                             </tbody>
                                         </table>

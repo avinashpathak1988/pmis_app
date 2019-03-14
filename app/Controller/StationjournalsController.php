@@ -8,6 +8,14 @@ class StationjournalsController extends AppController{
      * Index Function
      */
     public function index() {
+        $menuId = $this->getMenuId("/Stationjournals ");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
     if($this->request->is(array('post','put'))){//debug($this->data);exit;
         if(isset($this->request->data['ApprovalProcess']) && count($this->request->data['ApprovalProcess']) > 0)
         {
@@ -177,8 +185,14 @@ class StationjournalsController extends AppController{
          return $data['Prison']['name'];
     }
     public function add(){
-        if ($isAccess==1) {
-            
+        $menuId = $this->getMenuId("/Stationjournals ");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         
         $this->layout='table';
         if($this->request->is(array('post','put'))){//debug($this->data);exit;
@@ -243,11 +257,7 @@ class StationjournalsController extends AppController{
         //debug($duty_officer);
           
         $this->set(compact('is_enable','prison_id','duty_officer','psid'));
-    }else{
-                $this->Session->write('message_type','error');
-                $this->Session->write('message','Not Authorized!');
-                $this->redirect(array('action'=>'../sites/dashboard')); 
-    }
+    
     }
     /**
      * Edit Function

@@ -3,6 +3,14 @@ App::uses('AppController', 'Controller');
 class EscortTeamsController extends AppController {
 	public $layout='table';
 	public function index() {
+        $menuId = $this->getMenuId("/EscortTeams");
+                $moduleId = $this->getModuleId("escort_team");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$this->loadModel('State'); 
         $this->loadModel('EscortTeam');
         if(isset($this->data['EscortTeamDelete']['id']) && (int)$this->data['EscortTeamDelete']['id'] != 0){
@@ -75,6 +83,14 @@ class EscortTeamsController extends AppController {
         )); 
     }
 	public function add() { 
+         $menuId = $this->getMenuId("/EscortTeams/add");
+                $moduleId = $this->getModuleId("escort_team");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$this->loadModel("EscortTeam"); 
 		$this->loadModel('Prison');
 		if (isset($this->data['EscortTeam']) && is_array($this->data['EscortTeam']) && count($this->data['EscortTeam'])>0){

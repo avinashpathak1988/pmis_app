@@ -6,6 +6,16 @@ class DischargeBoardSummaryController extends AppController{
     public $uses=array('User','Prisoner','Aftercare','DischargeBoardSummary');
 
 	public function index(){
+        $menuId = $this->getMenuId("/DischargeBoardSummary");
+                $moduleId = $this->getModuleId("social_rehabilitation");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+                //echo $moduleId;exit;
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$prison_id = $this->Session->read('Auth.User.prison_id');
 		$today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -221,9 +231,33 @@ class DischargeBoardSummaryController extends AppController{
         if($this->request->is(array('post','put'))){
             $data = $this->request->data;
              if(isset($this->request->data['DischargeBoardSummaryEdit']['id'])){
+
+                $menuId = $this->getMenuId("/DischargeBoardSummary");
+                $moduleId = $this->getModuleId("social_rehabilitation");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+
+                //echo $moduleId;exit;
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
                 $this->request->data=$this->DischargeBoardSummary->findById($this->data["DischargeBoardSummaryEdit"]["id"]);
                 $prisoner_id =$this->request->data['DischargeBoardSummary']['prisoner_id'];
                 }else{
+
+                $menuId = $this->getMenuId("/DischargeBoardSummary");
+                $moduleId = $this->getModuleId("social_rehabilitation");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+                //echo $moduleId;exit;
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
                 if($data['DischargeBoardSummary']['earliest_date_of_discharge'] != '' ){
                 $data['DischargeBoardSummary']['earliest_date_of_discharge'] = date('Y-m-d',strtotime($data['DischargeBoardSummary']['earliest_date_of_discharge']));
                  }
@@ -263,7 +297,16 @@ class DischargeBoardSummaryController extends AppController{
     
     function viewDischargeSummary(){
 
-        
+        $menuId = $this->getMenuId("/DischargeBoardSummary");
+                $moduleId = $this->getModuleId("social_rehabilitation");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+                //echo $moduleId;exit;
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         if($this->request->is(array('post','put'))){
             $data = $this->request->data;
              if(isset($this->request->data['DischargeBoardSummaryView']['id'])){

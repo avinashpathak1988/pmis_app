@@ -19,13 +19,13 @@
                 </div>
                 <div id="searchassignsearch" class="collapse <?php if($isEdit == 0){echo 'in';}?>" <?php if($isEdit == 1){?> style="height: 0px;" <?php }?>>
                     <div class="">
-                        <?php echo $this->Form->create('AssignSkill',array('class'=>'form-horizontal','enctype'=>'multipart/form-data'));?>
+                        <?php echo $this->Form->create('searchAssignSkill',array('class'=>'form-horizontal','enctype'=>'multipart/form-data'));?>
                         <div class="row-fluid"  style="padding-bottom: 14px;">
                             <div class="span6">
                                 <div class="control-group">
                                 <label class="control-label">Prisoner No:</label>
                                     <div class="controls">
-                                        <?php echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'id'=>'prisoner_id_search','class'=>'span11 pmis_select','type'=>'select','options'=>$prisonerlist,'empty'=>''));?>
+                                        <?php echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'id'=>'prisoner_id_search','class'=>'span11 pmis_select','type'=>'select','options'=>$prisonerlistSearch,'empty'=>''));?>
                                     </div>
                                    
                                 </div>
@@ -33,7 +33,7 @@
                             <div class="span6">
                                
                                 <div class="control-group">
-                                     <label class="control-label">Skill<?php echo $req; ?> :</label>
+                                     <label class="control-label">Skill:</label>
                                     <div class="controls">
                                         <?php echo $this->Form->input('assign_skill_id',array('div'=>false,'label'=>false,'id'=>'assign_skill_id_search','class'=>'span11 pmis_select','type'=>'select','options'=>$gradeslist,'empty'=>'', 'required'));?>
                                     </div>
@@ -42,7 +42,7 @@
                              <div class="clearfix"></div> 
                              <div class="span6">
                                 <div class="control-group">
-                                    <label class="control-label maxCurrentDate">Effective Date<?php echo $req; ?> :</label>
+                                    <label class="control-label maxCurrentDate">Effective Date :</label>
                                     <div class="controls">
                                         <?php $currentDate = date('d-m-Y');
                                         echo $this->Form->input('assignment_date',array('div'=>false,'label'=>false,'type'=>'text','id'=>'assignment_date_search','placeholder'=>'Enter Assignment/Prommotion date', 'data-date-format'=>"dd-mm-yyyy",
@@ -70,9 +70,9 @@
                             <div class="row-fluid  style="padding-bottom: 14px;">
                                 <div class="span6">
                                     <div class="control-group">
-                                    <label class="control-label">Prisoner No:</label>
+                                    <label class="control-label">Prisoner No:<?php echo $req; ?> </label>
                                         <div class="controls">
-                                            <?php echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','options'=>$prisonerlist,'empty'=>'','onchange'=>'getPrisonerGradelist(this.value);'));?>
+                                            <?php echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','options'=>$prisonerlist,'empty'=>'','onchange'=>'getPrisonerGradelist(this.value);', 'required'));?>
                                         </div>
                                        
                                     </div>
@@ -133,28 +133,28 @@ jQuery(function($) {
          });
     });
 
-function validateForm(){
-    var errcount = 0;
-    $('.validate').each(function(){
-        if($(this).val() == ''){
-            errcount++;
-            $(this).addClass('error-text');
-            $(this).removeClass('success-text'); 
-        }else{
-            $(this).removeClass('error-text');
-            $(this).addClass('success-text'); 
-        }        
-    });        
-    if(errcount == 0){            
-        if(confirm('Are you sure want to save?')){  
-            return true;            
-        }else{               
-            return false;           
-        }        
-    }else{   
-        return false;
-    }  
-}
+// function validateForm(){
+//     var errcount = 0;
+//     $('.validate').each(function(){
+//         if($(this).val() == ''){
+//             errcount++;
+//             $(this).addClass('error-text');
+//             $(this).removeClass('success-text'); 
+//         }else{
+//             $(this).removeClass('error-text');
+//             $(this).addClass('success-text'); 
+//         }        
+//     });        
+//     if(errcount == 0){            
+//         if(confirm('Are you sure want to save?')){  
+//             return true;            
+//         }else{               
+//             return false;           
+//         }        
+//     }else{   
+//         return false;
+//     }  
+// }
 
 </script>
 <?php
@@ -199,4 +199,29 @@ echo $this->Html->scriptBlock("
     }
 ",array('inline'=>false));
 ?>
+<script>
+	 $(function(){
+    $("#AssignSkillAssignSkillForm").validate({
+     
+      ignore: "",
+            rules: {  
+                'data[AssignSkill][prisoner_id]': {
+                    required: true,
+                },
+                'data[AssignSkill][assign_skill_id]': {
+                    required: true,
+                },
+           },
+            messages: {
+                'data[AssignSkill][prisoner_id]': {
+                    required: "This Field is Required.",
+                },
+                'data[AssignSkill][assign_skill_id]': {
+                    required: "This Field is Required.",
+                },
+            },
+               
+    });
+  });
+</script>
 

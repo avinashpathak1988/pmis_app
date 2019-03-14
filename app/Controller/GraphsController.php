@@ -5,6 +5,14 @@ class GraphsController extends AppController{
     public $layout='table';
     public $uses=array('User', 'Department', 'Designation', 'Usertype', 'State', 'District', 'Prison','Officer','MedicalDeathRecord','MedicalCheckupRecord','MedicalSickRecord');
     public function mortality() { 
+        $menuId = $this->getMenuId("/Graphs/mortality");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $prisonCondi = array();
         if($this->Session->read('Auth.User.prison_id')!=''){
             $prisonCondi = array("Prison.id"=>$this->Session->read('Auth.User.prison_id'));
@@ -53,6 +61,15 @@ class GraphsController extends AppController{
     }
 
     public function congestionLevel() { 
+        $menuId = $this->getMenuId("/Graphs/congestionLevel");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
         $prisonCondi = array();
         if($this->Session->read('Auth.User.prison_id')!=''){
             $prisonCondi = array("Prison.id"=>$this->Session->read('Auth.User.prison_id'));

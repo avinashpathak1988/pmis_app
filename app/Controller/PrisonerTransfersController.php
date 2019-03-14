@@ -102,7 +102,15 @@ class PrisonerTransfersController   extends AppController {
             $this->redirect(array('action'=>'../sites/dashboard'));
         }
     }
-    public function index(){        
+    public function index(){       
+        $menuId = $this->getMenuId("/prisonerTransfers");
+                $moduleId = $this->getModuleId("transfer");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                } 
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $usertype_id = $this->Session->read('Auth.User.usertype_id');
         $login_user_id = $this->Session->read('Auth.User.id');
@@ -297,6 +305,14 @@ class PrisonerTransfersController   extends AppController {
     
     function deleteTransfer()
     {
+         $menuId = $this->getMenuId("/prisonerTransfers");
+                $moduleId = $this->getModuleId("transfer");
+
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_delete');
+                if($isAccess != 1){
+                        echo "NA"; exit;
+                        
+                }
         $this->autoRender = false;
         if(isset($this->data['paramId'])){
             $transfer_id = $this->data['paramId'];
@@ -1194,6 +1210,20 @@ class PrisonerTransfersController   extends AppController {
 
     //functon for adding apply transfer request
     function add(){
+        $check ="is_add";
+        if($this->request->is(array('post','put'))){
+            if(isset($this->request->data['PrisonerTransfer']['id']) && $this->request->data['PrisonerTransfer']['id'] != ''){
+                $check ="is_edit";
+            }
+        }
+                $menuId = $this->getMenuId("/prisonerTransfers");
+                $moduleId = $this->getModuleId("transfer");
+                $isAccess = $this->isAccess($moduleId,$menuId,$check);
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $usertype_id = $this->Session->read('Auth.User.usertype_id');
         $login_user_id = $this->Session->read('Auth.User.id');
@@ -1346,13 +1376,15 @@ class PrisonerTransfersController   extends AppController {
                 'Prisoner.is_enable'      => 1,
                 'Prisoner.is_approve'      => 1,
                 'Prisoner.is_trash'       => 0,                
+                'Prisoner.is_death'       => 0,                
+                'Prisoner.present_status'       => 1,                
                 "Prisoner.transfer_status NOT IN ('".implode("','", $transferStatus['outgoing'])."')",                
             ),
             'order'         => array(
                 'Prisoner.prisoner_no',
             ),
         ));
-        //debug($prisonerList); exit;
+        // debug($prisonerList); exit;
         //get escorting officer list
         $escortingOfficerList = $this->EscortTeam->find('list', array(
             'recursive'     => -1,
@@ -1382,6 +1414,14 @@ class PrisonerTransfersController   extends AppController {
     }
 
     public function transferList(){  
+         $menuId = $this->getMenuId("/prisonerTransfers");
+                $moduleId = $this->getModuleId("transfer");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $usertype_id = $this->Session->read('Auth.User.usertype_id');
         $login_user_id = $this->Session->read('Auth.User.id');
@@ -1571,6 +1611,14 @@ class PrisonerTransfersController   extends AppController {
     }
 
     public function transferFinalList(){ 
+        $menuId = $this->getMenuId("/prisonerTransfers/transferFinalList");
+                $moduleId = $this->getModuleId("transfer");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }  
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $usertype_id = $this->Session->read('Auth.User.usertype_id');
         $login_user_id = $this->Session->read('Auth.User.id');
@@ -1682,7 +1730,7 @@ class PrisonerTransfersController   extends AppController {
         $status = '';
         $condition = array(            
             'PrisonerTransfer.is_trash' => 0,
-            'PrisonerTransfer.status' => "Approved",
+            // 'PrisonerTransfer.status' => "Approved",
         );
 
         if($this->Session->read('Auth.User.usertype_id')==Configure::read('RPCS_USERTYPE')){
@@ -1700,7 +1748,7 @@ class PrisonerTransfersController   extends AppController {
             ));
             if(isset($prisonList) && is_array($prisonList) && count($prisonList)>0){
                 $condition += array(            
-                    'PrisonerTransfer.transfer_from_station_id' => implode(",", $prisonList),
+                    'PrisonerTransfer.transfer_from_station_id IN ('.implode(",", $prisonList).')',
                     // 'PrisonerTransfer.regional_transfer' => 'within',
                 );
             }            
@@ -1774,7 +1822,7 @@ class PrisonerTransfersController   extends AppController {
         }else{
             $limit = array('limit'  => 20);
         }
-
+        // debug($condition);
         $this->paginate = array(
             "conditions"    => $condition,
         );
@@ -1790,7 +1838,15 @@ class PrisonerTransfersController   extends AppController {
         ));
     }
 
-    public function transferIncomingList(){        
+    public function transferIncomingList(){   
+    $menuId = $this->getMenuId("/prisonerTransfers/transferIncomingList");
+                $moduleId = $this->getModuleId("transfer");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }     
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $usertype_id = $this->Session->read('Auth.User.usertype_id');
         $login_user_id = $this->Session->read('Auth.User.id');
@@ -2360,9 +2416,11 @@ class PrisonerTransfersController   extends AppController {
         $this->Prisoner->recursive = 1;
         $prisonerData = $this->Prisoner->findById($prisoner_id);
         $prisonerCaseFileData = $this->PrisonerCaseFile->findByPrisonerId($prisoner_id);
+         $prisonerSentence = $this->PrisonerSentence->findByPrisonerId($prisoner_id);
         $this->set(array(
             'prisonerData'          => $prisonerData,
             'prisonerCaseFileData'  => $prisonerCaseFileData,
+            'prisonerSentence'      => $prisonerSentence,
         ));
     }
 
@@ -2536,6 +2594,14 @@ class PrisonerTransfersController   extends AppController {
 
     // listing for process the discharge module
     public function gatepassList(){
+         $menuId = $this->getMenuId("/PrisonerTransfers/gatepassList");
+                $moduleId = $this->getModuleId("escort_team");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -2625,7 +2691,7 @@ class PrisonerTransfersController   extends AppController {
         $this->layout   = 'ajax';
         $prisoner_id    = '';
         $status = '';
-        $condition              = array();
+        $condition = array();
         $this->loadModel('EscortTeam');
         $teamList = $this->EscortTeam->find('list', array(
             'recursive'     => -1,
@@ -2637,7 +2703,7 @@ class PrisonerTransfersController   extends AppController {
                 'EscortTeam.is_enable'    => 1,
                 'EscortTeam.is_trash'     => 0,
                 'EscortTeam.prison_id'    => $this->Auth->user('prison_id'),
-                'EscortTeam.escort_type'  => "Court",
+                'EscortTeam.escort_type'  => "Transfer",
             ),
             'order'         => array(
                 'EscortTeam.name'
@@ -2645,6 +2711,7 @@ class PrisonerTransfersController   extends AppController {
         ));
         $condition              = array(
             'PrisonerTransfer.discharge_status'      => 'Comm Approved',
+            'PrisonerTransfer.transfer_from_station_id'      => $this->Session->read('Auth.User.prison_id'),
             //'PrisonerTransfer.prison_id'      => $this->Session->read('Auth.User.prison_id'),
         );
         // if(isset($this->params['named']['status']) && $this->params['named']['status'] != ''){
@@ -2697,6 +2764,7 @@ class PrisonerTransfersController   extends AppController {
         }else{
             $limit = array('limit'  => 20);
         } 
+        // debug($condition);
 
         $this->paginate = array(
             'conditions'    => $condition,
@@ -2800,6 +2868,7 @@ class PrisonerTransfersController   extends AppController {
                     "Prisoner.is_trash"    => 0,
                     "Prisoner.is_enable"    => 1,
                     "Prisoner.present_status"    => 1,
+                    "Prisoner.is_death"    => 0,
                     "Prisoner.transfer_status NOT IN ('Draft','Approved')",  
                     'Prisoner.status'        => 'Approved',
                 ),

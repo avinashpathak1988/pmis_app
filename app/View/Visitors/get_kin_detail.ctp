@@ -51,8 +51,8 @@
                                     </button>
                                 </span> -->
                                 <span class="input-group-btn">
-                                    <button class="btn btn-danger btn-removes" type="button" style="padding: 8px 8px;margin-bottom: 13px;">
-                                        <span class="icon icon-minus"></span>
+                                    <button class="btn btn-success btn-addss" type="button" style="padding: 8px 8px;margin-bottom: 13px;">
+                                        <span class="icon icon-plus"></span>
                                     </button>
                                 </span>
                             <?php }

@@ -11,6 +11,15 @@ class OccurancesController extends AppController
 	//public $components = array();
     public $uses = array('Shift');
 	public function index() {
+         $menuId = $this->getMenuId("/Occurances/occurnce");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
 		$this->loadModel('Occurance');
         if(isset($this->data['OcuuranceDelete']['id']) && (int)$this->data['OcuuranceDelete']['id'] != 0){
             
@@ -219,17 +228,16 @@ class OccurancesController extends AppController
         $this->set(compact('show_data'));
     }
     ////////////////////////////////////////lockup ajax////////////////////////////////////////////////////////////
-    public function lockupReportAjax($id='',$shift_date=''){
+   public function lockupReportAjax()
+     {
         $this->layout = 'ajax';
-        $this->loadModel('PhysicalLockup');
-        $this->loadModel('SystemLockup');
-        $this->loadModel('LockupType');
         $from=date('Y-m-d');
         $datas=array();
-        if(isset($shift_date) && $shift_date != '')
+        if(isset($this->params['named']['from']) && $this->params['named']['from'] != '')
         {
-             $from=date('Y-m-d', strtotime($shift_date));
+             $from=date('Y-m-d', strtotime($this->params['named']['from']));
         }
+        $this->loadModel('LockupType');
         $lockupTypeList=$this->LockupType->find('all',array(
                         'recursive'     => -1,
                         'fields'        => array(
@@ -248,8 +256,10 @@ class OccurancesController extends AppController
         {
           $datas[$row['LockupType']['name']]=$this->getlockupReport($from,$row['LockupType']['id']);
         }
+        $this->loadModel('SystemLockup');
         $system_lockup = $this->SystemLockup->find("all", array(
             "conditions"    => array(
+                "SystemLockup.prison_id" => $this->Session->read('Auth.User.prison_id'),
                 "SystemLockup.lock_date" => $from,
                 "SystemLockup.is_trash" => 0,
             ),
@@ -257,11 +267,12 @@ class OccurancesController extends AppController
 
         $physical_lockup = $this->PhysicalLockup->find("all", array(
             "conditions"    => array(
+                "PhysicalLockup.prison_id" => $this->Session->read('Auth.User.prison_id'),
                 "PhysicalLockup.lock_date" => $from,
                 "PhysicalLockup.is_trash" => 0,
             ),
         ));
-
+        // debug($system_lockup);
         $finalLockupDataList = array();
         $prisonerTypeArray=array();
         if(isset($system_lockup) && is_array($system_lockup) && count($system_lockup)>0){
@@ -283,7 +294,7 @@ class OccurancesController extends AppController
         }
         //debug($datas);
         //$prisonerTypeArray[]=$physical_lockupvalue['PhysicalLockup']['prisoner_type_id'];
-        //debug($finalLockupDataList);
+        // debug($finalLockupDataList);
         //debug($finalLockupDataList);
         //debug($physical_lockup);
 
@@ -306,21 +317,137 @@ class OccurancesController extends AppController
             'totalPrisoner' => $totalPrisoner,
             'finalLockupDataList'=>$finalLockupDataList,
             'prisonerTypeArray'=>$prisonerTypeArray
-        ));
-    }
+        )); 
+     }
     public function getlockupReport($from,$locktype)
     {
         // echo "SELECT prisoner_types.name AS prisoner_type,SUM(no_of_male) AS males,SUM(no_of_female) AS female  FROM physical_lockups
         //   JOIN prisoner_types ON physical_lockups.prisoner_type_id=prisoner_types.id 
         //   WHERE lock_date='".$from."' AND lockup_type_id='".$locktype."'
         //    GROUP BY prisoner_types.name"; exit;
+        $this->loadModel('PhysicalLockup');
         return $this->PhysicalLockup->query("SELECT prisoner_types.name AS prisoner_type,SUM(no_of_male) AS males,SUM(no_of_female) AS female  FROM physical_lockups
           JOIN prisoner_types ON physical_lockups.prisoner_type_id=prisoner_types.id 
           WHERE lock_date='".$from."' AND lockup_type_id='".$locktype."'
            GROUP BY prisoner_types.name");
-    }
+      }
     public function occurnce() {
+         $menuId = $this->getMenuId("/Occurances/occurnce");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->loadModel('Occurance');
+        $this->set('funcall',$this);
+        $status = 'Saved'; 
+        $remark = '';
+        $condition = array();
+        if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE'))
+        {
+            $condition      += array('Occurance.status'=>'Draft');
+        }
+        else if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
+        {
+            $condition      += array('Occurance.status'=>'Draft');
+            // $condition      += array('DisciplinaryProceeding.status'=>'Saved');
+        }
+        else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+        {
+            $condition      += array('Occurance.status !='=>'Draft');
+            $condition      += array('Occurance.status !='=>'Draft');
+            $condition      += array('Occurance.status !='=>'Review-Rejected');
+            $condition      += array('Occurance.status'=>'Reviewed');
+        }   
+        if($this->request->is(array('post','put')))
+        {
+            if(isset($this->request->data['ApprovalProcess']) && count($this->request->data['ApprovalProcess']) > 0)
+            {
+                $status = 'Saved'; 
+                $remark = '';
+                if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+                {
+                    if(isset($this->request->data['ApprovalProcessForm']) && count($this->request->data['ApprovalProcessForm']) > 0)
+                    {
+                        $status = $this->request->data['ApprovalProcessForm']['type']; 
+                        $remark = $this->request->data['ApprovalProcessForm']['remark'];
+                    }
+                }
+                $items = $this->request->data['ApprovalProcess'];
+                $status = $this->setApprovalProcess($items, 'Occurance', $status, $remark);
+                if($status == 1)
+                {
+                    //notification on approval of Disciplinary proceeding list --START--
+                    if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE'))
+                    {
+                        $notification_msg = "Occurance for review.";
+                        $notifyUser = $this->User->find('first',array(
+                            'recursive'     => -1,
+                            'conditions'    => array(
+                                'User.usertype_id'    => Configure::read('PRINCIPALOFFICER_USERTYPE'),
+                                'User.is_trash'     => 0,
+                                'User.is_enable'     => 1,
+                                'User.prison_id'  => $this->Session->read('Auth.User.prison_id')
+                            )
+                        ));
+                        if(isset($notifyUser['User']['id']))
+                        {
+                            $this->addNotification(array( 
+                                "user_id"   => $notifyUser['User']['id'],
+                                "content"   => $notification_msg,
+                                "url_link"   => "Occurances/occurnce",
+                            )); 
+                        }
+                    }
+                    if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
+                    {
+                        $notification_msg = "occurnce prisoner are pending for approve";
+                        $notifyUser = $this->User->find('first',array(
+                            'recursive'     => -1,
+                            'conditions'    => array(
+                                'User.usertype_id'    => Configure::read('OFFICERINCHARGE_USERTYPE'),
+                                'User.is_trash'     => 0,
+                                'User.is_enable'     => 1,
+                                'User.prison_id'  => $this->Session->read('Auth.User.prison_id')
+                            )
+                        ));
+                        if(isset($notifyUser['User']['id']))
+                        {
+                            $this->addNotification(array(
+                                "user_id"   => $notifyUser['User']['id'],
+                                "content"   => $notification_msg,
+                                "url_link"   => "Occurances/occurnce",               
+                            ));
+                        }
+                    }
+                    //notification on approval of Disciplinary proceeding list --END--
+                    $this->Session->write('message_type','success');
+                    if(isset($this->request->data['ApprovalProcessForm']) && count($this->request->data['ApprovalProcessForm']) > 0)
+                    {
+                        
+                        if(isset($this->request->data['ApprovalProcessForm']['type']) && $this->request->data['ApprovalProcessForm']['type']=="Reviewed"){
+                            $this->Session->write('message','Reviewed Successfully !');}
+                        if(isset($this->request->data['ApprovalProcessForm']['type']) && ($this->request->data['ApprovalProcessForm']['type']=="Review-Rejected" || $this->request->data['ApprovalProcessForm']['type']=="Approve-Rejected")){
+                            $this->Session->write('message','Rejected Successfully !');
+                        }
+                        if(isset($this->request->data['ApprovalProcessForm']['type']) && $this->request->data['ApprovalProcessForm']['type']=="Approved"){
+                            $this->Session->write('message','Approved Successfully !');
+                        }
+                    }else{
+                        $this->Session->write('message','Forwarded Successfully !');
+                    }
+                }
+                else 
+                {
+                    $this->Session->write('message_type','error');
+                    $this->Session->write('message','saving failed');
+                }
+                $this->redirect('occurnce');
+            }
+        }
+
         $prisonCondi = array();
     	$gradeslist=$this->Occurance->find('list',array(
                     'recursive'     => -1,
@@ -372,7 +499,7 @@ class OccurancesController extends AppController
                         $this->addNotification(array(                        
                             "user_id"   => $notifyUser['User']['id'],                        
                             "content"   => $notification_msg,                        
-                            "url_link"   => "occurances",                    
+                            "url_link"   => "Occurances/occurnce",                    
                         )); 
                     }
                 }
@@ -411,11 +538,46 @@ class OccurancesController extends AppController
             ),
             'conditions'    => $prisonCondi,
         )); 
+        $default_status = '';
+        $statusList = '';
+        $statusInfo = $this->getApprovalStatusInfo();
+        if(is_array($statusInfo) && count($statusInfo) > 0)
+        {
+            $default_status = $statusInfo['default_status']; 
+            $statusList = $statusInfo['statusList'];
+        }
+
+       
+         if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
+        {
+            $default_status = "Draft";
+            // $condition      += array('DisciplinaryProceeding.status'=>'Saved');
+        }
+        else if($this->Session->read('Auth.User.usertype_id')==Configure::read('GATEKEEPER_USERTYPE'))
+        {
+            $default_status = "Draft";
+            // $condition      += array('DisciplinaryProceeding.status'=>'Saved');
+        }
+       
+         if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
+        {
+            $statusList = array("Draft"=>"Draft");
+            // $condition      += array('DisciplinaryProceeding.status'=>'Saved');
+        }
+        else if($this->Session->read('Auth.User.usertype_id')==Configure::read('GATEKEEPER_USERTYPE'))
+        {
+            $statusList = array("Draft"=>"Draft");
+            // $condition      += array('DisciplinaryProceeding.status'=>'Saved');
+        }
+       
+        // debug($statusList);exit;
 
       
           $this->set(compact('gradeslist'));
             $this->set(array(
                 'prisonListData' =>$prisonListData,
+                'sttusListData'     => $statusList,
+                'default_status'    => $default_status 
             ));
     }
     function occuranceApproval(){
@@ -441,6 +603,7 @@ class OccurancesController extends AppController
             $date = date('Y-m-d',strtotime($this->params['named']['date']));
             $condition += array("Occurance.date" => $date);
          } 
+
          // debug($condition);
       
           $this->paginate=array(

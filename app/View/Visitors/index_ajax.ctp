@@ -191,6 +191,11 @@ foreach($datas as $data){
           <?php
           }
       }
+          //debug($data);
+          $visitorItemCount = count($data['VisitorPrisonerItem']);
+          $cashCount = count($data['VisitorPrisonerCashItem']);
+          //echo $cashCount . ',' . $visitorItemCount;
+         // echo $visitorItemCount;
           ?>
       <td><?php echo $rowCnt; ?>&nbsp;</td>
       <td><?php echo $funcall->getVisitorName($data['Visitor']['id']); ?>&nbsp;</td>
@@ -200,7 +205,7 @@ foreach($datas as $data){
       <td><?php echo ucwords(h($data['Visitor']['reason'])); ?>&nbsp;</td>
       <td><?php //echo $data['Visitor']['prisoner_no'];
       echo $funcall->getName($data["Visitor"]["prison_id"],'Prison','name');  ?>&nbsp;</td>
-      <td><?php echo ($data['Visitor']['category']=='Visiting Prisoner') ? $funcall->getName($data["Visitor"]["name"],'Prisoner','fullname')."<br>(".$data['Visitor']['prisoner_no'].")": $data['Visitor']['to_whom'];  ?>&nbsp;</td>
+      <td><?php echo ($data['Visitor']['category']=='Private Visit') ? $funcall->getName($data["Visitor"]["name"],'Prisoner','fullname')."<br>(".$data['Visitor']['prisoner_no'].")": $data['Visitor']['to_whom'];  ?>&nbsp;</td>
       
       <td><?php echo ucwords(h($data['Visitor']['gate_keeper'])); ?>&nbsp;</td>                 
       <td><?php echo $data['Visitor']['time_in']; ?>&nbsp;</td>
@@ -346,10 +351,14 @@ foreach($datas as $data){
         if($allowUpdate == 0 || $this->Session->read('Auth.User.usertype_id')==Configure::read('GATEKEEPER_USERTYPE')  ) { ?>
                 <td>
                   <?php if($data['Visitor']['category'] == 'Private Visit') {?>
+                    <?php if($cashCount > 0 || $visitorItemCount >0 ){ ?>
+
                   <button type="button" class="btn btn-success btn-mini button-gap" data-toggle="modal" onclick="setRecieveForm('<?php echo $data['Visitor']['id']; ?>');" data-target="#recieveNow">
                   Recieve
                 </button><br/>
-                  <?php if(count($data['CanteenFoodItem']) == 0 && $data['Visitor']['main_gate_out_time'] == ''){?>
+                  <?php
+                      }
+                   if(count($data['CanteenFoodItem']) == 0 && $data['Visitor']['main_gate_out_time'] == ''){?>
                   <?php echo $this->Form->button('Canteen', array('type'=>'button', 'div'=>false, 'label'=>false, 'class'=>'btn btn-warning btn-mini', 'onclick'=>"javascript:addCanteenFood(".$data['Visitor']['id'].");"));
                  } 
                }?>

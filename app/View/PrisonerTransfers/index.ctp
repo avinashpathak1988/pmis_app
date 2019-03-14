@@ -175,7 +175,11 @@ echo $this->Html->scriptBlock("
                 $.post(url, {'paramId':paramId}, function(res) { 
                     if(res.trim() == 'SUCC'){
                         showData();
-                    }else{
+                    }else if(res.trim()=='NA'){
+                        alert('Not Authorised Delete');
+
+                    }
+                    else{
                         alert('Invalid request, please try again!');
                     }
                 });

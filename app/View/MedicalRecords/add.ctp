@@ -845,7 +845,7 @@ if($login_user_type_id == Configure::read('RECEPTIONIST_USERTYPE') && !empty($pr
                                     <div class="control-group">
                                         <label class="control-label">Lab Test :</label>
                                         <div class="controls">
-                                            <?php echo $this->Form->input('lab_test_search',array('div'=>false,'label'=>false,'type'=>'select','empty'=>'-- Select Lab Test --','options'=>$diseaseList, 'class'=>'form-control','required', 'id'=>'lab_test_search'));?>
+                                            <?php echo $this->Form->input('lab_test_search',array('div'=>false,'label'=>false,'type'=>'select','empty'=>'-- Select Lab Test --','options'=>$diseaseList, 'class'=>'form-control','required','multiple','id'=>'lab_test_search'));?>
                                             
                                         </div>
                                     </div>

@@ -11,6 +11,14 @@ class PhysicallockupsController   extends AppController {
 
     public function index()
     {
+    	$menuId = $this->getMenuId("/physicallockups");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         // debug($this->getTotalPrisonerAdmission(1, 1));exit;
         /**
          * code add the Physical Lockups 
@@ -122,6 +130,14 @@ class PhysicallockupsController   extends AppController {
             $this->request->data['SystemLockup']['total'] = $systemLockUpData['total'];
             // debug($this->request->data);
             // debug($this->request->data['PhysicalLockup']);exit;
+            $menuId = $this->getMenuId("/physicallockups");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
             $db = ConnectionManager::getDataSource('default');
             $db->begin();
             if($this->PhysicalLockup->save($this->data['PhysicalLockup']))
@@ -175,6 +191,14 @@ class PhysicallockupsController   extends AppController {
         /*
          *Code for edit the PhysicalLockup 
          */
+        $menuId = $this->getMenuId("/physicallockups");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         if(isset($this->data['PhysicalLockupEdit']['id']) && (int)$this->data['PhysicalLockupEdit']['id'] != 0){
           $isEdit = 1;
             if($this->PhysicalLockup->exists($this->data['PhysicalLockupEdit']['id'])){
@@ -348,6 +372,14 @@ class PhysicallockupsController   extends AppController {
     }
     public function delete($id=''){
       // $this->PhysicalLockup->id=$id;
+    	$menuId = $this->getMenuId("/physicallockups");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_delete');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $db = ConnectionManager::getDataSource('default');
         $db->begin();
         if($this->PhysicalLockup->updateAll(

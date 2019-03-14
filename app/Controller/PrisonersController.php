@@ -1630,6 +1630,17 @@ class PrisonersController extends AppController{
     }
     public function add($ex_prisoner_unique_no='')
     {
+        $menuId = $this->getMenuId("/prisoners");
+        $moduleId = $this->getModuleId("prisoner_admission");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
         if($this->Session->read('Auth.User.usertype_id')!=Configure::read('OFFICERINCHARGE_USERTYPE') && $this->Session->read('Auth.User.usertype_id')!=Configure::read('RECEPTIONIST_USERTYPE'))
         {
             $this->Session->write('message_type','error');
@@ -2295,6 +2306,18 @@ class PrisonersController extends AppController{
     //check if prisoner is eligible for petition -- END --
     public function edit($id, $from_court_id='')
     {
+
+        $menuId = $this->getMenuId("/prisoners");
+        $moduleId = $this->getModuleId("prisoner_admission");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
         $to_court = '';
         $editSentenceCountData  = '';
         $sectionOfLawList2      = '';
@@ -8904,6 +8927,18 @@ class PrisonersController extends AppController{
     //Prisoner detail view START 
     public function details($uuid)
     {
+
+        $menuId = $this->getMenuId("/prisoners");
+        $moduleId = $this->getModuleId("prisoner_admission");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
         if($uuid){
             if(!in_array($this->Session->read('Auth.User.usertype_id'), array(Configure::read('RECEPTIONIST_USERTYPE'), Configure::read('PRINCIPALOFFICER_USERTYPE'), Configure::read('OFFICERINCHARGE_USERTYPE'), Configure::read('GATEKEEPER_USERTYPE'))))
             {
@@ -11657,6 +11692,16 @@ class PrisonersController extends AppController{
     }
 
     function archivelistview($prisoner_type=''){
+        $menuId = $this->getMenuId("/prisoners/archivelistview");
+        $moduleId = $this->getModuleId("station");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prisonerTypeList = $this->PrisonerType->find("list", array(
             "condition"     => array(
                 "PrisonerType.is_enable"    => 1,
@@ -11992,6 +12037,16 @@ class PrisonersController extends AppController{
     }
     //escaped prisoner list
     function escapedPrisoners($prisoner_type=''){
+        $menuId = $this->getMenuId("/prisoners/escapedPrisoners");
+        $moduleId = $this->getModuleId("station");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prisonerTypeList = $this->PrisonerType->find("list", array(
             "condition"     => array(
                 "PrisonerType.is_enable"    => 1,
@@ -13851,4 +13906,47 @@ class PrisonersController extends AppController{
         }
     }
     //Commit Appeal -- END -- 
+    //get prisoner previous personal details -- START --
+    function prevPersonalDetails($uuid)
+    {
+        //check prisoner uuid
+        if(!empty($uuid))
+        {
+            //check prisoner existance
+            $prisonerdata = $this->Prisoner->find('first', array(
+                'recursive'     => -1,
+                'conditions'    => array(
+                    'Prisoner.uuid' => $uuid,
+                ),
+            ));
+            //check prisoner existance 
+            if(isset($prisonerdata['Prisoner']['id']) && ($prisonerdata['Prisoner']['id'] != ''))
+            {
+                $prisoner_id = $prisonerdata['Prisoner']['id'];
+                $personal_no = $prisonerdata['Prisoner']['personal_no'];
+                //get previous personal details of prisoner 
+                $data = $this->getPreviouspersonaldetails($personal_no, $prisoner_id);
+                //debug($data); exit;
+
+                $this->set(
+                    array(
+                        'data'          => $data,
+                        'uuid'          => $uuid
+                    )
+                );
+            }
+            else 
+            {
+                return $this->redirect(array('action' => 'index'));
+            }
+        }
+        else 
+        {
+            return $this->redirect(array('action' => 'index'));
+        }
+        $this->set(array(
+            'prison_name'         => $prison_name,  
+        ));
+    }
+    //get prisoner previous personal details -- END --
 }

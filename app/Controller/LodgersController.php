@@ -6,6 +6,14 @@ class LodgersController extends AppController {
 
     // listing for process the Lodger module
     public function index(){
+        $menuId = $this->getMenuId("/Lodgers");
+                $moduleId = $this->getModuleId("lodger");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }  
         // echo $this->getPrisonerNo(2,5);exit;
         $this->set('funcall',$this);
         $status = 'Saved'; 
@@ -235,6 +243,15 @@ class LodgersController extends AppController {
 
     // listing for process the Lodger module
     public function lodgerOut(){
+         $menuId = $this->getMenuId("/Lodgers/lodgerOut");
+                $moduleId = $this->getModuleId("lodger");
+                //debug($menuId);exit;
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                } 
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -561,6 +578,14 @@ class LodgersController extends AppController {
     }
 
     public function add() {
+         $menuId = $this->getMenuId("/Lodgers/add");
+                $moduleId = $this->getModuleId("lodger");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->loadModel('PhysicalProperty');
         
         if(isset($this->data['Lodger']) && is_array($this->data['Lodger']) && count($this->data['Lodger'])>0){
@@ -569,6 +594,14 @@ class LodgersController extends AppController {
             $this->request->data['Lodger']['in_date'] = date("Y-m-d H:i:s", strtotime($this->request->data['Lodger']['in_date']));
             $this->request->data['Lodger']['escape_date'] = date("Y-m-d H:i:s", strtotime($this->request->data['Lodger']['escape_date']));
             $this->request->data['Lodger']['recapture_date'] = date("Y-m-d", strtotime($this->request->data['Lodger']['recapture_date']));
+            // debug($this->request->data['LodgerPrisonerCashItem']);exit;
+            if($this->request->data['LodgerPrisonerCashItem'][0]['pp_amount']==''){
+                unset($this->request->data['LodgerPrisonerCashItem']);
+            }
+            if($this->request->data['LodgerPrisonerItem'][0]['quantity']==''){
+                unset($this->request->data['LodgerPrisonerItem']);
+            }
+            // debug($this->request->data);exit;
             if ($this->Lodger->saveAll($this->request->data)) {
                 // echo "111111111";exit;
                 $this->Session->write('message_type','success');
@@ -1449,6 +1482,14 @@ class LodgersController extends AppController {
 
     // listing for process the discharge module
     public function gatepassList(){
+        $menuId = $this->getMenuId("/Lodgers/gatepassList");
+                $moduleId = $this->getModuleId("lodger");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }  
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -1871,8 +1912,8 @@ class LodgersController extends AppController {
     }
 
     public function escapedPrisonerAjax(){
-         $this->layout   = 'ajax';
-         $data = $this->Discharge->find('first', array(
+        $this->layout   = 'ajax';
+        $data = $this->Discharge->find('first', array(
            
             'conditions'=>array(
                 'Discharge.prisoner_id'         => $this->data['prisoner_id'],

@@ -83,7 +83,7 @@ array('escape'=>false,'class'=>'btn btn-success btn-mini'));
               
                     <div class="form-actions" align="center">
                         <?php echo $this->Form->button('Search', array('type'=>'button','class'=>'btn btn-success','div'=>false,'label'=>false,'onclick'=>'javascript:showData();'))?>
-                        <?php echo $this->Form->button('Reset', array('type'=>'reset', 'class'=>'btn btn-warning', 'div'=>false, 'label'=>false,'onclick'=>'javascript:resetForm();'))?>
+                         <?php echo $this->Form->input('Reset', array('type'=>'button', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger', 'onclick'=>"resetData()"))?>
                     </div>
                     <?php echo $this->Form->end();?> 
                     <div class="table-responsive" id="listingDiv">
@@ -119,8 +119,9 @@ echo $this->Html->scriptBlock("
         });    
     }
 
-    function resetForm()
+    function resetData()
     {
+        // alert(1);
         $('#shift_id').val('');
         $('#force_id').val('');
         $('#s2id_shift_id span').html(' -- Select Shift --');

@@ -332,6 +332,7 @@ class EarningRatesController   extends AppController {
                 {
                     $this->request->data['EarningGradePrisoner']['status'] = 'Draft';
                 }
+                //debug($this->request->data); exit;
                 $db = ConnectionManager::getDataSource('default');
                 $db->begin();  
                 if($this->EarningGradePrisoner->save($this->data))
@@ -438,7 +439,10 @@ class EarningRatesController   extends AppController {
            //      'Prisoner.earning_rate_id !='   =>  0,
            //      'Prisoner.prison_id'       => $prison_id
            //  );
-           if ($this->Session->read('Auth.User.prison_id')!='') {
+            // echo $this->Session->read('Auth.User.prison_id'); exit;
+           if ($this->Session->read('Auth.User.prison_id')!='') 
+           {
+
               
            
            // $prisonerlist = $this->Prisoner->find('list', array(
@@ -454,18 +458,18 @@ class EarningRatesController   extends AppController {
            //          'Prisoner.prisoner_no'
            //      ),
            //  ));
+            $prisonerlist = array();
             $prisonerCondition = array(
                 'Prisoner.is_enable'      => 1,
                 'Prisoner.is_trash'       => 0,
                 'Prisoner.present_status' => 1,
                 'Prisoner.is_death'       => 0,
                 'Prisoner.transfer_id'    => 0,
-                //'Prisoner.earning_grade_id !='   =>  0,
-                //'Prisoner.earning_rate_id !='   =>  0,
                 'Prisoner.prison_id'=> $prison_id,
-                'StagesAssign.id NOT IN ' => array(1,3)//stage I AND II
-                // 'AssignSkill.prisoner_id' => 
+                'StageHistory.stage_id NOT IN ' => array(1,2)//stage I AND II
             );
+            // debug($prisonerCondition); exit;
+
             //check skilled prisoners -- START -- 
             $this->loadModel('AssignSkill');
             $skillList = $this->AssignSkill->find('list', array(
@@ -501,39 +505,40 @@ class EarningRatesController   extends AppController {
             {
                 $skillPrisoners = implode(',',$skillList);
                 $prisonerCondition += array("Prisoner.id in (".$skillPrisoners.")");
+
+                //check skilled prisoners -- END -- 
+                $prisonerlist=$this->Prisoner->find('list',array(
+                        'recursive'     => -1,
+                        'fields'        => array(
+                            'Prisoner.id',
+                            'Prisoner.prisoner_no',
+                        ),
+                        "joins" => array(
+                            array(
+                                "table" => "stage_histories",
+                                "alias" => "StageHistory",
+                                "type" => "LEFT",
+                                "conditions" => array(
+                                "Prisoner.id= StageHistory.prisoner_id"
+                                )
+                                
+                            ),
+                            array(
+                                "table" => "assign_skills",
+                                "alias" => "AssignSkill",
+                                "type" => "right",
+                                "conditions" => array(
+                                "Prisoner.id= AssignSkill.prisoner_id"
+                                )
+                            )
+                        ),
+                        'conditions'    => $prisonerCondition,
+                        'order'=>array(
+                            'Prisoner.prisoner_no'
+                        )
+                    )); 
             }
             
-            //check skilled prisoners -- END -- 
-            $prisonerlist=$this->Prisoner->find('list',array(
-                    'recursive'     => -1,
-                    'fields'        => array(
-                        'Prisoner.id',
-                        'Prisoner.prisoner_no',
-                    ),
-                    "joins" => array(
-                        array(
-                            "table" => "stage_assigns",
-                            "alias" => "StagesAssign",
-                            "type" => "LEFT",
-                            "conditions" => array(
-                            "Prisoner.id= StagesAssign.prisoner_id"
-                            )
-                            
-                        ),
-                        array(
-                            "table" => "assign_skills",
-                            "alias" => "AssignSkill",
-                            "type" => "right",
-                            "conditions" => array(
-                            "Prisoner.id= AssignSkill.prisoner_id"
-                            )
-                        )
-                    ),
-                    'conditions'    => $prisonerCondition,
-                    'order'=>array(
-                        'Prisoner.prisoner_no'
-                    )
-                )); 
 
 
          }else{
@@ -711,17 +716,19 @@ class EarningRatesController   extends AppController {
             {
                 $status = 'Saved'; 
                 $remark = '';
-                if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') || ($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE')))
+                if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE'))
                 {
+                    $status = 'Approved'; 
                     if(isset($this->request->data['ApprovalProcessForm']) && count($this->request->data['ApprovalProcessForm']) > 0)
                     {
                         $status = $this->request->data['ApprovalProcessForm']['type']; 
                         $remark = $this->request->data['ApprovalProcessForm']['remark'];
                     }
                 }
+                //debug($status); exit;
                 $items = $this->request->data['ApprovalProcess'];
-                $status = $this->setApprovalProcess($items, 'EarningGradePrisoner', $status, $remark);
-                if($status == 1)
+                $approve_status = $this->setApprovalProcess($items, 'EarningGradePrisoner', $status, $remark);
+                if($approve_status == 1)
                 {
                     //notification on approval of payment list --START--
                     if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
@@ -768,19 +775,19 @@ class EarningRatesController   extends AppController {
         $status = ''; $date_from = ''; $date_to = '';
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $condition      = array(
-            'EarningGradePrisoner.prison_id'        => $prison_id,
+            'EarningGradePrisoner.grade_id'        => 1
         );
         $default_status = ''; $approvalStatusList = '';
-         debug($this->params['named']);
+         
         
-         if(isset($this->params['named']['date_from']) && $this->params['named']['date_from'] != ''){
-            $start_date = $this->params['named']['date_from'];
-            $condition += array("EarningGradePrisoner.created" => $start_date);
-         } 
-         if(isset($this->params['named']['date_to']) && $this->params['named']['date_to'] != ''){
-            $enddate = $this->params['named']['date_to'];
-            $condition += array("EarningGradePrisoner.modified"=> $enddate);
-         } 
+         // if(isset($this->params['named']['date_from']) && $this->params['named']['date_from'] != ''){
+         //    $start_date = $this->params['named']['date_from'];
+         //    $condition += array("EarningGradePrisoner.created" => $start_date);
+         // } 
+         // if(isset($this->params['named']['date_to']) && $this->params['named']['date_to'] != ''){
+         //    $enddate = $this->params['named']['date_to'];
+         //    $condition += array("EarningGradePrisoner.modified"=> $enddate);
+         // } 
         
         $statusInfo = $this->getApprovalStatusInfo();
         if(is_array($statusInfo) && count($statusInfo) > 0)
@@ -793,13 +800,37 @@ class EarningRatesController   extends AppController {
         {
             $condition      += array('EarningGradePrisoner.status !='=>'Draft');
         }
+        else 
+        {
+            $condition      += array(
+                'EarningGradePrisoner.prison_id'        => $prison_id
+            );
+        }
         //debug($this->params);
+        // debug($this->params['data']['date_from']);
+
+        // if(isset($this->params['data']['status']) && $this->params['data']['status'] != '' && $this->params['data']['status'] != '0')
+        // { 
+        //     $status = $this->params['data']['status'];
+        //     $condition      += array('EarningGradePrisoner.status'=>$status);
+        // }
+
+         if(isset($this->params['data']['date_from']) && $this->params['data']['date_from'] != '' && $this->params['data']['date_from'] != '0')
+        { 
+            $date = date('Y-m-d',strtotime($this->params['data']['date_from']));
+            $condition      += array('EarningGradePrisoner.assignment_date'=>$date);
+        }
+         if(isset($this->params['data']['date_to']) && $this->params['data']['date_to'] != '' && $this->params['data']['date_to'] != '0')
+        { 
+            $date_to = date('Y-m-d',strtotime($this->params['data']['date_to']));
+            $condition      += array('EarningGradePrisoner.assignment_date'=>$date_to);
+        }
         if(isset($this->params['data']['status']) && $this->params['data']['status'] != '' && $this->params['data']['status'] != '0')
         { 
             $status = $this->params['data']['status'];
             $condition      += array('EarningGradePrisoner.status'=>$status);
         }
-       
+       //debug($condition);
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='XLS'){
                 $this->layout='export_xls';
@@ -821,8 +852,7 @@ class EarningRatesController   extends AppController {
         }else{
             $limit = array('limit'  => 20);
         }             
-       
-        debug($condition);          
+                 
         $this->paginate = array(
             'conditions'    => $condition,
             'order'         => array(
@@ -830,7 +860,7 @@ class EarningRatesController   extends AppController {
             ),
         )+$limit;
         $datas = $this->paginate('EarningGradePrisoner');
-
+        //debug($condition);
         $this->set(array(
             'datas'         => $datas, 
             'prison_id'=>$prison_id,

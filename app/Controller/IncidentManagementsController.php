@@ -3,6 +3,14 @@ App::uses('AppController', 'Controller');
 class IncidentManagementsController extends AppController {
 	public $layout='table';
 	public function index() {
+         $menuId = $this->getMenuId("/IncidentManagements");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$this->loadModel('Prisoner'); 
         $this->loadModel('IncidentManagement');
          if(isset($this->data['IncidentManagementDelete']['id']) && (int)$this->data['IncidentManagementDelete']['id'] != 0){
@@ -188,6 +196,14 @@ class IncidentManagementsController extends AppController {
         )); 
     }
 	public function add() { 
+        $menuId = $this->getMenuId("/IncidentManagements");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$this->loadModel("IncidentManagement"); 
 		$this->loadModel('Ward');
         $prison_id = $this->Session->read('Auth.User.prison_id');

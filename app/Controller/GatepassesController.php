@@ -255,7 +255,7 @@ class GatepassesController    extends AppController {
     }
 
     // listing for process the discharge module
-    public function gatepassList(){
+    public function gatepassList() {
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -335,9 +335,9 @@ class GatepassesController    extends AppController {
                 'Prisoner.id',
                 'Prisoner.prisoner_no',
             ),
-            'conditions'    => array(
-                'Gatepass.prison_id IN ('.$this->Session->read('Auth.User.prison_id').')',
-            ),
+            // 'conditions'    => array(
+            //     'Gatepass.prison_id IN ('.$this->Session->read('Auth.User.prison_id').')',
+            // ),
         ));
 
         $default_status = '';
@@ -373,8 +373,9 @@ class GatepassesController    extends AppController {
         $searchData = $this->params['named'];
         $condition              = array(
             'Gatepass.is_trash'      => 0,
+            'Gatepass.approval_status'      => "Approved",
             'date(Gatepass.created)'      => date("Y-m-d"),
-            'Gatepass.prison_id IN ('.$this->Session->read('Auth.User.prison_id').')',
+            // 'Gatepass.prison_id IN ('.$this->Session->read('Auth.User.prison_id').')',
         );
         if(isset($this->params['named']['status']) && $this->params['named']['status'] != ''){
             $status = $this->params['named']['status'];
@@ -461,11 +462,12 @@ class GatepassesController    extends AppController {
         // debug($condition);
         $this->paginate = array(
             'conditions'    => $condition,
-            'order'         => array(
-                'Gatepass.modified'  => 'DESC',
-            ),
+            // 'order'         => array(
+            //     'Gatepass.modified'  => 'DESC',
+            // ),
         )+$limit;
         $datas = $this->paginate('Gatepass');
+        
         $this->set(array(
             'datas'         => $datas,
             'searchData'    => $searchData,
@@ -1197,5 +1199,16 @@ class GatepassesController    extends AppController {
             'datas'         => $datas,
             'searchData'    => $searchData,
         ));
+    }
+
+    public function updatePhysicalProperty(){
+        $this->loadModel('Gatepass');
+        debug($this->data);exit;
+        if($this->Gatepass->saveAll($this->data)){
+            echo "SUCC";
+        }else{
+            echo "FAIL";
+        }
+        exit;
     }
 }

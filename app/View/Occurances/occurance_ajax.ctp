@@ -10,8 +10,8 @@ if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_
 }
 else if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
 {
-  $btnName = Configure::read('REVIEW');
-  $isModal = 1;
+  $btnName = Configure::read('SAVE');
+  // $isModal = 1;
 }
 else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
 {
@@ -26,7 +26,7 @@ echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal',
 <?php if($isModal == 1)
 {?>
   <!-- Verify Modal START -->
-  <?php echo $this->element('verify-modal');?>                       
+  <?php echo $this->element('occurance_verify_modal');?>                       
   <!-- Verify Modal END -->
 <?php }?>
 
@@ -128,14 +128,21 @@ foreach($datas as $data){
                         'format' => array('before', 'input', 'between', 'label', 'after', 'error' ) 
                   ));
               }
-              else if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE') && ($data[$modelName]['status'] == 'Saved'))
+              else if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE') && ($data[$modelName]['status'] == 'Draft'))
               {
                 echo $this->Form->input('ApprovalProcess.'.$rowCnt.'.fid', array(
                         'type'=>'checkbox', 'value'=>$id,'hiddenField' => false, 'label'=>false,
                         'format' => array('before', 'input', 'between', 'label', 'after', 'error' ) 
                   ));
               }
-              else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') && ($data[$modelName]['status'] == 'Reviewed'))
+                else if($this->Session->read('Auth.User.usertype_id')==Configure::read('GATEKEEPER_USERTYPE') && ($data[$modelName]['status'] == 'Draft'))
+              {
+                echo $this->Form->input('ApprovalProcess.'.$rowCnt.'.fid', array(
+                        'type'=>'checkbox', 'value'=>$id,'hiddenField' => false, 'label'=>false,
+                        'format' => array('before', 'input', 'between', 'label', 'after', 'error' ) 
+                  ));
+              }
+              else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE') && ($data[$modelName]['status'] == 'Saved'))
               {
                 echo $this->Form->input('ApprovalProcess.'.$rowCnt.'.fid', array(
                         'type'=>'checkbox', 'value'=>$id,'hiddenField' => false, 'label'=>false,

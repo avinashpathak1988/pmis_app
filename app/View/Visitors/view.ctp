@@ -21,7 +21,7 @@
                 </div>
                 <div class="widget-content nopadding">
                         <div class="row-fluid">
-                           <!--  <?php debug($visitorList); ?> -->
+                            
                                 <div class="row-fluid">
                                     <div class="span12">
                                         <table class="table detail table-bordered table-responsive" style="width:100%;">
@@ -57,12 +57,10 @@
                                                     <th style="border: 1px solid;">Address</th>
                                                     <th style="border: 1px solid;">Contact No</th>
                                                     <th style="border: 1px solid;">Cash Details</th>
-                                                    <th style="border: 1px solid;">PP Cash</th>
-                                                    <th style="border: 1px solid;">PP Amount</th>
                                                     <th style="border: 1px solid;">Personal Property</th>
                                                     <th style="border: 1px solid;">To Whom To Meet</th>
-                                                    <th style="border: 1px solid;">Prisoner No</th>
-                                                    <th style="border: 1px solid;">Prisoner Name</th>
+                                                    <!-- <th style="border: 1px solid;">Prisoner No</th>
+                                                    <th style="border: 1px solid;">Prisoner Name</th> -->
 
 
 
@@ -74,30 +72,31 @@
                                                     <td style="border: 1px solid;"><?php echo  $visitorList[0]["Visitor"]['address'];?></td>
                                                     <td style="border: 1px solid;"><?php echo  $visitorList[0]["Visitor"]['contact_no'];?></td>
                                                     <td style="border: 1px solid;"><?php echo  $visitorList[0]["Visitor"]['cash_details'];?></td>
-                                                    <td style="border: 1px solid;"><?php if($visitorList[0]["Visitor"]['pp_cash'] !=''){ ?>
+                                                    <!-- <td style="border: 1px solid;"><?php if($visitorList[0]["Visitor"]['pp_cash'] !=''){ ?>
                                                     <?php echo  $funcall->getPPCashName($visitorList[0]["Visitor"]['pp_cash']);?>
                                                     <?php } ?>
                                                     </td>
                                                     <td style="border: 1px solid;"><?php if($visitorList[0]["Visitor"]['pp_amount'] !=''){ ?>
                                                     <?php echo  $visitorList[0]["Visitor"]['pp_amount'];?>
                                                     <?php } ?>
-                                                    </td>
+                                                    </td> -->
                                                     <td style="border: 1px solid;"><?php if($visitorList[0]["Visitor"]['Personal_property'] !=''){ ?>
                                                     <?php echo  $visitorList[0]["Visitor"]['Personal_property'];?>
                                                     <?php } ?>
                                                     </td>
-                                                    <td style="border: 1px solid;"><?php if( $visitorList[0]["Visitor"]['to_whom'] != ''){ ?>
-                                                    <?php echo  $visitorList[0]["Visitor"]['to_whom'];?>
-                                                    <?php } ?>
+                                                    <td style="border: 1px solid;">
+                                                    <?php echo ($visitorList[0]["Visitor"]['category']=='Private Visit') ?$visitorList[0]["Visitor"]['prisoner_no']: $visitorList[0]["Visitor"]['to_whom'];
+
+                                                    ?>
                                                     </td>
-                                                    <td style="border: 1px solid;"><?php if($visitorList[0]["Visitor"]['prisoner_no'] !=''){ ?>
+                                                    <!-- <td style="border: 1px solid;"><?php if($visitorList[0]["Visitor"]['prisoner_no'] !=''){ ?>
                                                     <?php echo  $visitorList[0]["Visitor"]['prisoner_no'];?>
                                                     <?php } ?>
                                                     </td>
                                                     <td style="border: 1px solid;"><?php if($visitorList[0]["Visitor"]['name'] !=''){ ?>
                                                     <?php echo  $funcall->getPrisonerName($visitorList[0]["Visitor"]['name']);?>
                                                     <?php } ?>
-                                                    </td>
+                                                    </td> -->
                                                 </tr>
 
                                             </tbody>
@@ -141,6 +140,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                <!--  <?php debug($visitorList) ?> -->
                                                 <?php foreach($visitorList[0]['VisitorItem'] as $item){
                                                 	?>
                                                     <tr>
@@ -157,7 +157,9 @@
                                         </table>
                                     </div>
                                 </div>
-                            <?php } ?>
+                            <?php }else{ ?>
+                                <div style="margin-left: 20px;">NA</div>
+                           <?php }?>
 
                             <div class="row-fluid">
                                 <div class="span12 heading">
@@ -176,20 +178,16 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                               
                                                 <?php foreach($visitorList[0]['VisitorPrisonerItem'] as $item){
                                                     ?>
 
                                                     <tr>
-                                                        <?php 
-                                                        $itemName = '';
-                                                        foreach($propertyItemList as $propertyitem){
-                                                        
-                                                          if($item['item_type'] == $propertyitem['Propertyitem']['id']){
-                                                            $itemName=$propertyitem['Propertyitem']['name'] ;
-                                                            break;
-                                                          }  
+                                                        <?php
+                                                            $itemName=$item['Item']['name'] ;
+
                                                     
-                                                    }?>
+                                                    ?>
                                                         <td style="border: 1px solid;"><?php echo $itemName?></td>
                                                         <td style="border: 1px solid;"><?php echo $item['quantity'];?></td>
                                                         <?php if($item['quantity'] != ''){ ?>
@@ -208,7 +206,9 @@
                                         </table>
                                     </div>
                                 </div>
-                            <?php } ?>
+                            <?php }else{ ?>
+                                <div style="margin-left: 20px;">NA</div>
+                           <?php }?>
 
                             <div class="row-fluid">
                                 <div class="span12 heading">
@@ -228,7 +228,9 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php foreach($visitorList[0]['VisitorPrisonerCashItem'] as $item){
+                                                <?php if(count($visitorList[0]['VisitorPrisonerCashItem']) > 0){
+
+                                                 foreach($visitorList[0]['VisitorPrisonerCashItem'] as $item){
                                                     ?>
 
                                                     <tr>
@@ -248,13 +250,24 @@
                                                        <?php } ?>
 
                                                     </tr>
-                                                <?php }?>
+                                                <?php }
+                                                    }else{ ?>
+
+                                                    <tr>
+                                                        <td>NA</td>
+                                                        <td>NA</td>
+                                                        <td>NA</td>
+                                                        <td>NA</td>
+                                                    </tr>
+                                                 <?php   }
+                                                ?>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
-                            <?php } ?>
-
+                            <?php }else{ ?>
+                                <div style="margin-left: 20px;">NA</div>
+                           <?php }?>
 
                             <div class="row-fluid">
                                 <div class="span12 heading">
@@ -287,7 +300,9 @@
                                         </table>
                                     </div>
                                 </div>
-                            <?php } ?>
+                            <?php }else{ ?>
+                                <div style="margin-left: 20px;">NA</div>
+                           <?php }?>
 
 
                             <div class="row-fluid">
@@ -324,7 +339,12 @@
                                                         <td style="border: 1px solid;">
                                                             
                                                         <?php
+                                                        if($visitor["photo"] != null){
+                                                            
                                                         echo $this->Html->image('../files/visitors/'.$visitor["photo"], array('escape'=>false, 'class'=>'img', 'alt'=>'visitor photo','style'=>'width: 100px;'));
+                                                        }else{
+                                                            echo 'N/A';
+                                                        }
                                                         ?>
                                                         </td>
                                                         <td style="border: 1px solid;"><?php echo $visitor['nat_id'];?></td>

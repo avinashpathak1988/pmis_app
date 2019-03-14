@@ -985,6 +985,14 @@ class InPrisonOffenceCaptureController   extends AppController {
     /////////////////////////////////////////////confinement in cell////////////////////////////////////////////
 
     public function punishmentConfineList(){
+    	$menuId = $this->getMenuId("/InPrisonOffenceCapture/punishmentConfineList");
+                $moduleId = $this->getModuleId("discipline");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -1117,6 +1125,14 @@ class InPrisonOffenceCaptureController   extends AppController {
     }
 
     public function approveConfineList(){
+    	$menuId = $this->getMenuId("/InPrisonOffenceCapture/approveConfineList");
+                $moduleId = $this->getModuleId("discipline");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $this->loadModel('InPrisonPunishmentConfinement');
         $status = 'Saved'; 
@@ -1413,6 +1429,14 @@ class InPrisonOffenceCaptureController   extends AppController {
 
 
     public function punishmentList(){
+        $menuId = $this->getMenuId("/InPrisonOffenceCapture/punishmentList");
+                $moduleId = $this->getModuleId("discipline");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -2037,6 +2061,14 @@ class InPrisonOffenceCaptureController   extends AppController {
     }
 
     public function disciplinaryProceedingList(){
+    	 $menuId = $this->getMenuId("/InPrisonOffenceCapture/disciplinaryProceedingList");
+                $moduleId = $this->getModuleId("discipline");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -2262,6 +2294,15 @@ class InPrisonOffenceCaptureController   extends AppController {
      */
 
     public function punishmentWardDocket(){
+    	$menuId = $this->getMenuId("/InPrisonOffenceCapture/punishmentWardDocket");
+                $moduleId = $this->getModuleId("discipline");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -2353,6 +2394,14 @@ class InPrisonOffenceCaptureController   extends AppController {
      * [FR-152] Punishment Book
      */
     public function punishmentBook(){
+    	$menuId = $this->getMenuId("/InPrisonOffenceCapture/punishmentBook");
+                $moduleId = $this->getModuleId("discipline");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -2443,6 +2492,14 @@ class InPrisonOffenceCaptureController   extends AppController {
      * 
      */
     public function prisonerReport(){
+    	$menuId = $this->getMenuId("/InPrisonOffenceCapture/prisonerReport");
+                $moduleId = $this->getModuleId("discipline");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';

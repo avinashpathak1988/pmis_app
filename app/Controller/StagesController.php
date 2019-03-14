@@ -10,6 +10,15 @@ class StagesController  extends AppController {
 
     public function stageReinstatementList()
     {
+    	$menuId = $this->getMenuId("/Stages/stageReinstatementList");
+                $moduleId = $this->getModuleId("stage");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
         $this->set('funcall',$this);
         if($this->request->is(array('post','put')))
         {
@@ -154,6 +163,14 @@ class StagesController  extends AppController {
     }
     public function stagePromotionList()
     {
+    	 $menuId = $this->getMenuId("/Stages/stagePromotionList");
+                $moduleId = $this->getModuleId("stage");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         if($this->request->is(array('post','put')))
         {
@@ -1672,6 +1689,14 @@ class StagesController  extends AppController {
     }    
 
     public function listOutStage(){
+    	$menuId = $this->getMenuId("/Stages/listOutStage");
+                $moduleId = $this->getModuleId("stage");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
                 $this->loadModel('Prison');
         $this->loadModel('Gender');
         if($this->Session->read('Auth.User.prison_id')!=''){

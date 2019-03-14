@@ -72,6 +72,71 @@
         </div>
     </div>
 </div> 
+<div class="row-fluid">
+ <div class="span6">
+        <div class="control-group">
+            <label class="control-label">Total Length Served:</label>
+            <div class="controls">
+                <?php 
+                    $date1=date_create(date("Y-m-d",strtotime($prisonerSentence['PrisonerSentence']['date_of_conviction'])));
+                    $date2=date_create(date("Y-m-d"));
+                    $diff=date_diff($date1,$date2);
+                    $finalDays = (int)$diff->format("%a");
+
+                    $finalYear = intval($finalDays/(30*12));
+                    $finalMonth = intval(fmod($finalDays,(30*12))/30);
+                    $finalrDays = fmod(fmod($finalDays,(30*12)),30);
+
+                    echo ($finalYear!=0) ? $finalYear." Years " : '';
+                    echo ($finalMonth!=0) ? $finalMonth." months " : '';
+                    echo ($finalrDays!=0) ? $finalrDays." days" : '';
+                ?>
+            </div>
+        </div>
+    </div>
+   <div class="span6">
+        <div class="control-group">
+            <label class="control-label">Total length pending:</label>
+            <div class="controls">
+               <?php
+               // debug($finalDays);
+          $lpd = (isset($prisonerData['Prisoner']['sentence_length']) && $prisonerData['Prisoner']['sentence_length']!='') ? json_decode($prisonerData['Prisoner']['sentence_length']) : '';
+            $remission = array();
+
+            if(isset($lpd->days) &&  $lpd->days !=''){
+                foreach ($lpd as $key => $value) {
+                    if($key == 'days'){
+                        if($value > 0)
+                            $remission[2] = $value;
+                    }
+                    if($key == 'years'){
+                        if($value > 0)
+                            $remission[0] = $value * 12 * 30;
+                    }
+                    if($key == 'months'){
+                        if($value > 0)
+                            $remission[1] = $value * 30;
+                    }                        
+                }
+                $finalSenDays = array_sum($remission) - $finalDays;
+
+                $finalYear = intval($finalSenDays/(30*12));
+                $finalMonth = intval(fmod($finalSenDays,(30*12))/30);
+                $finalrDays = fmod(fmod($finalSenDays,(30*12)),30);
+
+                echo ($finalYear!=0) ? $finalYear." Years " : '';
+                echo ($finalMonth!=0) ? $finalMonth." months " : '';
+                echo ($finalrDays!=0) ? $finalrDays." days" : '';
+            } 
+            else {
+                //echo 'N/A';
+            }
+        ?>
+            </div>
+        </div>
+    </div>
+
+</div> 
 
 <div class="row-fluid">
     <div class="span6">

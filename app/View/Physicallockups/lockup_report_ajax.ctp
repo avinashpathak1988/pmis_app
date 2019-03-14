@@ -156,7 +156,7 @@ foreach($finalLockupDataList as $key1=>$lockuplist){
 }
     ?>
 <?php
-}else{
+}else{  
 ?>
 <span style="color:red;font-weight:bold;">No Record Found!!</span>
 <?php    

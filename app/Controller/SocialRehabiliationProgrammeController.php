@@ -9,6 +9,17 @@ class SocialRehabiliationProgrammeController extends AppController{
 	}
 
 	public function socialisationProgrammes(){
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
 		$prison_id = $this->Session->read('Auth.User.prison_id');
 		
         $prisonersList = $this->Prisoner->find('list',array(
@@ -29,6 +40,17 @@ class SocialRehabiliationProgrammeController extends AppController{
 		
         
 	if(isset($this->data['SocialisationProgramDelete']['id']) && (int)$this->data['SocialisationProgramDelete']['id'] != 0){
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_delete');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
             if($this->SocialisationProgram->exists($this->data['SocialisationProgramDelete']['id'])){
                 $db = ConnectionManager::getDataSource('default');
                 $db->begin();                 
@@ -52,6 +74,16 @@ class SocialRehabiliationProgrammeController extends AppController{
 	}
 
     public function addSocialisationProgrammes(){
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         //debug($this->request->data);exit;
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $today =  date('Y-m-d');
@@ -119,6 +151,16 @@ class SocialRehabiliationProgrammeController extends AppController{
                 ));
         //debug($prison_id);
         if(isset($this->request->data['SocialisationProgramEdit']['id'])){
+            $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
             $this->request->data=$this->SocialisationProgram->findById($this->data["SocialisationProgramEdit"]["id"]);
             //SocialTheme
 
@@ -425,6 +467,16 @@ class SocialRehabiliationProgrammeController extends AppController{
     }
 
 	public function counsellingAndGuidance(){
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
 		$prison_id = $this->Session->read('Auth.User.prison_id');
 		$today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -552,6 +604,16 @@ public function changeSession(){
     }
 
         public function addCounsellingAndGuidance(){
+            $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -629,6 +691,16 @@ public function changeSession(){
 
         );
         if(isset($this->request->data['CounsellingAndGuidanceEdit']['id'])){
+            $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
             $this->request->data=$this->CounsellingAndGuidance->findById($this->data["CounsellingAndGuidanceEdit"]["id"]);
             //SocialTheme
 
@@ -655,6 +727,7 @@ public function changeSession(){
     }
 
 	public function saveCounsellingAndGuidance(){
+
 		$this->layout   = 'ajax';
 		$themes='';
         $session_selected = $this->request->data['CounsellingAndGuidance']['session'];
@@ -775,6 +848,17 @@ public function changeSession(){
     }
 	public function spiritualAndMoralRehabiliation(){
 		
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
 		$prison_id = $this->Session->read('Auth.User.prison_id');
         $today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -794,6 +878,16 @@ public function changeSession(){
                     )
                 ));
         if(isset($this->data['SpiritualMoralRehabilationDelete']['id']) && (int)$this->data['SpiritualMoralRehabilationDelete']['id'] != 0){
+            $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+            $moduleId = $this->getModuleId("social_rehabilitation");
+            $isAccess = $this->isAccess($moduleId,$menuId,'is_delete');
+
+            //echo $moduleId;exit;
+            if($isAccess != 1){
+                    $this->Session->write('message_type','error');
+                    $this->Session->write('message','Not Authorized!');
+                    $this->redirect(array('action'=>'../sites/dashboard')); 
+            }
             if($this->SpiritualMoralRehabilation->exists($this->data['SpiritualMoralRehabilationDelete']['id'])){
                 $db = ConnectionManager::getDataSource('default');
                 $db->begin();                 
@@ -817,7 +911,16 @@ public function changeSession(){
 	}
 
     public function addSpiritualAndMoralRehabiliation(){
-        
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -881,6 +984,16 @@ public function changeSession(){
                     )
                 ));
         if(isset($this->request->data['SpiritualMoralRehabilationEdit']['id'])){
+            $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+            $moduleId = $this->getModuleId("social_rehabilitation");
+            $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+
+            //echo $moduleId;exit;
+            if($isAccess != 1){
+                    $this->Session->write('message_type','error');
+                    $this->Session->write('message','Not Authorized!');
+                    $this->redirect(array('action'=>'../sites/dashboard')); 
+            }
             $this->request->data=$this->SpiritualMoralRehabilation->findById($this->data["SpiritualMoralRehabilationEdit"]["id"]);
             //SocialTheme
 
@@ -998,6 +1111,17 @@ public function SaveSpiritualMoralRehabilation(){
     }
 
 	public function  behaviourLifeSkillTrainings(){
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
 		$prison_id = $this->Session->read('Auth.User.prison_id');
         $today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -1017,6 +1141,16 @@ public function SaveSpiritualMoralRehabilation(){
                     )
                 ));
       if(isset($this->data['BehaviourLifeSkillTrainingDelete']['id']) && (int)$this->data['BehaviourLifeSkillTrainingDelete']['id'] != 0){
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_delete');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
             if($this->BehaviourLifeSkillTraining->exists($this->data['BehaviourLifeSkillTrainingDelete']['id'])){
                 $db = ConnectionManager::getDataSource('default');
                 $db->begin();                 
@@ -1040,7 +1174,17 @@ public function SaveSpiritualMoralRehabilation(){
 	}
 
 public function  addBehaviourLifeSkillTrainings(){
-    
+        
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -1104,6 +1248,16 @@ public function  addBehaviourLifeSkillTrainings(){
                     )
                 ));
         if(isset($this->request->data['BehaviourLifeSkillTrainingEdit']['id'])){
+            $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+            $moduleId = $this->getModuleId("social_rehabilitation");
+            $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+
+            //echo $moduleId;exit;
+            if($isAccess != 1){
+                    $this->Session->write('message_type','error');
+                    $this->Session->write('message','Not Authorized!');
+                    $this->redirect(array('action'=>'../sites/dashboard')); 
+            }
             $this->request->data=$this->BehaviourLifeSkillTraining->findById($this->data["BehaviourLifeSkillTrainingEdit"]["id"]);
             //SocialTheme
 
@@ -1224,6 +1378,16 @@ public function SaveBehaviourLifeSkillTraining(){
 
     }
 	public function  livelihoodSkillsTraining(){
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
 		$prison_id = $this->Session->read('Auth.User.prison_id');
 		$today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -1244,6 +1408,16 @@ public function SaveBehaviourLifeSkillTraining(){
                 ));
        
         if(isset($this->data['LivelihoodSkillsTrainingDelete']['id']) && (int)$this->data['LivelihoodSkillsTrainingDelete']['id'] != 0){
+            $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+            $moduleId = $this->getModuleId("social_rehabilitation");
+            $isAccess = $this->isAccess($moduleId,$menuId,'is_delete');
+
+            //echo $moduleId;exit;
+            if($isAccess != 1){
+                    $this->Session->write('message_type','error');
+                    $this->Session->write('message','Not Authorized!');
+                    $this->redirect(array('action'=>'../sites/dashboard')); 
+            }
             if($this->LivelihoodSkillsTraining->exists($this->data['LivelihoodSkillsTrainingDelete']['id'])){
                 $db = ConnectionManager::getDataSource('default');
                 $db->begin();                 
@@ -1266,6 +1440,17 @@ public function SaveBehaviourLifeSkillTraining(){
 	}
 
     public function  addLivelihoodSkillsTraining(){
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -1330,6 +1515,16 @@ public function SaveBehaviourLifeSkillTraining(){
                     )
                 ));
         if(isset($this->request->data['LivelihoodSkillsTrainingEdit']['id'])){
+            $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+            $moduleId = $this->getModuleId("social_rehabilitation");
+            $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+
+            //echo $moduleId;exit;
+            if($isAccess != 1){
+                    $this->Session->write('message_type','error');
+                    $this->Session->write('message','Not Authorized!');
+                    $this->redirect(array('action'=>'../sites/dashboard')); 
+            }
             $this->request->data=$this->LivelihoodSkillsTraining->findById($this->data["LivelihoodSkillsTrainingEdit"]["id"]);
             //SocialTheme
 
@@ -1448,6 +1643,18 @@ public function SaveBehaviourLifeSkillTraining(){
 
     }
 	public function  specificCaseTreatment(){
+
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
 		$prison_id = $this->Session->read('Auth.User.prison_id');
 		$today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -1467,6 +1674,18 @@ public function SaveBehaviourLifeSkillTraining(){
                     )
                 ));
 		if(isset($this->data['SpecificCaseTreatmentDelete']['id']) && (int)$this->data['SpecificCaseTreatmentDelete']['id'] != 0){
+
+
+                $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+                $moduleId = $this->getModuleId("social_rehabilitation");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_delete');
+
+                //echo $moduleId;exit;
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
             if($this->SpecificCaseTreatment->exists($this->data['SpecificCaseTreatmentDelete']['id'])){
                 $db = ConnectionManager::getDataSource('default');
                 $db->begin();                 
@@ -1490,6 +1709,18 @@ public function SaveBehaviourLifeSkillTraining(){
 	}
 
     public function  addSpecificCaseTreatment(){
+
+        $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -1554,6 +1785,18 @@ public function SaveBehaviourLifeSkillTraining(){
                     )
                 ));
         if(isset($this->request->data['SpecificCaseTreatmentEdit']['id'])){
+
+            $menuId = $this->getMenuId("/SocialRehabiliationProgramme/socialisationProgrammes");
+            $moduleId = $this->getModuleId("social_rehabilitation");
+            $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+
+            //echo $moduleId;exit;
+            if($isAccess != 1){
+                    $this->Session->write('message_type','error');
+                    $this->Session->write('message','Not Authorized!');
+                    $this->redirect(array('action'=>'../sites/dashboard')); 
+            }
+
             $this->request->data=$this->SpecificCaseTreatment->findById($this->data["SpecificCaseTreatmentEdit"]["id"]);
             //SocialTheme
 

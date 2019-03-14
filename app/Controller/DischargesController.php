@@ -518,6 +518,14 @@ class DischargesController    extends AppController {
 
     // listing for process the discharge module
     public function dischargeList(){
+    	$menuId = $this->getMenuId("/Discharges/dischargeList");
+                $moduleId = $this->getModuleId("discharge");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -737,6 +745,14 @@ class DischargesController    extends AppController {
 
     // listing for process the discharge module
     public function gatepassList(){
+    	$menuId = $this->getMenuId("/Discharges/gatepassList");
+                $moduleId = $this->getModuleId("discharge");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -1000,6 +1016,14 @@ class DischargesController    extends AppController {
 
     // listing for process the discharge module
     public function childDetailList(){
+    	$menuId = $this->getMenuId("/Discharges/childDetailList");
+                $moduleId = $this->getModuleId("discharge");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';

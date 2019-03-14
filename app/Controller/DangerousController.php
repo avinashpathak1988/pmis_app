@@ -5,6 +5,14 @@ class DangerousController extends AppController {
 
     // listing for process the Dangerous module
     public function index(){
+        $menuId = $this->getMenuId("/Dangerous");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -342,6 +350,14 @@ class DangerousController extends AppController {
     }
 
     public function add() {
+        $menuId = $this->getMenuId("/Dangerous");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->layout = "star";
         $this->loadModel("DangerousDescription");
         $options = $options = $this->DangerousDescription->find("list", array(

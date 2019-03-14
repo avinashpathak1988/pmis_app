@@ -4,6 +4,14 @@ class ShiftDeploymentsController  extends AppController {
 	public $layout='table';
     public $uses = array('Shift','Officer','ShiftDeployment','AreaOfDeployment');
 	public function index() { 
+         $menuId = $this->getMenuId("/ShiftDeployments");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		//debug($this->data['RecordStaffDelete']['id']);
 		//return false;
         //debug($this->data); exit;
@@ -122,7 +130,7 @@ class ShiftDeploymentsController  extends AppController {
         $created = '';
         $condition = array('ShiftDeployment.is_trash' => 0, 'ShiftDeployment.prison_id' => $this->Session->read('Auth.User.prison_id'));
 
-
+        debug($this->params['named']);
         if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != ''){
             $prison_id = $this->params['named']['prison_id'];
             $condition += array('ShiftDeployment.prison_id' => $prison_id );
@@ -169,7 +177,7 @@ class ShiftDeploymentsController  extends AppController {
         }else{
             $limit = array('limit'  => 20);
         }
-         // debug($condition);
+         debug($condition);
 
         $this->paginate = array(
             'conditions'    => $condition,
@@ -188,6 +196,14 @@ class ShiftDeploymentsController  extends AppController {
         )); 
     }
 	public function add() { 
+        $menuId = $this->getMenuId("/ShiftDeployments");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		
 
 		if (isset($this->data['ShiftDeployment']) && is_array($this->data['ShiftDeployment']) && count($this->data['ShiftDeployment'])>0){	//debug($this->data);exit;

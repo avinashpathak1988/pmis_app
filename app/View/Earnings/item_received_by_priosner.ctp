@@ -176,7 +176,7 @@
                 { 
                     var prisoner_baalance = $('#prisoner_baalance').val();
                     var item_price = $('#price').val(); 
-                    if(parseFloat(prisoner_baalance) < parseFloat(item_price))
+                    if(parseFloat(prisoner_baalance) > parseFloat(data))
                     {
                         $('#price').val(data); 
                     }

@@ -69,7 +69,6 @@ if(is_array($datas) && count($datas)>0)
             $work_month = date('m',strtotime($data['PrisonerAttendance']['attendance_date']));
             
             //$earning_grade = $funcall->getPrisonerEarninigGrade();
-            
             if(empty($working_months))
             {
                 $start_date = date(Configure::read('UGANDA-DATE-FORMAT'),strtotime($data['PrisonerAttendance']['attendance_date']));
@@ -94,6 +93,7 @@ if(is_array($datas) && count($datas)>0)
             {
                 $start_date = date(Configure::read('UGANDA-DATE-FORMAT'),strtotime($data['PrisonerAttendance']['attendance_date']));
                 $working_months[count($working_months)] =  $work_month;
+                $total_price = $total_price+$data['PrisonerAttendance']['amount'];
                 $end_date = '';
                 if($data['PrisonerAttendance']['payment_status'] != 'Pending' && $data['PrisonerAttendance']['payment_status'] != 'Paid')
                     $is_pay_on_progress = 1;

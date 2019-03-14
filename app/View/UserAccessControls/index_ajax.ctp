@@ -1,5 +1,5 @@
 <?php 
-//debug($data); exit;
+//debug($data);
 $aceessData = '';
 if(isset($data) && count($data)>0)
 {
@@ -14,8 +14,8 @@ if(isset($data) && count($data)>0)
             $aceessData[$menu_id]['is_edit']     =  $val['UserAccessControl']['is_edit'];
             $aceessData[$menu_id]['is_delete']   =  $val['UserAccessControl']['is_delete'];
             $aceessData[$menu_id]['is_view']     =  $val['UserAccessControl']['is_view'];
-            $aceessData[$menu_id]['is_review']   =  $val['UserAccessControl']['is_review'];
-            $aceessData[$menu_id]['is_approve']  =  $val['UserAccessControl']['is_approve'];
+            // $aceessData[$menu_id]['is_review']   =  $val['UserAccessControl']['is_review'];
+            // $aceessData[$menu_id]['is_approve']  =  $val['UserAccessControl']['is_approve'];
         }
     }
 }
@@ -31,8 +31,8 @@ if(isset($module_ids) && count($module_ids) > 0)
             <div class="span2"><strong>Edit</strong></div>
             <div class="span2"><strong>Delete</strong></div>
             <div class="span2"><strong>View</strong></div>
-            <div class="span2"><strong>Review</strong></div>
-            <div class="span2"><strong>Approve</strong></div>
+           <!--  <div class="span2"><strong>Review</strong></div>
+            <div class="span2"><strong>Approve</strong></div> -->
         </div>
     </div>
     <?php $i = 0; 
@@ -95,12 +95,12 @@ if(isset($module_ids) && count($module_ids) > 0)
                 <div class="span2">
                     <?php echo $this->Form->input('UserAccessControl.'.$i.'.is_view',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'checkbox','required'=>false, $is_view));?>
                 </div>
-                <div class="span2">
+               <!--  <div class="span2">
                     <?php echo $this->Form->input('UserAccessControl.'.$i.'.is_review',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'checkbox','required'=>false, $is_review));?>
                 </div>
                 <div class="span2">
                     <?php echo $this->Form->input('UserAccessControl.'.$i.'.is_approve',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'checkbox','required'=>false, $is_approve));?>
-                </div>
+                </div> -->
             </div>
         </div>
         <?php $i = $i+1;

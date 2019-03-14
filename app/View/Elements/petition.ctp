@@ -1,6 +1,10 @@
 <?php //debug($this->data['Prisoner']['id']);
 //$appeal_file_no = $funcall->getAppealCaseFile($this->data['Prisoner']['id']);
 //debug($appeal_file_no);
+
+$caseFiles = $funcall->getPrisonerFileData($this->data['Prisoner']['id']);
+$offences = $funcall->getPrisonerOffenceData($this->data['Prisoner']['id']);
+$highCourtfileNo = $funcall->getPrisonerHighCourtFileNo($this->data['Prisoner']['id']);
 ?>
 <div>
     <div class="span12 petition_hide" style="background:#fff;border-top:1px solid #ddd;border-bottom:1px solid #ddd;box-shadow:0 0 5px #ddd;border-left:5px solid #a03230;margin:10px 0px; position:relative; padding-bottom: 10px;">
@@ -66,29 +70,31 @@
            <div class="control-group">
                 <label class="control-label">Case File no:</label>
                 <div class="controls">
-                    <?php 
-                    
-                    echo implode(", ", $case_file_no);
+                    <?php  echo $caseFiles;
                    
                        //echo $this->Form->input('petition_case_file_no',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','onChange'=>'getPetitionOffence(this.value)','type'=>'select','options'=>$case_file_no, 'empty'=>'','required', 'title'=>'Case File is required.', 'required' => false)); ?>
                 </div>
             </div>
         </div>
-        <div class="span6">
-            <div class="control-group">
-                <label class="control-label">High Court File No:</label>
-                <div class="controls">
-                    <?php //echo $this->Form->input('petition_court_file_no',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'text','placeholder'=>"Enter High Court File No",'required'=>false));?>
+        <?php if($highCourtfileNo != 'N/A')
+        {?>
+            <div class="span6">
+                <div class="control-group">
+                    <label class="control-label">High Court File No:</label>
+                    <div class="controls">
+                        <?php //echo $this->Form->input('petition_court_file_no',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'text','placeholder'=>"Enter High Court File No",'required'=>false));?>
+                    </div>
                 </div>
             </div>
-        </div>
+        <?php }?>
+        
         <div class="clearfix"></div>
         <div class="span6">
             <div class="control-group">
                 <label class="control-label">Offence:</label>
                 <div class="controls">
-                    <?php 
-                     echo implode(", ", $offenceIdList);
+                    <?php echo $offences;
+                    // echo implode(", ", $offenceIdList);
                    // echo $this->Form->input('offence_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','options'=>$offenceIdList, 'empty'=>'','required'));?>
                 </div>
             </div>

@@ -74,6 +74,16 @@ $modelArr = $funcall->getLabelsByModel('Menu');
                          </div> 
                          </div> 
 
+                        <div class="clearfix"></div>
+                        <div class="span6">
+                            <div class="control-group">
+                                <label class="control-label">Show in Menu <?php echo $req; ?> :</label>
+                                <div class="controls">
+                                    <?php echo $this->Form->input('show_menu', array('checked'=>true,'div'=>false,'label'=>false)); ?>
+                                </div>
+                            </div>
+                        </div> 
+
                     </div>           
                     <div class="form-actions" align="center">
                         <?php echo $this->Form->button('Submit', array('type'=>'submit','class'=>'btn btn-info btn-fill','div'=>false,'label'=>false,'formnovalidate'=>true,'onclick'=>'javascript:return validateForm();'))?>

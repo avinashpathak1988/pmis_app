@@ -482,7 +482,18 @@ if(isset($this->request->data['Visitor']['category']) && $this->request->data['V
 							</div>
 						</div>
 						</div>
-<?php //} ?>
+<?php //} ?>	
+					<div class="row-fluid fourthDiv" style="<?php echo $display; ?>">
+                                <center><h4>Visitor Details</h4></center>
+
+						<?php echo $this->element('visitor-details');?>
+						</div>
+						<div class="row-fluid kinDiv" style="<?php echo (isset($kindisplay)) ? $kindisplay : ''; ?>">
+                                <center><h4>Visitor Details</h4></center>
+							
+						<?php echo $this->element('kin-details');?>
+					</div>
+
 						<span class="tooltiptexts">
 						  <h5>Visitor Items</h5>
 						</span>
@@ -509,16 +520,7 @@ if(isset($this->request->data['Visitor']['category']) && $this->request->data['V
 
 						<?php echo $this->element('visitor-prisoner-cash-items');?>
 
-						<div class="row-fluid fourthDiv" style="<?php echo $display; ?>">
-                                <center><h4>Visitor Details</h4></center>
-
-						<?php echo $this->element('visitor-details');?>
-						</div>
-						<div class="row-fluid kinDiv" style="<?php echo (isset($kindisplay)) ? $kindisplay : ''; ?>">
-                                <center><h4>Visitor Details</h4></center>
-							
-						<?php echo $this->element('kin-details');?>
-						</div>
+						
 						<div class="row-fluid article" style="<?php echo $display; ?>">
 							<div class="span6">
 								<div class="control-group">
@@ -563,7 +565,7 @@ if(isset($this->request->data['Visitor']['category']) && $this->request->data['V
 						                <h4 class="modal-title">Add Visitor ID details</h4>
 						            </div>
 						            <div class="modal-body">
-						            	<div>Not allowed to visit today .PLease fill NatId details to validate with Visitor pass.</div>
+						            	<div id="naMsg">Not allowed to visit today .PLease fill NatId details to validate with Visitor pass.</div>
 						                <div class="row-fluid">
 						                    <div class="span10">
 						                        <div class="control-group">
@@ -1119,7 +1121,7 @@ function showFields(){
 			$('#visit_nat_id_no').attr('disabled','disabled');
 	
 		if(cat == 'Official visit' ){
-
+			$('.kinDiv').hide();
 			$('#visit_first_name').removeAttr('disabled');
 			$('#visit_nat_id').removeAttr('disabled');
 			$('#visit_nat_id_no').removeAttr('disabled');
@@ -1175,7 +1177,7 @@ function showFields(){
 					$('#visitorPrisonerCashItemsDiv').hide();
 					$('.rpp').hide();
 					$('.whom').show();
-				    $('.kinDiv').show();
+				    //$('.kinDiv').show();
 					makeFieldMandatory('VisitorVehicleNo');
 					makeFieldMandatory('VisitorVehicleType');
 
@@ -1197,7 +1199,7 @@ function showFields(){
 					$('.article').show();
 					$('#visitorPrisonerCashItemsDiv').hide();
 					$('.rpp').hide();
-					$('.kinDiv').show();
+					//$('.kinDiv').show();
 					$('.whom').show();
 			
 
@@ -1213,7 +1215,7 @@ function showFields(){
 					$('.article').show();
 					$('.rpp').hide();
 					$('.whom').show();
-					  $('.kinDiv').show();
+					 // $('.kinDiv').show();
 
 			}else if(subcat == 'Other'){
 				othertext =$('#VisitorOtherSub').val();
@@ -1229,7 +1231,7 @@ function showFields(){
 						$('.article').show();
 						$('.rpp').hide();
 						$('.whom').show();
-					    $('.kinDiv').show();
+					    //$('.kinDiv').show();
 
 				}else{
 					alert('Please Enter Subcategory other');
@@ -1393,7 +1395,7 @@ function showFields(){
 						$('.article').show();
 						$('.rpp').hide();
 						$('.whom').show();
-					    $('.kinDiv').show();
+					    $('.kinDiv').hide();
 					    $('.baracks_div').show();
 
 					    
@@ -1445,7 +1447,7 @@ function showFields(){
 						$('.article').show();
 						$('.rpp').hide();
 						$('.whom').show();
-					    $('.kinDiv').show();
+					    $('.kinDiv').hide();
 					    $('.baracks_div').hide();
 
 					    
@@ -1530,11 +1532,15 @@ function getRcvVisiter(prisoner_id)
                 	dynamicAlertBox('Message','Visitor is allowed today to meet this prisoner');
 					//$('#VisitorAddForm').submit();
 			}else if(res.trim() == 'not allowed'){
+                	$('#naMsg').html("Visitor is not allowed today to meet this prisoner");
 					$('#myIdDetailModal').modal('show');
-				$('#NatIdFormNatIdType').select2('destroy');
+					$('#NatIdFormNatIdType').select2('destroy');
 
 			}else{
-                	dynamicAlertBox('Message',res.trim());
+                	//dynamicAlertBox('Message',res.trim());
+                	$('#naMsg').html(res.trim() + ", PLease fill NatId details to validate with Visitor pass");
+					$('#myIdDetailModal').modal('show');
+					$('#NatIdFormNatIdType').select2('destroy');
 			}
 
 

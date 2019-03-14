@@ -206,7 +206,8 @@ $(function()
         $('#visitorPrisonerItemsDiv input[name*="quantity"]:last').attr('name',quantity_name);
         $('#visitorPrisonerItemsDiv input[name*="quantity"]:last').attr('id',quantity_name_id);
         $('#visitorPrisonerItemsDiv input[name*="quantity"]:last').attr('required','required');
-
+        $('#'+quantity_name_id).val('');
+        
 
          var quantity_name = "data[VisitorPrisonerItem]["+scount2+"][weight]";
         var quantity_name_id = "VisitorPrisonerItem"+scount2+"weight";
@@ -214,14 +215,16 @@ $(function()
         $('#visitorPrisonerItemsDiv input[name*="weight"]:last').attr('id',quantity_name_id);
         $('#visitorPrisonerItemsDiv input[name*="weight"]:last').attr('required','required');
 
-
+        $('#'+quantity_name_id).val('');
+        
         var item_id_name = "data[VisitorPrisonerItem]["+scount2+"][weight_unit]";
         var item_id_id = "VisitorPrisonerItem"+scount2+"weight_unit";
         $('#visitorPrisonerItemsDiv select[name*="weight_unit"]:last').attr('name',item_id_name);
         $('#visitorPrisonerItemsDiv select[name*="weight_unit"]:last').attr('id',item_id_id);
         $('#visitorPrisonerItemsDiv select[name*="weight_unit"]:last').attr('required','required');
 
-
+        $('#'+item_id_id).val('');
+        
 
         var property_type_name = "data[VisitorPrisonerItem]["+scount2+"][property_type]";
         var property_type_id = "VisitorPrisonerItem"+scount2+"property_type";

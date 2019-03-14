@@ -6,6 +6,16 @@ class AftercareController extends AppController{
     public $uses=array('User','Prisoner','Aftercare','AfterCareActivity');
 
 	public function index(){
+        $menuId = $this->getMenuId("/aftercare ");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
 		$prison_id = $this->Session->read('Auth.User.prison_id');
 		$today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -79,6 +89,16 @@ class AftercareController extends AppController{
 
     }
         public function addAfterCare(){
+            $menuId = $this->getMenuId("/aftercare ");
+        $moduleId = $this->getModuleId("social_rehabilitation");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $today =  date('Y-m-d');
         $nullDate = date('0000-00-00');
@@ -123,6 +143,16 @@ class AftercareController extends AppController{
                 ));
 
         if(isset($this->request->data['AfterCareEdit']['id'])){
+                $menuId = $this->getMenuId("/aftercare ");
+                $moduleId = $this->getModuleId("social_rehabilitation");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_edit');
+
+                //echo $moduleId;exit;
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
             $this->request->data=$this->Aftercare->findById($this->data["AfterCareEdit"]["id"]);
             
         }

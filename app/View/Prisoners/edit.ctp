@@ -140,6 +140,12 @@ $next_date_after_6months = date('d-m-Y',strtotime("+6 months"));
                                 <div class="row" style="padding-bottom: 14px;">
                                     <div class="span12" style="text-align: center; margin-bottom:10px;">
                                         <button type="button" class="btn btn-success" id="prisonerInfo" onclick="displayPrisonerDetail();">Prisoner Registration Info</button>
+                                        <?php 
+                                        $isPrevpersonalDetails = $funcall->getPreviouspersonaldetails($this->data['Prisoner']['personal_no'], $this->data['Prisoner']['id']);
+                                        if(count($isPrevpersonalDetails) > 0)
+                                        {
+                                            echo $this->Html->link('Previous Personal Details',array('action'=>'prevPersonalDetails', $this->data['Prisoner']['uuid']),array('escape'=>false,'class'=>'btn btn-warning'));
+                                        }?>
                                     </div>
                                     <div class="clearfix"></div>
                                     <div id="prisonerInfoDiv" style="display: none;">
@@ -1673,7 +1679,8 @@ $next_date_after_6months = date('d-m-Y',strtotime("+6 months"));
                                         'id'=> 'admission_date',
                                         'default'=> date('d-m-Y')
                                       ));
-                                $isAddCase = $funcall->isAccess('prisoner_admission','is_add');
+                                
+                                //$isAddCase = $funcall->isAccess('prisoner_admission','is_add');
                                 $isAddCase = 1;
                                 if($isAddCase == 1)
                                 {

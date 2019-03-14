@@ -23,16 +23,16 @@ if(isset($this->data['EarningRate']['end_date']) && $this->data['EarningRate']['
                 <div class="widget-content nopadding">
                     <div class="">
                                 <?php echo $this->Form->create('EarningGradePrisoner',array('class'=>'form-horizontal','enctype'=>'multipart/form-data'));?>
-                                <?php echo $this->Form->input('id',array("type"=>"hidden"))?>
-                                <?php echo $this->Form->input('uuid',array('type'=>'hidden'))?>
+                                <?php //echo $this->Form->input('id',array("type"=>"hidden"))?>
+                                <?php //echo $this->Form->input('uuid',array('type'=>'hidden'))?>
                                 <?php echo $this->Form->input('prison_id',array('type'=>'hidden', 'value'=>$this->Session->read('Auth.User.prison_id')))?>
                                 
                                 <div class="row" style="padding-bottom: 14px;">
                                     <div class="span6">
                                         <div class="control-group">
-                                        <label class="control-label">Prisoner No:</label>
+                                        <label class="control-label">Prisoner No<?php echo $req; ?> :</label>
                                             <div class="controls">
-                                                <?php echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'class'=>'form-control pmis_select span11','type'=>'select','options'=>$prisonerlist,'empty'=>'','onchange'=>'getPrisonerGradelist(this.value);'));?>
+                                                <?php echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'class'=>'form-control pmis_select span11','type'=>'select','options'=>$prisonerlist,'empty'=>'','onchange'=>'getPrisonerGradelist(this.value);', 'title'=>'Please select prisoner no.', 'required'));?>
                                             </div>
                                            
                                         </div>
@@ -64,12 +64,12 @@ if(isset($this->data['EarningRate']['end_date']) && $this->data['EarningRate']['
                                         <div class="control-group">
 
 
-                                            <label class="control-label"> Promotion In Stage- :</label>
+                                            <label class="control-label"> In Stage- :</label>
                                             <div class="controls">
                                                 <?php 
                                                 echo $this->Form->input('prisoner_stage_id',array('type'=>'hidden','id'=>'prisoner_stage_id'));
                                                 echo $this->Form->input('prisoner_stage_name',array('div'=>false,'label'=>false,'placeholder'=>'Prisoner Current Stage',
-                                                     'readonly'=>'readonly','class'=>'form-control','type'=>'text','required'=>false, 'id'=>'prisoner_stage_name'));?>
+                                                     'readonly'=>'readonly','class'=>'form-control','type'=>'text', 'id'=>'prisoner_stage_name'));?>
                                             </div>
                                         </div>
                                     </div>
@@ -78,14 +78,14 @@ if(isset($this->data['EarningRate']['end_date']) && $this->data['EarningRate']['
                                         <div class="control-group">
                                             <label class="control-label">Remarks :</label>
                                             <div class="controls">
-                                                <?php echo $this->Form->textarea('remarks',array('div'=>false,'label'=>false,'type'=>'text','placeholder'=>'Enter Remarks','class'=>'form-control','type'=>'text','required'));?>
+                                                <?php echo $this->Form->textarea('remarks',array('div'=>false,'label'=>false,'type'=>'text','placeholder'=>'Enter Remarks','class'=>'form-control','type'=>'text'));?>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="clearfix"></div>
                                 <div class="span12">
                                     <div class="form-actions" align="center">
-                                        <?php echo $this->Form->input('Submit', array('type'=>'submit', 'class'=>'btn btn-success','div'=>false,'label'=>false,'id'=>'submit','onclick'=>"javascript:return validateForm();"))?>
+                                        <?php echo $this->Form->input('Submit', array('type'=>'submit', 'class'=>'btn btn-success','div'=>false,'label'=>false,'id'=>'submit'))?>
                                     </div>
                                 </div>
                                 <?php echo $this->Form->end();?>     
@@ -102,28 +102,59 @@ if(isset($this->data['EarningRate']['end_date']) && $this->data['EarningRate']['
 <script type="text/javascript">
 
 
-function validateForm(){
-    var errcount = 0;
-    $('.validate').each(function(){
-        if($(this).val() == ''){
-            errcount++;
-            $(this).addClass('error-text');
-            $(this).removeClass('success-text'); 
-        }else{
-            $(this).removeClass('error-text');
-            $(this).addClass('success-text'); 
-        }        
-    });        
-    if(errcount == 0){            
-        if(confirm('Are you sure want to save?')){  
-            return true;            
-        }else{               
-            return false;           
-        }        
-    }else{   
-        return false;
-    }  
-}
+// function validateForm(){
+//     var errcount = 0;
+//     $('.validate').each(function(){
+//         if($(this).val() == ''){
+//             errcount++;
+//             $(this).addClass('error-text');
+//             $(this).removeClass('success-text'); 
+//         }else{
+//             $(this).removeClass('error-text');
+//             $(this).addClass('success-text'); 
+//         }        
+//     });        
+//     if(errcount == 0){            
+//         if(confirm('Are you sure want to save?')){  
+//             return true;            
+//         }else{               
+//             return false;           
+//         }        
+//     }else{   
+//         return false;
+//     }  
+// }
+ $(function(){
+    $("#EarningGradePrisonerAssignGradesForm").validate({
+     
+      ignore: "",
+            rules: {  
+                'data[EarningGradePrisoner][EarningGradePrisonerPrisonerId]': {
+                    required: true,
+                },
+                'data[EarningGradePrisoner][EarningGradePrisonerGradeId]': {
+                    required: true,
+                },
+                'data[EarningGradePrisoner][EarningGradePrisonerAssignmentDate]': {
+                    required: true,
+                },
+                
+           },
+            messages: {
+                'data[EarningGradePrisoner][EarningGradePrisonerPrisonerId]': {
+                    required: "This Field is Required.",
+                },
+                'data[EarningGradePrisoner][EarningGradePrisonerGradeId]': {
+                    required: "This Field is Required.",
+                },
+                'data[EarningGradePrisoner][EarningGradePrisonerAssignmentDate]': {
+                    required: "This Field is Required.",
+                },
+                
+            },
+               
+    });
+  });
 
 </script>
 <?php

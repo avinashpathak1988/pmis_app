@@ -14,10 +14,11 @@ if(is_array($Prisoner) && count($Prisoner)>0){
             'controller'            => 'Report',
             'action'                => 'convictPrisonerReleasedAjax',
             'name'             		=> $name,
-            'country_id' 			=> $country_id,
+            'geographical_id'  		=> $geographical_id,
             'state_id'		   		=> $state_id,
-            'district_id'	   		=> $district_id,
+            'district_id'  	   		=> $district_id,
             'prison_id'		   		=> $prison_id,
+            'geographical_region_id'=> $geographical_region_id,
             'total_sentence_length' => $total_sentence_length,
             /*'total_sentence'              => $total_sentence,
             'sentenceLength'              => $sentenceLength*/

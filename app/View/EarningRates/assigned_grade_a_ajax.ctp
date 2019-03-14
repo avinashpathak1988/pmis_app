@@ -209,7 +209,7 @@ function MyYesFunction() {
     }
     else 
     {
-      $('#ApprovalProcessFormAttendanceAjaxForm').submit();
+      $('#ApprovalProcessFormAssignedGradeAAjaxForm').submit();
     }
 }
 function MyNoFunction() {

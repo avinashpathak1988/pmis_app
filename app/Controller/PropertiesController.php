@@ -120,6 +120,16 @@ class PropertiesController   extends AppController {
     
     public function index($prisoner_uuid)
     {
+
+        $menuId = $this->getMenuId("/Properties");
+        $moduleId = $this->getModuleId("property");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+
         $prisoner_id="";
         $prisonList = $this->Prisoner->find('first', array(
             'recursive'     => -1,
@@ -189,7 +199,8 @@ class PropertiesController   extends AppController {
             ),
             'conditions'    => array(
                 'CashItem.is_trash'         => 0,
-                'PhysicalProperty.prisoner_id' => $prisoner_id
+                'PhysicalProperty.prisoner_id' => $prisoner_id,
+                'Currency.id !=' => ''
             ),
         ));  
         //echo '<pre>'; print_r($prisonerCurrencyList); exit;   
@@ -292,11 +303,28 @@ class PropertiesController   extends AppController {
             //echo '<pre>'; print_r($this->request->data); exit;
             if(isset($this->request->data['CashItem']) && count($this->request->data['CashItem'])>0)
             {
+                $menuId = $this->getMenuId("/Properties");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
                 $this->cashproperty($this->request->data);
                 unset($this->request->data['CashItem']);
             }
             if(isset($this->request->data['DebitCash']) && count($this->request->data['DebitCash'])>0)
             {
+                $menuId = $this->getMenuId("/Properties");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
                 $this->debitCash($this->request->data);
                 unset($this->request->data['DebitCash']);
                 
@@ -305,6 +333,15 @@ class PropertiesController   extends AppController {
         $isCreditEdit = 0;
         if(isset($this->data["CashPropertyEdit"]))
         {//debug($this->data);exit;
+            $menuId = $this->getMenuId("/Properties");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
             $isCreditEdit = 1;
             $this->request->data=$this->PhysicalProperty->findById($this->data["CashPropertyEdit"]["id"]);
         }
@@ -312,6 +349,15 @@ class PropertiesController   extends AppController {
         $isDebitEdit = 0;
         if(isset($this->data["DebitCashEdit"]))
         {
+            $menuId = $this->getMenuId("/Properties");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
             $isDebitEdit = 1;
             $this->request->data=$this->DebitCash->findById($this->data["DebitCashEdit"]["id"]);
         }
@@ -1245,6 +1291,16 @@ class PropertiesController   extends AppController {
 
     function property($prisoner_uuid)
     {
+
+        $menuId = $this->getMenuId("/Properties");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
         $isEdit = 0;
         $prisonerKin = array();
         $prison_id = $this->Session->read('Auth.User.prison_id');
@@ -2020,6 +2076,14 @@ class PropertiesController   extends AppController {
     }
     function creditList()
     { 
+        $menuId = $this->getMenuId("/Properties");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $default_status = ''; $statusList = '';
         $statusInfo = $this->getApprovalStatusInfo();
         if(is_array($statusInfo) && count($statusInfo) > 0)
@@ -2200,6 +2264,14 @@ class PropertiesController   extends AppController {
     }
     function debitList()
     { 
+        $menuId = $this->getMenuId("/Properties");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $default_status = ''; $statusList = '';
         $statusInfo = $this->getApprovalStatusInfo();
         if(is_array($statusInfo) && count($statusInfo) > 0)
@@ -2635,6 +2707,16 @@ class PropertiesController   extends AppController {
     //function get all physical property list 
     function physicalPropertyList()
     { 
+
+        $menuId = $this->getMenuId("/Properties");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
         $default_status = '';
         $statusList = '';
         $statusInfo = $this->getApprovalStatusInfo();
@@ -2675,14 +2757,15 @@ class PropertiesController   extends AppController {
                 }
                 if($process=="done"){
                     $items = $this->request->data['ApprovalProcess'];
-                           // debug($items);
+                           //debug($items);exit;
                      
                         //debug($fieldss);exit;
-                    $aproveItems=array();
                     $approveItems = array();
                         foreach ($items as $key => $value) {
                             //echo $value['fid'];
                             //exit;
+                            $aproveItems=array();
+
                             $condss = array(
                                 'PhysicalPropertyItem.physicalproperty_id' => $value['fid'],
                             );
@@ -2889,7 +2972,14 @@ class PropertiesController   extends AppController {
 /////////////////////////Manage prisoners property///////////////////////////////////////
     function manageTransactionList()
     { 
-         
+         $menuId = $this->getMenuId("/Properties");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
     }
     function manageTransactionListAjax()
     { 
@@ -3092,6 +3182,14 @@ class PropertiesController   extends AppController {
 
     function destroyedPropertyList()
     {
+        $menuId = $this->getMenuId("/Properties");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $default_status = '';
         $statusList = '';
         $statusInfo = $this->getApprovalStatusInfo();
@@ -3484,6 +3582,15 @@ class PropertiesController   extends AppController {
 
     function outgoingPropertyList()
     {
+        
+        $menuId = $this->getMenuId("/Properties");
+                $moduleId = $this->getModuleId("property");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
             $default_status = '';
         $statusList = '';
         $statusInfo = $this->getApprovalStatusInfo();

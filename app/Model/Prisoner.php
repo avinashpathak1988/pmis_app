@@ -228,7 +228,7 @@ class Prisoner extends AppModel{
 	public $virtualFields = array(
 		'fullname' => 'CONCAT(Prisoner.first_name, " ", Prisoner.middle_name, " ", Prisoner.last_name)',
         'age' => 'TIMESTAMPDIFF(YEAR, Prisoner.date_of_birth, CURDATE())',
-        'age_on_admission' => 'TIMESTAMPDIFF(YEAR, Prisoner.date_of_birth, Prisoner.created)'
+        'age_on_admission' => 'TIMESTAMPDIFF(YEAR, Prisoner.date_of_birth, Prisoner.doa)'
 	);    
 	public $validate = array(
 		'first_name' => array(

@@ -6,6 +6,14 @@ class PrisonercomplaintsController  extends AppController {
 	
 
     public function index() {
+        $menuId = $this->getMenuId("/prisonercomplaints");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $prisonerList = $this->Prisonercomplaint->find("list", array(
             'recursive'     => -1,
             'fields'        => array(
@@ -168,7 +176,14 @@ class PrisonercomplaintsController  extends AppController {
     }
 
     public function pending() {
-        
+        $menuId = $this->getMenuId("/prisonercomplaints/pending");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
     }
 
     public function pendingAjax(){
@@ -261,6 +276,14 @@ class PrisonercomplaintsController  extends AppController {
     }
 
 	public function add() { 
+         $menuId = $this->getMenuId("/prisonercomplaints");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 
 		$this->loadModel('Prisonercomplaint');
 		$prison_id = $this->Session->read('Auth.User.prison_id');

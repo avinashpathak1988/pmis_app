@@ -31,8 +31,23 @@ echo $this->Paginator->counter(array(
     'format' => __('Page {:page} of {:pages}, showing {:current} records out of {:count}')
 ));
 ?>
+<?php
+    $exUrl = "indexAjax/from_date:$from_date/to_date:$to_date";
+    $urlExcel = $exUrl.'/reqType:XLS';
+    $urlDoc = $exUrl.'/reqType:DOC';
+     $urlPDF = $exUrl.'/reqType:PDF';
+   $urlPrint = $exUrl.'/reqType:PRINT';
+    echo($this->Html->link($this->Html->image("excel-2012.jpg",array("height" => "20","width" => "20","title"=>"Download Excel")),$urlExcel, array("escape" => false)));
+    echo '&nbsp;&nbsp;';
+    echo($this->Html->link($this->Html->image("word-2012.png",array("height" => "20","width" => "20","title"=>"Download Doc")),$urlDoc, array("escape" => false)));
+    echo '&nbsp;&nbsp;';
+    echo($this->Html->link($this->Html->image("pdf-2012.png",array("height" => "20","width" => "20","title"=>"Download PDF")),$urlPDF, array("escape" => false)));
+  echo '&nbsp;&nbsp;';
+  echo($this->Html->link($this->Html->image("print.png",array("height" => "20","width" => "20","title"=>"Download Doc")),$urlPrint, array("escape" => false,'target'=>"_blank")));
+  ?>
     </div>
 </div>
+
 
 <?php 
 $btnName = Configure::read('SAVE');

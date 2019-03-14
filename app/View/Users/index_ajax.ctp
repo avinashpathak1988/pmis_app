@@ -16,7 +16,7 @@ if(is_array($datas) && count($datas)>0){
             'action'                => 'indexAjax',
             'from_date'             => $from_date,
             'to_date'               => $to_date,
-            'prison_id'             => $prison_id,
+            // 'prison_id'             => $prison_id,
             'usertype_id'           => $usertype_id
         )
     ));         
@@ -111,7 +111,7 @@ if(!isset($is_excel)){
          
             <td><?php if($data['Prison']['name']!='')echo ucwords(h($data['Prison']['name']));else echo Configure::read('NA'); ?>&nbsp;</td>
             
-            <td><?php if($data['User']['first_name']!='')echo ucwords(h($data['User']['first_name']));else echo Configure::read('NA'); ?>&nbsp;</td>
+            <td><?php if($data['User']['first_name']!='')echo ucwords(h($data['User']['first_name']." ".$data['User']['last_name']));else echo Configure::read('NA'); ?>&nbsp;</td>
            
             <td><?php if($data['User']['mail_id']!='')echo ucwords(h($data['User']['mail_id']));else echo Configure::read('NA'); ?>&nbsp;</td>
            

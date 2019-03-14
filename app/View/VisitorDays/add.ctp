@@ -40,7 +40,10 @@
                         <div class="control-group">
                         <label class="control-label">Visitor Days:</label>
                         <div class="controls">
+
+
                            <?php  
+                           //debug($prisonerType);
                            if(isset($this->data['VisitorDay']['days'])){
                             $daysSelected = explode(',', $this->data['VisitorDay']['days']);
                            }else{

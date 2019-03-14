@@ -3,6 +3,14 @@ App::uses('AppController', 'Controller');
 class LetterinoutsController  extends AppController {
 	public $layout='table';
 	public function index() {
+         $menuId = $this->getMenuId("/letterinouts");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$this->loadModel('Letterinout'); 
         $this->loadModel('Callinout'); 
 		//debug($this->data['RecordStaffDelete']['id']);
@@ -146,6 +154,14 @@ class LetterinoutsController  extends AppController {
 
     }
 	public function add() { 
+        $menuId = $this->getMenuId("/letterinouts");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$this->loadModel('Letterinout');
 		
 		 //debug($staffcategory_id);

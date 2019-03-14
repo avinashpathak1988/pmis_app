@@ -14,10 +14,11 @@
             'controller'            => 'Report',
             'action'                => 'prisonerVisitorBookAjax',
             'name'             		=> $name,
+            'geographical_id'  		=> $geographical_id,
             'state_id'		   		=> $state_id,
-            'country_id' 			=> $country_id,
-            'district_id'	   		=> $district_id,
+            'district_id'  	   		=> $district_id,
             'prison_id'		   		=> $prison_id,
+            'geographical_region_id'=> $geographical_region_id,
            
 
         )

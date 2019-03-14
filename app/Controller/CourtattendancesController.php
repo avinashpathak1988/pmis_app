@@ -5,6 +5,14 @@ class CourtattendancesController  extends AppController {
     public $uses=array('Prisoner', 'Courtattendance', 'Court', 'Magisterial','Offence','Courtlevel','PrisonerSentence','ApprovalProcess','Gatepass','PresidingJudge','CauseList','EscortTeam','ReturnFromCourt','PrisonerOffence');
     public function courtscheduleList()
     {
+        $menuId = $this->getMenuId("/courtattendances/courtscheduleList");
+                $moduleId = $this->getModuleId("court_attendance");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
     	$this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -1842,6 +1850,14 @@ class CourtattendancesController  extends AppController {
 
     public function courtscheduleGatepassList()
     {
+    	 $menuId = $this->getMenuId("/courtattendances/courtscheduleGatepassList");
+                $moduleId = $this->getModuleId("court_attendance");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -2104,6 +2120,15 @@ class CourtattendancesController  extends AppController {
 
     public function courtsTrackList()
     {
+    	$menuId = $this->getMenuId("/courtattendances/courtsTrackList");
+                $moduleId = $this->getModuleId("court_attendance");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
+
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -2312,6 +2337,14 @@ class CourtattendancesController  extends AppController {
 
     public function courtsLoadReport()
     {
+    	$menuId = $this->getMenuId("/courtattendances/courtsLoadReport");
+                $moduleId = $this->getModuleId("court_attendance");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -2483,6 +2516,14 @@ class CourtattendancesController  extends AppController {
 
     public function courtsTrackingReport()
     {
+    	 $menuId = $this->getMenuId("/courtattendances/courtsTrackingReport");
+                $moduleId = $this->getModuleId("court_attendance");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -2518,6 +2559,14 @@ class CourtattendancesController  extends AppController {
     }
     public function stayListReport()
     {
+    	 $menuId = $this->getMenuId("/courtattendances/stayListReport");
+                $moduleId = $this->getModuleId("court_attendance");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -2722,6 +2771,14 @@ class CourtattendancesController  extends AppController {
     }
     public function courtsTrackingReportNew()
     {
+    	$menuId = $this->getMenuId("/courtattendances/courtsTrackingReportNew");
+                $moduleId = $this->getModuleId("court_attendance");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';

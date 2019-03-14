@@ -4,6 +4,14 @@ class ReportreviewsController extends AppController {
     public $layout='table';
 	public $uses = array('Ward');
     public function index(){
+      $menuId = $this->getMenuId("/reportreviews/index");
+                $moduleId = $this->getModuleId("report");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
       $this->loadModel('Prisoner');
       $prisonList = $this->Prison->find('list', array(
         // 'conditions'=> array(
@@ -93,6 +101,14 @@ class ReportreviewsController extends AppController {
     }
 	public function prisonerLocation()
 	{
+     $menuId = $this->getMenuId("/reportreviews/prisonerLocation");
+                $moduleId = $this->getModuleId("report");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
     $this->loadModel('WardCell');
 		$ward = $this->Ward->find('list',array('conditions'=>array('Ward.is_trash'=>0),'order'=>array('Ward.name'=>'ASC')));
     $wardcell = $this->WardCell->find('list', array(
@@ -169,6 +185,14 @@ class ReportreviewsController extends AppController {
 	}
 	public function prisonerStageReport()
 	{
+    $menuId = $this->getMenuId("/reportreviews/prisonerStageReport");
+                $moduleId = $this->getModuleId("report");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 		$this->loadModel('Prison');
         $this->loadModel('Gender');
         if($this->Session->read('Auth.User.prison_id')!=''){
@@ -308,6 +332,14 @@ class ReportreviewsController extends AppController {
     }
 
   public function specialStageReport(){
+    $menuId = $this->getMenuId("/reportreviews/specialStageReport");
+                $moduleId = $this->getModuleId("stage");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 
     $this->loadModel('Prison');
         $this->loadModel('Gender');
@@ -351,6 +383,14 @@ class ReportreviewsController extends AppController {
   }
   // partha report stagePromotionReport
   public function stagePromotionReport() {
+    $menuId = $this->getMenuId("/reportreviews/stagePromotionReport");
+                $moduleId = $this->getModuleId("stage");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
     $this->loadModel('Prison');
         $this->loadModel('Gender');
         if($this->Session->read('Auth.User.prison_id')!=''){
@@ -499,6 +539,14 @@ class ReportreviewsController extends AppController {
   }
   public function wardStatisticReport()
   {
+    $menuId = $this->getMenuId("/reportreviews/wardStatisticReport");
+                $moduleId = $this->getModuleId("report");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
     
      $ward= $this->Ward->find('list', array(
     'fields'        => array(

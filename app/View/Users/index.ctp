@@ -49,7 +49,26 @@
                             </div>
                         </div>  
 
-                    </div>           
+                    </div> 
+                     <div class="row" style="padding-bottom: 14px;">
+                        <div class="span6">
+                            <div class="control-group">
+                                <label class="control-label">Designation :</label>
+                                <div class="controls">
+                                    <?php echo $this->Form->input('designation_id',array('div'=>false,'label'=>false,'class'=>'span11 pmis_select','id'=>'designation_id','options'=>$designationList,'empty'=>''));?>
+                                </div>
+                            </div>
+                        </div>  
+                        <div class="span6">
+                            <div class="control-group">
+                                <label class="control-label">Name :</label>
+                                <div class="controls">
+                                     <?php echo $this->Form->input('first_name',array('div'=>false,'label'=>false,'class'=>'span11 alpha','id'=>'first_name','type'=>'text','placeholder'=>'Enter Name'));?>
+                                </div>
+                            </div>
+                        </div>  
+
+                    </div>            
                     <div class="form-actions" align="center">
                         <?php echo $this->Form->button('Search', array('type'=>'button', 'class'=>'btn btn-primary','div'=>false,'label'=>false,'onclick'=>"javascript:return showData();"))?>
                         <?php echo $this->Form->button('Reset', array('type'=>'reset', 'class'=>'btn btn-warning', 'div'=>false, 'label'=>false,'onclick'=>"resetData('SearchIndexForm')"))?>
@@ -75,6 +94,8 @@ echo $this->Html->scriptBlock("
         url = url + '/to_date:'+$('#to_date').val();
         url = url + '/prison_id:'+$('#prison_id').val();
         url = url + '/usertype_id:'+$('#usertype_id').val();
+        url = url + '/designation_id:'+$('#designation_id').val();
+        url = url + '/first_name:'+$('#first_name').val();
         $.post(url, {}, function(res) {
             if (res) {
                 $('#listingDiv').html(res);

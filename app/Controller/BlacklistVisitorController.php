@@ -6,6 +6,17 @@ class BlacklistVisitorController extends AppController{
     public $uses=array('User','Prisoner','BlacklistedVisitor');
 
 	public function index(){
+
+        $menuId = $this->getMenuId("/BlacklistVisitor");
+        $moduleId = $this->getModuleId("visitor");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+
+        //echo $moduleId;exit;
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
 		 if($this->request->is(array('post','put')))
         {
             //if search data exists 

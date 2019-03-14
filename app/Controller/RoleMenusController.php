@@ -115,7 +115,8 @@ class RoleMenusController extends AppController {
                     'Menu.parent_id',
                 ), 
                 'conditions'            => array(
-                    'Menu.is_enable'    => 1
+                    'Menu.is_enable'    => 1,
+                    'Menu.show_menu'    => 1,
                 ),
                 'order'                 => array(
                     'Menu.order'        => 'ASC',

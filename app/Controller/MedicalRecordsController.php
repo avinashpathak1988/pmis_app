@@ -2068,11 +2068,13 @@ class MedicalRecordsController  extends AppController {
 	            	"MedicalSickRecord.checkup_type"=>$patient_type
 	    		);
 	        }
+	        // debug($this->params['named']['lab_test_search']);
+
 	        if(isset($this->params['named']['lab_test_search']) && $this->params['named']['lab_test_search'] != ''){
 	            $lab_test_search = $this->params['named']['lab_test_search'];
+	            $str = implode(",", array_filter(explode(",", $lab_test_search)));
 	            $condition += array(
-	            	"MedicalSickRecord.disease_id"=>$lab_test_search
-	    			
+	            	"MedicalSickRecord.disease_id"=>$str
 	    		);
 	        }
 	    	if(isset($this->params['named']['uuid']) && $this->params['named']['uuid'] != ''){
@@ -2126,7 +2128,7 @@ class MedicalRecordsController  extends AppController {
 
 	    	// 	);
 	    	// }		
-	    	 //debug($condition);
+	    	 // debug($condition);
 			$this->paginate = array(
 				'conditions'	=> $condition,
 				'order'			=> array(
@@ -3257,6 +3259,14 @@ function prisonerStateListAjax(){
 
 	// listing for process the discharge module
     public function gatepassList(){
+    	$menuId = $this->getMenuId("/MedicalRecords/gatepassList");
+                $moduleId = $this->getModuleId("medical");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -4069,6 +4079,14 @@ function prisonerStateListAjax(){
     }
 
     public function urbanLabour() {
+    	$menuId = $this->getMenuId("/MedicalRecords/urbanLabour");
+                $moduleId = $this->getModuleId("medical");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
     	$this->loadModel('Prisoner');
     $this->loadModel('UnfitHistory');
     $prisonerList = $this->Prisoner->find('list', array(

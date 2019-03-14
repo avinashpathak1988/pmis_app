@@ -23,19 +23,19 @@ class UserAccessControlsController extends AppController {
             //unset($this->request->data['UserAccessControl']);	
             //echo '<pre>'; print_r($this->request->data); exit;
             //validate 
-            if(count($this->data['UserAccessControl']) > 0)
+           /* if(count($this->data['UserAccessControl']) > 0)
             {
                 $datas = $this->data['UserAccessControl'];
                 $i = 0;
                 foreach($datas as $data)
                 {
-                    if(($data['is_add'] == 0) && ($data['is_edit'] == 0) && ($data['is_delete'] == 0) && ($data['is_view'] == 0) && ($data['is_review'] == 0) && ($data['is_approve'] == 0)) 
+                    if(($data['is_add'] == 0) && ($data['is_edit'] == 0) && ($data['is_delete'] == 0) && ($data['is_view'] == 0)) 
                     {
-                        unset($this->request->data['UserAccessControl'][$i]);
+                       // unset($this->request->data['UserAccessControl'][$i]);
                     }
                     $i++;
                 }
-            }
+            }*/
              // echo '<pre>'; print_r($this->data); exit;
             //update the previous user access controls
             // $fields = array(
@@ -53,7 +53,7 @@ class UserAccessControlsController extends AppController {
 
             //debug($this->data); exit;
             //$this->UserAccessControl->updateAll($fields, $conds);
-            // debug($this->data['UserAccessControl']); exit;
+            //debug($this->data['UserAccessControl']); exit;
 			if($this->UserAccessControl->saveAll($this->data['UserAccessControl'])){
                 $this->Session->write('message_type','success');
                 $this->Session->write('message','User Access Control saved successfully !');

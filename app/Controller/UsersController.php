@@ -59,7 +59,22 @@ class UsersController extends AppController{
                 'Usertype.name' => 'ASC',
             ),
         ));
-        $view_data = compact('usertypeList', 'prisonList');
+          $designationList = $this->Designation->find('list',array(
+            'recursive'     => -1,
+            'fields'        => array(
+                'Designation.id',
+                'Designation.name',
+            ),
+            'conditions'    => array(
+                'Designation.is_enable' => 1,
+                'Designation.is_trash'  => 0,
+                // "Designation.id NOT IN ($superadmin_desig)"
+            ),
+            'order'=>array(
+                'Designation.name'
+            )
+        ));
+        $view_data = compact('usertypeList', 'prisonList', 'designationList');
         $this->set($view_data);
     }
     public function indexAjax(){
@@ -87,7 +102,19 @@ class UsersController extends AppController{
         {
             $usertype_id = $this->params['named']['usertype_id'];
             $condition += array('User.usertype_id' => $usertype_id );
-        }    
+        }   
+          if(isset($this->params['named']['designation_id']) && (int)$this->params['named']['designation_id'] != 0)
+        {
+            $designation_id = $this->params['named']['designation_id'];
+            $condition += array('User.designation_id' => $designation_id );
+        }  
+         if(isset($this->params['named']['first_name']) && $this->params['named']['first_name'] != '' )
+        {
+            $first_name = $this->params['named']['first_name'];
+            $first_name = str_replace(' ','',$first_name);
+            $condition += array(2 => "CONCAT(User.first_name, User.last_name) LIKE '%$first_name%'");
+            $isSearched = 1;
+        }  
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='XLS'){
                 $this->layout='export_xls';

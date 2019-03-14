@@ -7,6 +7,14 @@ class PrisonerinoutsController  extends AppController {
 		
 		//debug($this->data['RecordStaffDelete']['id']);
 		//return false;
+        $menuId = $this->getMenuId("/prisonerinouts");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
 
         $default_status = '';
         $statusList = '';
@@ -140,6 +148,14 @@ class PrisonerinoutsController  extends AppController {
 
     }
     public function gatepassList(){
+        $menuId = $this->getMenuId("/prisonerinouts/gatepassList");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
@@ -319,6 +335,14 @@ class PrisonerinoutsController  extends AppController {
         return $result;
     }
      public function gatepassListAjax(){
+          // $menuId = $this->getMenuId("/prisonerinouts/gatepassList");
+          //       $moduleId = $this->getModuleId("station");
+          //       $isAccess = $this->isAccess($moduleId,$menuId,'is_approve');
+          //       if($isAccess != 1){
+          //               $this->Session->write('message_type','error');
+          //               $this->Session->write('message','Not Authorized!');
+          //               $this->redirect(array('action'=>'../sites/dashboard')); 
+          //       }
         $this->layout   = 'ajax';
         $prisoner_id    = '';
         $prisoner_no    = '';
@@ -417,6 +441,14 @@ class PrisonerinoutsController  extends AppController {
 
   
 	public function add() { 
+          $menuId = $this->getMenuId("/prisonerinouts");
+                $moduleId = $this->getModuleId("station");
+                $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+                if($isAccess != 1){
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Not Authorized!');
+                        $this->redirect(array('action'=>'../sites/dashboard')); 
+                }
         $id1=$this->Session->read('Auth.User.prison_id');
        // $id1=$this->Session->read('Auth.User.id');
 		$gateKeepers=$this->User->find('list',array(

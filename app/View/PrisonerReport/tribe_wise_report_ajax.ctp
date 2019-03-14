@@ -10,8 +10,6 @@ if(is_array($datas) && count($datas)>0){
     $this->Paginator->options(array(
         'update'                        => '#listingDiv',
         'evalScripts'                   => true,
-        //'before'                      => '$("#lodding_image").show();',
-        //'complete'                    => '$("#lodding_image").hide();',
             'url'                       => array(
             'controller'                => 'PrisonerReport',
             'action'                    => 'tribeWiseReportAjax',
@@ -26,13 +24,13 @@ if(is_array($datas) && count($datas)>0){
         </ul>
     </div>
     <div class="span7 text-right" style="padding-top:25px;">
+        
 <?php
 echo $this->Paginator->counter(array(
     'format' => __('Page {:page} of {:pages}, showing {:current} records out of {:count} total, starting on record {:start}, ending on {:end}')
 ));
 ?>
 <?php
-   //$exUrl = "indexAjax/prison_id:$prison_id/from_date:$from_date/to_date:$to_date";
    $exUrl = "tribeWiseReportAjax";
     $urlExcel = $exUrl.'/reqType:XLS';
     $urlDoc = $exUrl.'/reqType:DOC';
@@ -79,7 +77,6 @@ echo $this->Paginator->counter(array(
             <th>Female</th>
             <th>Total</th>
 
-
             <th>Male</th>
             <th>Female</th>
             <th>Total</th>
@@ -112,8 +109,6 @@ echo $this->Paginator->counter(array(
                         <td><?php echo $convictedCounts[0]?></td>
                         <td><?php echo $convictedCounts[1]?></td>
                         <td><?php echo $convictedCounts[0] + $convictedCounts[1]?></td>
-
-
 
                         <td><?php echo $remandCounts[0]?></td>
                         <td><?php echo $remandCounts[1]?></td>
@@ -159,8 +154,6 @@ echo $this->Paginator->counter(array(
                         <td><?php echo $convictedCounts[0]?></td>
                         <td><?php echo $convictedCounts[1]?></td>
                         <td><?php echo $convictedCounts[0] + $convictedCounts[1]?></td>
-
-
 
                         <td><?php echo $remandCounts[0]?></td>
                         <td><?php echo $remandCounts[1]?></td>

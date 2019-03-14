@@ -23,6 +23,10 @@
                                 $user_type2 = Configure::read('PRINCIPALOFFICER_USERTYPE');
                                 $user_type3 = Configure::read('OFFICERINCHARGE_USERTYPE');
                                 $user_type4 = '';
+                                if($currentController == 'EarningRates' && $currentAction == 'assignedGradeAAjax')
+                                {
+                                    $user_type3 = Configure::read('COMMISSIONERGENERAL_USERTYPE');
+                                }
                                 if($currentController == 'MedicalRecords' || $currentController == 'medicalRecords' || $currentController == 'RecordFood' || $currentController == 'recordFood')
                                 {
                                     $user_type1 = Configure::read('MEDICALOFFICE_USERTYPE');
@@ -40,7 +44,8 @@
                                     $verification_type = array('Reviewed'=>'Reviewed','Review-Rejected'=>'Reject');
                                     $default = array("default"=>"Reviewed");
                                 }
-                                if($this->Session->read('Auth.User.usertype_id')==$user_type3){
+                                if($this->Session->read('Auth.User.usertype_id')==$user_type3)
+                                {
                                     $verification_type = array('Approved'=>'Approve','Approve-Rejected'=>'Reject');    
                                     $default = array("default"=>"Approved");
                                 }

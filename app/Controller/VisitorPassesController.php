@@ -5,24 +5,30 @@ class VisitorPassesController   extends AppController {
     public $uses=array('Prisoner','Prison','VisitorPass','PrisonerAdmissionDetail','PrisonerIdDetail','PrisonerKinDetail','PrisonerSentenceDetail','PrisonerSpecialNeed','PrisonerOffenceDetail','PrisonerOffenceCount','PrisonerRecaptureDetail','PrisonerChildDetail','MedicalDeathRecord','MedicalSeriousIllRecord','MedicalCheckupRecord','MedicalDeathRecord','StagePromotion','StageDemotion','StageReinstatement','InPrisonOffenceCapture','InPrisonPunishment','MedicalSickRecord','Property','PrisonerType','EscortTeam','Gatepass','DisciplinaryProceeding');
   
       function index(){
-
-
+        $menuId = $this->getMenuId("/VisitorPasses");
+        $moduleId = $this->getModuleId("visitor");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
+        if($isAccess != 1){
+                $this->Session->write('message_type','error');
+                $this->Session->write('message','Not Authorized!');
+                $this->redirect(array('action'=>'../sites/dashboard')); 
+        }
+        
         if(isset($this->data['VisitorPassDelete']['id']) && (int)$this->data['VisitorPassDelete']['id'] != 0){
-            if($this->VisitorPass->exists($this->data['VisitorPassDelete']['id'])){
-                $db = ConnectionManager::getDataSource('default');
-                $db->begin();                 
-                if($this->VisitorPass->updateAll(array('VisitorPass.is_trash' => 1), array('VisitorPass.id'  => $this->data['VisitorPassDelete']['id']))){
-                    $this->Session->write('message_type','success');
-                    $this->Session->write('message','Deleted Successfully !');
-                    $this->redirect(array('action'=>'VisitorPasses'));
-                }else{
-                    $db->rollback();
-                    $this->Session->write('message_type','error');
-                    $this->Session->write('message','Deleted Failed !');
+                if($this->VisitorPass->exists($this->data['VisitorPassDelete']['id'])){
+                    $db = ConnectionManager::getDataSource('default');
+                    $db->begin();                 
+                    if($this->VisitorPass->updateAll(array('VisitorPass.is_trash' => 1), array('VisitorPass.id'  => $this->data['VisitorPassDelete']['id']))){
+                        $this->Session->write('message_type','success');
+                        $this->Session->write('message','Deleted Successfully !');
+                        $this->redirect(array('action'=>'VisitorPasses'));
+                    }else{
+                        $db->rollback();
+                        $this->Session->write('message_type','error');
+                        $this->Session->write('message','Deleted Failed !');
+                    }
                 }
             }
-        }
-
         $this->set(array(
            
         ));
@@ -38,6 +44,15 @@ class VisitorPassesController   extends AppController {
         $searchData = $this->request->data['Search'];
         $condition = array('VisitorPass.is_trash'   => 0);
          //debug($searchData);exit;
+        if($this->Session->read('Auth.User.usertype_id')!= Configure::read('COMMISSIONERGENERAL_USERTYPE') && $this->Session->read('Auth.User.usertype_id')!= Configure::read('ADMIN_USERTYPE')){
+            
+            $prison_id = $this->Session->read('Auth.User.prison_id');
+
+            $condition += array(
+                'VisitorPass.prison_id ' => $prison_id,
+            );
+        }
+
         
         
         if(isset($this->request->data['Search']['from']) && $this->request->data['Search']['from'] != '' &&
@@ -176,8 +191,18 @@ class VisitorPassesController   extends AppController {
      function add(){
         // code for save the transfer request
 
-         $prisonerList =array();
+        $menuId = $this->getMenuId("/VisitorPasses");
+        $moduleId = $this->getModuleId("visitor");
+        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+        //echo $isAccess;exit;
+        if($isAccess != 1){
+            $this->Session->write('message_type','error');
+            $this->Session->write('message','Not Authorized!');
+            $this->redirect(array('action'=>'../sites/dashboard'));  
+        }
 
+        $prisonerList =array();
+        
         if(isset($this->data) && is_array($this->data) && count($this->data)>0){
            if(isset($this->request->data['VisitorPassEdit']['id'])){
                 $this->request->data=$this->VisitorPass->findById($this->data["VisitorPassEdit"]["id"]);
@@ -188,6 +213,7 @@ class VisitorPassesController   extends AppController {
                         "conditions"    => array(
                             "Prisoner.prison_id"    => $this->request->data['VisitorPass']['prison_id'],
                             "Prisoner.is_trash"    => 0,
+                            "Prisoner.is_enable"    => 1,
                             "Prisoner.is_enable"    => 1,
                             "Prisoner.present_status"    => 1,
                         ),
@@ -254,8 +280,16 @@ class VisitorPassesController   extends AppController {
         //get prisoner list
         //
 
+    $conditionPrison =array();
+       if($this->Session->read('Auth.User.usertype_id')!= Configure::read('COMMISSIONERGENERAL_USERTYPE') && $this->Session->read('Auth.User.usertype_id')!= Configure::read('ADMIN_USERTYPE')){
+            
+            $prison_id = $this->Session->read('Auth.User.prison_id');
 
-       
+            $conditionPrison += array(
+                'Prison.id ' => $prison_id,
+            );
+        }
+
         $prisonList = $this->Prison->find('list', array(
             'recursive'     => -1,
             'fields'        => array(
@@ -266,7 +300,7 @@ class VisitorPassesController   extends AppController {
                 'Prison.is_enable'      => 1,
                 'Prison.is_trash'       => 0,
                 // 'Prison.id !='       => $prison_id
-            ),
+            )+$conditionPrison,
             'order'         => array(
                 'Prison.name'
             ),

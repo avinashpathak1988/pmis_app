@@ -122,6 +122,8 @@ class MenusController extends AppController {
           'Menu.order',
           'Menu.module_id',
           'Menu.is_enable',
+          'Menu.show_menu',
+
       ),
 			'order'=>array(
 
@@ -145,6 +147,7 @@ class MenusController extends AppController {
  */
 
 	public function addMenu() {
+        
 		$this->loadModel('Menu');
 		/* for add menu */
         if(isset($this->data['Menu']) && is_array($this->data['Menu']) && count($this->data['Menu'])>0){

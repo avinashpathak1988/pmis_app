@@ -170,7 +170,7 @@
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-success" id="returnBtn" onclick="submitCanteenFood()">Save</button>
+                        <button type="submit" class="btn btn-success" id="returnBtn">Save</button>
                       </div>
                           <?php echo $this->Form->end();?>
 
@@ -201,6 +201,16 @@ $ajaxUrlSubmitCanteenFoodItem =  $this->Html->url(array('controller'=>'Visitors'
 echo $this->Html->scriptBlock("
     $(document).ready(function(){
         showData();
+
+
+      $('#CanteenFoodItemIndexForm').on('submit',function(e){
+        e.preventDefault();
+        //alert('here');
+        if($('#CanteenFoodItem0FoodItem').val() != '' && $('#CanteenFoodItem0Quantity').val() != ''){
+          submitCanteenFood();
+        }
+      });
+
     });
 
     function submitRecieveItemCash(){
@@ -219,13 +229,15 @@ echo $this->Html->scriptBlock("
                      }
                     });
       }
-
       function submitCanteenFood(){
         var url ='".$ajaxUrlSubmitCanteenFoodItem."';
-                $.post(url,$('#CanteenFoodItemIndexForm').serialize(), function(res) {
+       // var isvalidForm = $('#CanteenFoodItemIndexForm').find('label.error').length;
+
+       // if($('#CanteenFoodItemIndexForm').isValid()){
+                  $.post(url,$('#CanteenFoodItemIndexForm').serialize(), function(res) {
                     if (res) {
                         if(res=='success'){
-                            console.log('Canteen Food svaed Successfully !');
+                            console.log('Canteen Food saved Successfully !');
                         }else if(res=='failed'){
                             console.log('Failed to save !');
                         }else{
@@ -236,6 +248,8 @@ echo $this->Html->scriptBlock("
                      }
 
                     });
+       // }
+        
       }
 
       function printReceipt(){
@@ -484,6 +498,29 @@ function editForm(id){
             );
   }
  
+ $(function(){
+    $("#CanteenFoodItemIndexForm").validate({
+     
+      ignore: "",
+            rules: {  
+                'data[CanteenFoodItem][0][food_item]': {
+                    required: true,
+                },
+                'data[CanteenFoodItem][0][quantity]': {
+                    required: true,
+                }
+            },
+            messages: {
+                'data[CanteenFoodItem][0][food_item]': {
+                    required: "Please enter food item.",
+                },
+                'data[CanteenFoodItem][0][quantity]': {
+                    required: "Please enter food quantity.",
+                }
+            },
+               
+    });
+  });
 </script>
 
 

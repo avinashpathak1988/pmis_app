@@ -2,7 +2,7 @@
 $prisoner_type_id =$this->data['Prisoner']['prisoner_type_id'];
 $caseFiles = array(); 
 $judicialOfficerLevel = 'Presiding Judicial Officer';
-$isAdd = $funcall->isAccess('prisoner_admission','is_add'); 
+//$isAdd = $funcall->isAccess('prisoner_admission','is_add'); 
 $isAdd = 1;
 if(isset($this->data['PrisonerAdmission']['id']) && !empty($this->data['PrisonerAdmission']['id']))
 {

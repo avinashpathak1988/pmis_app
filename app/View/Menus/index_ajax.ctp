@@ -65,6 +65,8 @@ echo $this->Paginator->counter(array(
                 <th>
                   <?php echo __(isset($modelArr['is_enable'])?$modelArr['is_enable']:'Is Enable'); ?> 
                 </th>
+                <th><?php echo __('Show in menu'); ?></th>
+
                 <th><?php echo __('Actions'); ?></th>
               </tr>
             </thead>
@@ -72,6 +74,8 @@ echo $this->Paginator->counter(array(
             <?php
               $rowCnt = $this->Paginator->counter(array('format' => __('{:start}')));
               foreach($datas as $menu){
+           // debug($menu);
+
             ?>
               <tr>
                 	<td><?php echo $rowCnt; ?>&nbsp;</td>
@@ -85,7 +89,13 @@ echo $this->Paginator->counter(array(
         						                }else{
         							                    echo "<font color=red>No</font>"; 
         						                }?>&nbsp;
-                	</td>					
+                	</td>		
+                  <td><?php if($menu['Menu']['show_menu'] == '1'){
+                                          echo "<font color=green>Yes</font>"; 
+                                    }else{
+                                          echo "<font color=red>No</font>"; 
+                                    }?>&nbsp;
+                  </td>			
           				<td class="actions">          					
                     <!-- edit form -->
                     <div style="float:left;margin-right:3px;">

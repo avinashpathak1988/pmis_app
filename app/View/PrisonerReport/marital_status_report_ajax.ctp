@@ -101,7 +101,7 @@ echo $this->Paginator->counter(array(
                          ?>
                     <tr>
                         <td><?php echo $rowcnt; ?></td>
-                        <td></td>
+                        <td><?php echo isset($data['State']['GeographicalRegion']['name'])?$data['State']['GeographicalRegion']['name']:''?></td>
                         <td><?php echo isset($data['State']['name'])?$data['State']['name']:''?></td>
                         <td><?php echo isset($data['PrisonDistrict']['name'])?$data['PrisonDistrict']['name']:''?></td>
                         <td><?php echo isset($data['GeographicalDistrict']['name'])?$data['GeographicalDistrict']['name']:''?></td>
@@ -127,7 +127,6 @@ echo $this->Paginator->counter(array(
                     </tr>
               <?php 
                 $rowcnt++;
-
                
             ?>
               

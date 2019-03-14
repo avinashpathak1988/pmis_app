@@ -69,62 +69,14 @@ class AdmissionReportController extends AppController {
         //$countryHtml .= '<option value="other">Other</option>';
         echo $prison_html;  
     }
+
     public function monthlyPrisonerAdmitted(){
 
-             $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
+           $otherFields = array();
 
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-                'Prison.id'         => $this->Session->read('Auth.User.prison_id'),
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'districtList'    => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
+        $this->set(array(
+            'otherFields'=>$otherFields,
+            'reporttitle'=>'Monthly prisoner admitted in custody directly from court'
         ));
        
         
@@ -134,35 +86,14 @@ class AdmissionReportController extends AppController {
         $this->layout = 'ajax';            
         $this->loadModel('Prisoner');
         $this->loadModel('Prison');
-        $name      = '';
-        $state_id = ''; 
-        $district_id = ''; 
-        $prison_id = '';   
-        $condition = array();
-        if ($this->Session->read('Auth.User.prison_id')!='') {
-            
-        $condition = array('Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'));
-        }
-        $this->Prison->recursive = 0;
-        // debug($this->params['named']);
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+      
+
+        $allConditions = $this->getReportAjaxCondition();
+
+        $condition = $allConditions['conditions'];
+        $fromDate = $allConditions['from_date'];
+        $toDate = $allConditions['to_date'];
+
      // debug($condition);
      if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='XLS'){
@@ -216,13 +147,112 @@ class AdmissionReportController extends AppController {
         $this->set(array(
             'MedicalSeriousIllRecord'     => $MedicalSeriousIllRecord,
             'funcall'                     => $this,
-            'name'                        => $name,
-            'state_id'                    => $state_id,
-            'district_id'                 => $district_id,
-            'prison_id'                   => $prison_id
            
         ));
     }
+
+    public function getReportAjaxCondition(){
+        $this->loadModel('Prison');
+
+        $condition      = array( 'Prison.is_enable'  => 1,'Prison.is_trash'=> 0);
+
+
+        if($this->Session->read('Auth.User.usertype_id')==Configure::read('ADMIN_USERTYPE') || $this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE')){
+               if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != ''){
+                    $prison_id = $this->params['named']['prison_id'];
+                    $condition += array('Prison.id' => $prison_id );
+                }
+        }else if($this->Session->read('Auth.User.usertype_id')==Configure::read('RPCS_USERTYPE')){
+
+            $condition += array(
+                    'Prison.state_id'=>$this->Session->read('Auth.User.state_id'),
+                );
+        }
+        else{
+            $condition += array(
+                    'Prison.id'=>$this->Session->read('Auth.User.prison_id'),
+                );
+        }
+
+        if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
+                $state_id = $this->params['named']['state_id'];
+                    if($state_id !=0){
+                        $condition += array('Prison.state_id' => $state_id);
+                    }
+                }
+        if(isset($this->params['named']['ups_district_id']) && $this->params['named']['ups_district_id'] != '' ){
+                $ups_district_id = $this->params['named']['ups_district_id'];
+                    if($ups_district_id !=0){
+                        $condition += array('Prison.district_id' => $ups_district_id);
+                    }
+                }
+        if(isset($this->params['named']['geographical_id']) && $this->params['named']['geographical_id'] != '' ){
+                $geographical_id = $this->params['named']['geographical_id'];
+                    if($geographical_id !=0){
+                        $condition += array('Prison.geographical_id' => $geographical_id);
+                    }
+                }
+        
+
+        $fromDate = '';
+        $toDate = '';
+
+        
+
+        if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id'] != '' ){
+             if(isset($this->params['named']['selected_year_id']) && $this->params['named']['selected_year_id'] != '' ){
+
+                $month = $this->params['named']['selected_month_id'];
+                if($month == '02'){
+                    $lastDay = '28';
+                }
+                else if($month == '01' || $month == '03' || $month == '05' || $month == '07' || $month == '08' || $month == '10'|| $month == '12'){
+                    $lastDay = '31';
+                }else{
+                    $lastDay = '30';
+                }
+
+                $fromDate = '01-'.$this->params['named']['selected_month_id'].'-'.$this->params['named']['selected_year_id'];
+                
+                $toDate = $lastDay.'-'.$this->params['named']['selected_month_id'].'-'.$this->params['named']['selected_year_id'];
+
+             }else{
+                if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '' ){
+                     $fromDate =    $this->params['named']['from_date'];
+                }
+                if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '' ){
+                     $toDate =    $this->params['named']['to_date'];
+                }
+             }
+        }else{
+                if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '' ){
+                     $fromDate =    $this->params['named']['from_date'];
+                }
+                if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '' ){
+                     $toDate =    $this->params['named']['to_date'];
+                }
+             }
+
+       
+
+        return array('conditions'=>$condition,'from_date'=>$fromDate,'to_date'=>$toDate);
+
+    }
+
+    public function getGeographicalListMain(){
+        $this->loadModel('GeographicalRegion');
+          $geographical=$this->GeographicalRegion->find('list',array(
+                'conditions'=>array(
+                  'GeographicalRegion.is_enable'=>1,
+                  'GeographicalRegion.is_trash'=>0,
+                ),
+                'order'=>array(
+                  'GeographicalRegion.name'
+                )
+          ));
+          return $geographical;
+     }
+
     //report AD1 ends
     // function prisoner offence starts partha
      function PriosnerOffenceame($prisoner_id){
@@ -255,62 +285,11 @@ class AdmissionReportController extends AppController {
      // function prisoner offence starts parth
       //report AD2 starts
      public function monthlyPrisonerReparitaion(){
-
-             $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-                'Prison.id'=> $this->Session->read('Auth.User.prison_id'),
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'districtList'    => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
-        ));
+           $otherFields = array();
+	        $this->set(array(
+	            'otherFields'=>$otherFields,
+	            'reporttitle'=>'Admitted Under Reparitation'
+	        ));
        
         
     }
@@ -319,34 +298,16 @@ class AdmissionReportController extends AppController {
         $this->layout = 'ajax';            
         $this->loadModel('Prisoner');
         $this->loadModel('Prison');
-        $name      = '';
-        $state_id = ''; 
-        $district_id = ''; 
-        $prison_id = '';  
-        $condition = array();
-        if($this->Session->read('Auth.User.prison_id')!=''){ 
-            $condition = array('Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'));
-        }
+       
+
+        $allConditions = $this->getReportAjaxCondition();
+
+        $condition = $allConditions['conditions'];
+        $fromDate = $allConditions['from_date'];
+        $toDate = $allConditions['to_date'];
         // $this->Prison->recursive = 0;
         // debug($this->params['named']);
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+  
       $fromDate = '';
         $toDate = '';
 
@@ -429,21 +390,21 @@ class AdmissionReportController extends AppController {
         }          
      //debug($condition);
 
-        $prisoner = $this->Prisoner->find('list',array(
-                    'recursive'     => -1,
-                    'fields'        => array(
-                        'Prisoner.id',
-                        'Prisoner.*'
-                    ),
-                    'conditions'    => array(
-                        'Prisoner.prison_id'        => $prison_id,
+        // $prisoner = $this->Prisoner->find('list',array(
+        //             'recursive'     => -1,
+        //             'fields'        => array(
+        //                 'Prisoner.id',
+        //                 'Prisoner.*'
+        //             ),
+        //             'conditions'    => array(
+        //                 'Prisoner.prison_id'        => $prison_id,
                         
-                    ),
-                    'order'=>array(
-                        'Prisoner.id'
-                    )
-                ));
-        // debug($prisoner);
+        //             ),
+        //             'order'=>array(
+        //                 'Prisoner.id'
+        //             )
+        //         ));
+        // // debug($prisoner);
 
         $this->paginate = array(
            
@@ -477,73 +438,17 @@ class AdmissionReportController extends AppController {
         $this->set(array(
             'MedicalSeriousIllRecord'     => $MedicalSeriousIllRecord,
             'funcall'                     => $this,
-            'name'                        => $name,
-            'state_id'                    => $state_id,
-            'district_id'                 => $district_id,
-            'prison_id'                   => $prison_id
-           
+         
         ));
     }
       //report AD2 ends
      // AD8 starts 
     public function admissionReportChildren(){
-
-             $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-                'Prison.id'=> $this->Session->read('Auth.User.prison_id'),
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'districtList'    => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
-        ));
-       
+         $otherFields = array();
+                    $this->set(array(
+                        'otherFields'=>$otherFields,
+                        'reporttitle'=>''
+                    ));
         
     }
         
@@ -552,34 +457,12 @@ class AdmissionReportController extends AppController {
         $this->loadModel('Prisoner');
         $this->loadModel('Prison');
         $this->loadModel('PrisonerChildDetail');
-        $name      = '';
-        $state_id = ''; 
-        $district_id = ''; 
-        $prison_id = '';   
-        $condition = array();
-        if($this->Session->read('Auth.User.prison_id')!=''){
-        $condition = array('Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'));
-         }
-        $this->Prison->recursive = 0;
-        // debug($this->params['named']);
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
+          $allConditions = $this->getReportAjaxCondition();
+
+        $condition = $allConditions['conditions'];
+        $fromDate = $allConditions['from_date'];
+        $toDate = $allConditions['to_date'];
+      
       $fromDate = '';
         $toDate = '';
 
@@ -712,11 +595,7 @@ class AdmissionReportController extends AppController {
         $this->set(array(
             'MedicalSeriousIllRecord'     => $MedicalSeriousIllRecord,
             'funcall'                     => $this,
-            'name'                        => $name,
-            'state_id'                    => $state_id,
-            'district_id'                 => $district_id,
-            'prison_id'                   => $prison_id
-           
+          
         ));
     }
      // AD8 ends
@@ -725,62 +604,11 @@ class AdmissionReportController extends AppController {
         // AD9 starts 
       public function childernHandedOverMonthly(){
 
-             $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-                'Prison.id'=> $this->Session->read('Auth.User.prison_id'),
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-
-             $this->set(array(
-            'districtList'    => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
-        ));
-       
+              $otherFields = array();
+                    $this->set(array(
+                        'otherFields'=>$otherFields,
+                        'reporttitle'=>''
+                    ));
         
     }
         
@@ -789,35 +617,12 @@ class AdmissionReportController extends AppController {
         $this->loadModel('Prisoner');
         $this->loadModel('PrisonerChildDetail');
         $this->loadModel('Prison');
-        $name      = '';
-        $state_id = ''; 
-        $district_id = ''; 
-        $prison_id = '';   
-        $condition = array();
-        if($this->Session->read('Auth.User.prison_id')!=''){
-        $condition = array('Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'));
-        }
-        $this->Prison->recursive = 0;
-        // debug($this->params['named']);
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
-     $fromDate = '';
+        $allConditions = $this->getReportAjaxCondition();
+
+        $condition = $allConditions['conditions'];
+        $fromDate = $allConditions['from_date'];
+        $toDate = $allConditions['to_date'];
+        $fromDate = '';
         $toDate = '';
 
        if(isset($this->params['named']['selected_month_id']) && $this->params['named']['selected_month_id'] != '' ){
@@ -964,10 +769,7 @@ class AdmissionReportController extends AppController {
         $this->set(array(
             'MedicalSeriousIllRecord'     => $MedicalSeriousIllRecord,
             'funcall'                     => $this,
-            'name'                        => $name,
-            'state_id'                    => $state_id,
-            'district_id'                 => $district_id,
-            'prison_id'                   => $prison_id
+            
            
         ));
     }
@@ -975,81 +777,12 @@ class AdmissionReportController extends AppController {
 
         // AD10 starts 
 
-          public function monthlyChildrenDue(){
-
-             $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-                'Prison.id'=> $this->Session->read('Auth.User.prison_id'),
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-         $this->loadModel('Prisoner');
-         $prisonerList = $this->Prisoner->find('list', array(
-        'recursive'     => -1,
-        'fields'        => array(
-            'Prisoner.id',
-            'Prisoner.prisoner_no',
-        ),
-        'conditions'    => array(
-            
-            'Prisoner.is_trash'   => 0,
-            'Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'),
-        ),
-        
-    ));
-         // debug($prisonerList);
-
-             $this->set(array(
-            'districtList'    => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
-            'prisonerList'  => $prisonerList,
-        ));
-       
-        
+    public function monthlyChildrenDue(){
+          $otherFields = array();
+                    $this->set(array(
+                        'otherFields'=>$otherFields,
+                        'reporttitle'=>''
+                    ));
     }
         
     public function monthlyChildrenDueAjax(){
@@ -1057,48 +790,13 @@ class AdmissionReportController extends AppController {
         $this->loadModel('Prisoner');
         $this->loadModel('PrisonerChildDetail');
         $this->loadModel('Prison');
-        $name      = '';
-        $state_id = ''; 
-        $district_id = ''; 
-        $prison_id = '';   
-        $prisoner_id ='';
-        $condition = array();
-        if($this->Session->read('Auth.User.prison_id')!=''){
-        $condition = array('Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'));
-        }
-        $this->Prison->recursive = 0;
-         // debug($this->params['named']);
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
-     // debug($this->params['named']);
-     if(isset($this->params['named']['prisoner_id']) && $this->params['named']['prisoner_id'] != '' ){
-        $prisoner_id = $this->params['named']['prisoner_id'];
-        $condition += array('Prisoner.id' => $prisoner_id);
-    
-     }
-      if(isset($this->params['named']['prisoner_name']) && $this->params['named']['prisoner_name'] != '' )
-        {
-            $prisoner_name = $this->params['named']['prisoner_name'];
-            $prisoner_name = str_replace(' ','',$prisoner_name);
-            $condition += array(2 => "CONCAT(Prisoner.first_name,  Prisoner.middle_name, Prisoner.last_name) LIKE '%$prisoner_name%'");
-            $isSearched = 1;
-        }
+        $allConditions = $this->getReportAjaxCondition();
+        $condition = $allConditions['conditions'];
+        $fromDate = $allConditions['from_date'];
+        $toDate = $allConditions['to_date'];
+        $fromDate = '';
+        $toDate = '';
+     
 
       $fromDate = '';
         $toDate = '';
@@ -1248,10 +946,7 @@ class AdmissionReportController extends AppController {
         $this->set(array(
             'MedicalSeriousIllRecord'     => $MedicalSeriousIllRecord,
             'funcall'                     => $this,
-            'name'                        => $name,
-            'state_id'                    => $state_id,
-            'district_id'                 => $district_id,
-            'prison_id'                   => $prison_id
+           
            
         ));
     }
@@ -1262,96 +957,11 @@ class AdmissionReportController extends AppController {
     //AD11  starts
     public function educationLevelReport()
     {
-          $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-
-         $this->loadModel('LevelOfEducation');
-         $levelofeducation = $this->LevelOfEducation->find('list', array(
-        'recursive'     => -1,
-        'fields'        => array(
-            'LevelOfEducation.id',
-            'LevelOfEducation.name',
-        ),
-        'conditions'    => array(
-            
-            'LevelOfEducation.is_trash'   => 0,
-            
-        ),
-        
-        ));
-         // debug($levelofeducation);
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-                'Prison.id'=> $this->Session->read('Auth.User.prison_id'),
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-    //      $this->loadModel('Prisoner');
-    //      $prisonerList = $this->Prisoner->find('list', array(
-    //     'recursive'     => -1,
-    //     'fields'        => array(
-    //         'Prisoner.id',
-    //         'Prisoner.prisoner_no',
-    //     ),
-    //     'conditions'    => array(
-            
-    //         'Prisoner.is_trash'   => 0,
-    //         'Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'),
-    //     ),
-        
-    // ));
-         // debug($prisonerList);
-
-             $this->set(array(
-            'districtList'    => $districtList,
-            'regionList'    => $regionList,
-            'prisonList'    => $prisonList,
-            'levelofeducation'=> $levelofeducation,
-           
-        ));
-       
+         $otherFields = array();
+                    $this->set(array(
+                        'otherFields'=>$otherFields,
+                        'reporttitle'=>''
+                    ));
     }
     
     public function educationLevelReportAjax()
@@ -1360,45 +970,14 @@ class AdmissionReportController extends AppController {
         $this->loadModel('Prisoner');
         $this->loadModel('PrisonerChildDetail');
         $this->loadModel('Prison');
-        $name      = '';
-        $state_id = ''; 
-        $district_id = ''; 
-        $prison_id = '';   
-        $prisoner_id ='';
-        $condition = array();
-        if ($this->Session->read('Auth.User.prison_id')!='') {
-          
-        $condition = array('Prison.id'=> $this->Session->read('Auth.User.prison_id'));
-    }
-        $this->Prison->recursive = 0;
-         // debug($this->params['named']);
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
-     // debug($this->params['named']);
-    
-      
-        if(isset($this->params['named']['level_of_education_id']) && $this->params['named']['level_of_education_id'] != '' ){
-                $level_of_education_id = $this->params['named']['level_of_education_id'];
-                $showOnly = $level_of_education_id;//Configure::read('CONVICTED');
-        }else{
-                $showOnly = 0;
-        }
+        $allConditions = $this->getReportAjaxCondition();
+        $condition = $allConditions['conditions'];
+        $fromDate = $allConditions['from_date'];
+        $toDate = $allConditions['to_date'];
+        $fromDate = '';
+        $toDate = '';
+        $showOnly = '';
+     
 
       $fromDate = '';
         $toDate = '';
@@ -1668,106 +1247,11 @@ class AdmissionReportController extends AppController {
     //AD12 starts
     public function employmentArrestReport()
     {
-          $this->loadModel('State');
-             $regionList = $this->State->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'State.id',
-                'State.name',
-            ),
-            'conditions'    => array(
-                'State.is_enable'  => 1,
-                'State.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'State.name'       => 'ASC',
-            ),
-        ));            
-
-
-        $this->loadModel('District');
-             $districtList = $this->District->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'District.id',
-                'District.name',
-            ),
-            'conditions'    => array(
-                'District.is_enable'  => 1,
-                'District.is_trash'   => 0,
-            ),
-            'order'         => array(
-                'District.name'       => 'ASC',
-            ),
-        ));
-
-
-         $this->loadModel('Employment');
-         $employemnt = $this->Employment->find('list', array(
-        'recursive'     => -1,
-        'fields'        => array(
-            'Employment.id',
-            'Employment.name',
-        ),
-        'conditions'    => array(
-            'Employment.is_trash'   => 0
-        ),
-        
-        ));
-         // debug($levelofeducation);
-
-         $this->loadModel('Prison');
-             $prisonList = $this->Prison->find('list', array(
-            'recursive'     => -1,
-            'fields'        => array(
-                'Prison.id',
-                'Prison.name',
-            ),
-            'conditions'    => array(
-                'Prison.is_enable'  => 1,
-                'Prison.is_trash'   => 0,
-                'Prison.id'=> $this->Session->read('Auth.User.prison_id'),
-            ),
-            'order'         => array(
-                'Prison.name'       => 'ASC',
-            ),
-        ));
-              $this->loadModel('Employment');
-            $employemnt = $this->Employment->find("list", array(
-            'recursive'=>-1,
-            'fields'=>array(
-                'Employment.id',
-                'Employment.name'
-            ),
-            'conditions'=> array(
-                'Employment.is_trash'=>0,
-
-            )
-         ));
-    //      $this->loadModel('Prisoner');
-    //      $prisonerList = $this->Prisoner->find('list', array(
-    //     'recursive'     => -1,
-    //     'fields'        => array(
-    //         'Prisoner.id',
-    //         'Prisoner.prisoner_no',
-    //     ),
-    //     'conditions'    => array(
-            
-    //         'Prisoner.is_trash'   => 0,
-    //         'Prisoner.prison_id'=> $this->Session->read('Auth.User.prison_id'),
-    //     ),
-        
-    // ));
-         // debug($prisonerList);
-
-             $this->set(array(
-            'districtList'    => $districtList,
-            'regionList'    => $regionList,
-            'employemnt'    => $employemnt,
-            'prisonList'    => $prisonList,
-            //'levelofeducation'=> $levelofeducation,
-           
-        ));
+            $otherFields = array();
+                    $this->set(array(
+                        'otherFields'=>$otherFields,
+                        'reporttitle'=>''
+                    ));
        
     }
     
@@ -1778,38 +1262,12 @@ class AdmissionReportController extends AppController {
         
         $this->loadModel('Prison');
         $name      = '';
-        $state_id = ''; 
-        $district_id = ''; 
-        $prison_id = '';   
-        $prisoner_id ='';
-        $condition = array();
-        if ($this->Session->read('Auth.User.prison_id')!='') {
-          
-        $condition = array('Prison.id'=> $this->Session->read('Auth.User.prison_id'));
-        }
-        $this->Prison->recursive = 0;
-         // debug($this->params['named']);
-    if(isset($this->params['named']['state_id']) && $this->params['named']['state_id'] != '' ){
-        $state_id = $this->params['named']['state_id'];
-        if($state_id !=0){
-            $condition += array('Prison.state_id' => $state_id);
-        }
-     }
-      if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '' ){
-        $district_id = $this->params['named']['district_id'];
-        if($district_id !=0){
-            $condition += array('Prison.district_id' => $district_id);
-        }
-     }
-     if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != '' ){
-        $prison_id = $this->params['named']['prison_id'];
-        if($prison_id !=0){
-            $condition += array('Prison.id' => $prison_id);
-        }
-     }
-     // debug($this->params['named']);
-    
-      
+        $allConditions = $this->getReportAjaxCondition();
+        $condition = $allConditions['conditions'];
+        $fromDate = $allConditions['from_date'];
+        $toDate = $allConditions['to_date'];
+        $fromDate = '';
+        $toDate = '';
         if(isset($this->params['named']['employment_type']) && $this->params['named']['employment_type'] != '' ){
                 $employment_type = $this->params['named']['employment_type'];
                 $showOnly = $employment_type;//Configure::read('CONVICTED');

@@ -1247,24 +1247,72 @@ class AppController extends Controller {
     * Author: Itishree
     * (c) Luminous Infoways
     */
-    function isAccess($module,$action='')
+
+    function getMenuId($url='')
+    { 
+        if($url!=''){
+            $this->loadModel('Menu');
+            $menu = $this->Menu->find('first',array(
+                'recursive'=>-1,
+                'conditions'=>array(
+                    'Menu.url'=>$url
+                )
+            ));
+            if($menu['Menu']['id'] && $menu['Menu']['id'] != ''){
+                    $menuId = $menu['Menu']['id'];
+                    return (int)$menuId;
+            }
+        }else{
+            return 0;
+        }
+    }
+    function getModuleId($code='')
+    { 
+        if($code!=''){
+            $this->loadModel('Module');
+            $module = $this->Module->find('first',array(
+                'recursive'=>-1,
+                'conditions'=>array(
+                    'Module.code'=>$code
+                )
+            ));
+            if($module['Module']['id'] && $module['Module']['id'] != ''){
+                    $moduleId = $module['Module']['id'];
+                    return (int)$moduleId;
+            }
+        }else{
+            return 0;
+        }
+    }
+    
+    function isAccess($module,$menuId,$action='')
     {   
         $isacees = 0;
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $user_type    = $this->Auth->user('usertype_id');
-        //userType 5 is for receptionist
+
+        $condition =array();
+
+        if($this->Session->read('Auth.User.usertype_id') != Configure::read('ADMIN_USERTYPE') && $this->Session->read('Auth.User.usertype_id') != Configure::read('COMMISSIONERGENERAL_USERTYPE') && $this->Session->read('Auth.User.usertype_id') != Configure::read('RPCS_USERTYPE')){
+            $condition  += array('UserAccessControl.prison_id IN (?)'=>array(implode("','", explode(",", $prison_id))));
+        }
+        
+        $condition += array(
+                'UserAccessControl.user_type'    => $user_type,
+                'UserAccessControl.is_trash'     => 0,
+                'UserAccessControl.module_id'    => $module,
+                'UserAccessControl.menu_id'    => $menuId
+            );
+
+
         $data = $this->UserAccessControl->find('first', array(
             'recursive'     => -1,
             'fields'        => array(
                 'UserAccessControl.'.$action
             ),
-            'conditions'    => array(
-                'UserAccessControl.prison_id'    => $prison_id,
-                'UserAccessControl.user_type'    => $user_type,
-                'UserAccessControl.is_trash'     => 0,
-                'UserAccessControl.module_id'    => $module
-            )
+            'conditions'    => $condition
         ));
+        //debug($condition);exit;
         if(isset($data['UserAccessControl'][$action]))
         {
             $isacees = $data['UserAccessControl'][$action];
@@ -3486,11 +3534,12 @@ class AppController extends Controller {
                 'conditions' => array(
                     'EarningGradePrisoner.prisoner_id' => $prisoner_id,
                     'EarningGradePrisoner.is_trash' => 0,
+                    'EarningGradePrisoner.status' => 'Approved',
                     'EarningRate.start_date <=' => $cdate,
                     //'EarningRate.end_date >=' => $cdate,
                     'EarningGradePrisoner.assignment_date <=' => $cdate,
-                    'Prisoner.earning_grade_id !='   =>  0,
-                    'Prisoner.earning_rate_id !='   =>  0,
+                    //'Prisoner.earning_grade_id !='   =>  0,
+                    //'Prisoner.earning_rate_id !='   =>  0,
                     'Prisoner.is_removed_from_earning'   =>  0,
                     //'EarningRatePrisoner.status' => 'Approved',
                 ),
@@ -5061,4 +5110,116 @@ class AppController extends Controller {
         }
     }
     //check if appeal cause list sent to court -- END -- 
+    //get prisoner case file -- START -- 
+    function getPrisonerFileData($prisoner_id)
+    {
+        $result = 'N/A';
+        if($prisoner_id != '')
+        {
+            $resultData = $this->PrisonerCaseFile->find('list', array(
+                'recursive'     => -1,
+                'fields'        => array(
+                    'PrisonerCaseFile.id',
+                    'PrisonerCaseFile.file_no',
+                ),
+                'conditions'    => array(
+                    'PrisonerCaseFile.prisoner_id'      => $prisoner_id,
+                    'PrisonerCaseFile.is_trash' => 0
+                ),
+            ));
+            if(!empty($resultData) && count($resultData))
+                $result = implode(", ", $resultData);
+            return $result;
+        }
+    }
+    //get prisoner case file -- END -- 
+    //get prisoner offences -- START -- 
+    function getPrisonerOffenceData($prisoner_id)
+    {
+        $result = 'N/A'; 
+        if($prisoner_id != '')
+        {
+            $conditions = array(
+                'PrisonerCaseFile.is_trash'         => 0,
+                'PrisonerOffence.is_trash'          => 0,
+                'PrisonerCaseFile.prisoner_id'      => $prisoner_id
+            );
+            $this->loadModel('PrisonerOffence');
+            
+            $resultData = $this->PrisonerOffence->find('all', array(
+                'recursive' => -1,
+                'joins' => array(
+                    array(
+                    'table' => 'prisoner_case_files',
+                    'alias' => 'PrisonerCaseFile',
+                    'type' => 'inner',
+                    'conditions'=> array('PrisonerOffence.prisoner_case_file_id = PrisonerCaseFile.id')
+                    )
+                ), 
+                "conditions"    => $conditions,
+                'fields'=>array(
+                    'PrisonerOffence.id',
+                    //'PrisonerOffence.offence_no'
+                    'CONCAT(`PrisonerCaseFile`.`file_no`, ": ", `PrisonerOffence`.`offence_no`) AS `file_count_no`'
+                ),
+            ));
+            $resultVal = '';
+            if(is_array($resultData) && count($resultData)>0)
+            {
+                foreach($resultData as $cresult)
+                {
+                    if($resultVal != '')
+                        $resultVal .= ', ';
+                    $resultVal .= $cresult[0]['file_count_no'];
+                }
+                $result = $resultVal;
+            }
+            return $result;
+        }
+    }
+    //get prisoner offences -- END --
+    //get prisoner HighCourtFileNo -- START -- 
+    function getPrisonerHighCourtFileNo($prisoner_id)
+    {
+        $result = 'N/A';
+        if($prisoner_id != '')
+        {
+            $resultData = $this->PrisonerCaseFile->find('list', array(
+                'recursive'     => -1,
+                'fields'        => array(
+                    'PrisonerCaseFile.id',
+                    'PrisonerCaseFile.highcourt_file_no',
+                ),
+                'conditions'    => array(
+                    'PrisonerCaseFile.prisoner_id'      => $prisoner_id,
+                    'PrisonerCaseFile.highcourt_file_no !=' => '',
+                    'PrisonerCaseFile.is_trash' => 0
+                ),
+            ));
+            if(!empty($resultData) && count($resultData))
+                $result = implode(", ", $resultData);
+            return $result;
+        }
+    }
+    //get prisoner HighCourtFileNo -- END --  
+    //get previous personal details -- START --  
+    function getPreviouspersonaldetails($personal_no, $prisoner_id)
+    {
+        $data = array();
+        if($personal_no != '' && $prisoner_id != '')
+        {
+            $data = $this->Prisoner->find('first',array(
+                //'recursive'=>2,
+                'conditions'=> array(
+                    'Prisoner.personal_no'=> $personal_no,
+                    'Prisoner.id !='=> $prisoner_id
+                ),
+                'order'         => array(
+                    'Prisoner.id' => 'DESC'
+                )
+            ));
+        }
+        return $data;
+    }
+    //get previous personal details -- END --  
 }

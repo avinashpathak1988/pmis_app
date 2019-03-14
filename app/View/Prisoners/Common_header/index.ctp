@@ -68,7 +68,7 @@
         }
         if($place_of_birth != '')
         {
-            echo '<h5>Place of Birth: </h5>'.$place_of_birth;
+            echo '<h5>Place of Birth: '.$place_of_birth.'</h5>';
         }?>
     </div>
     <div class="span5">
