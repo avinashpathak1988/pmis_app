@@ -16,10 +16,12 @@
                         <div class="controls">
                             <?php echo $this->Form->input('prison',array('div'=>false,'label'=>false,'placeholder'=>'Enter Ward','class'=>'span11 pmis_select','required','empty'=>'','options'=>$prisonlist));?>
                         </div>
+                        <br>
                          <label class="control-label">Gender:</label>
                         <div class="controls">
                             <?php echo $this->Form->input('gender',array('div'=>false,'label'=>false,'placeholder'=>'Enter Gender','class'=>'span11 pmis_select','required'=> false,'empty'=>'','options'=>$genderList));?>
                         </div>
+                        <br>
                     <div class="control-group">
                         <label class="control-label">Ward Name<?php echo MANDATORY; ?> :</label>
                         <div class="controls">

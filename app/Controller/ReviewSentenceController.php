@@ -154,26 +154,32 @@ class ReviewSentenceController extends AppController{
                                     array_push($listInArray,$key);
                                 }
         }
+        $condition = array();
+        if(isset($listInArray) && is_array($listInArray) && count($listInArray)>0){
+            $condition = array('Prisoner.id IN '. $lintInImploded);
+        
 
-        $lintInImploded = "( " . implode(',', $listInArray) . ")";
-        $prisonersList = $this->Prisoner->find('list',array(
-                    'recursive'     => -1,
-                    'fields'        => array(
-                        'Prisoner.id',
-                        'Prisoner.prisoner_no'
-                    ),
-                    'conditions'    =>array(
-                        'Prisoner.prison_id'        => $prison_id,
-                        'Prisoner.present_status'   => 1,
-                        'Prisoner.is_long_term_prisoner'=>1,
-                        'Prisoner.is_approve'   => 1,
-                        'Prisoner.status'   => "Approved",
-                        'Prisoner.id in '. $lintInImploded
-                    ),
-                    'order'=>array(
-                        'Prisoner.id'
-                    )
-                ));
+            $lintInImploded = "( " . implode(',', $listInArray) . ")";
+            $prisonersList = $this->Prisoner->find('list',array(
+                        'recursive'     => -1,
+                        'fields'        => array(
+                            'Prisoner.id',
+                            'Prisoner.prisoner_no'
+                        ),
+                        'conditions'    =>array(
+                            'Prisoner.prison_id'        => $prison_id,
+                            'Prisoner.present_status'   => 1,
+                            'Prisoner.is_long_term_prisoner'=>1,
+                            'Prisoner.is_approve'   => 1,
+                            'Prisoner.status'   => "Approved",                        
+                        )+$condition,
+                        'order'=>array(
+                            'Prisoner.id'
+                        )
+                    ));
+        }else{
+            $prisonersList = array();
+        }
 
        
 		$this->set(array(

@@ -5222,4 +5222,21 @@ class AppController extends Controller {
         return $data;
     }
     //get previous personal details -- END --  
+    //get sentence from prisoner offence -- START --
+    function getPrisonerSentenceFromOffence($offence_id)
+    {
+        if($offence_id != '')
+        {
+            $sentenceDetail  = $this->PrisonerSentence->find('all', array(
+                'recursive'     => -1,
+                'conditions'    => array(
+                    'PrisonerSentence.is_trash'     => 0,
+                    'PrisonerSentence.status'     => 'Approved',
+                    'PrisonerSentence.offence_id'  => $offence_id
+                )
+            ));
+            debug($sentenceDetail);
+        }
+    }
+    //get sentence from prisoner offence -- END --
 }

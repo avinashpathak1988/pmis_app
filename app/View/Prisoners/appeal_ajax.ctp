@@ -98,11 +98,26 @@ if(!isset($is_excel)){
                 $viewDetail = '<b>File no : </b>'.$data['PrisonerCaseFile']['file_no'].'<br>';
                 // $viewDetail .= '<b>Count : </b>'.$data['PrisonerOffence']['offence_no'].'<br>';
                 //get sentence details -- START --
+                // $sentenceData = $funcall->getSentenceDetail($data['PrisonerSentenceAppeal']['offence_id']);
+                // $sentenceData = (array)json_decode($sentenceData);
+                // debug($sentenceData);
                 $sentenceData = $funcall->getSentenceDetail($data['PrisonerSentenceAppeal']['offence_id']);
                 $sentenceData = (array)json_decode($sentenceData);
-                $appeal_case_file_no = $sentenceData['data']->PrisonerCaseFile->case_file_no;
+                $appeal_case_file_no = $data['PrisonerCaseFile']['case_file_no'];
                 $appeal_offence = $sentenceData['data']->Offence->name;
                 $appeal_sentence = $sentenceData['data']->PrisonerSentence->sentenceData;
+
+                // $appeal_case_file_no = $sentenceData['data']->PrisonerCaseFile->case_file_no;
+                // $appeal_case_file_no = $data['PrisonerCaseFile']['case_file_no'];
+                // //debug($data); exit;
+                // // $appeal_offence = $sentenceData['data']->Offence->name;
+                // // $appeal_offence = $funcall->getName($data['PrisonerOffence']['offence']);
+                // $appeal_offence = $funcall->getName($data['PrisonerOffence']['offence']);
+                // // debug($appeal_offence);
+                // // $appeal_sentence = $sentenceData['data']->PrisonerSentence->sentenceData;
+                // $appeal_sentence = $data['PrisonerSentence']['sentenceData'];
+                // $appeal_sentence = getPrisonerSentenceFromOffence($data['PrisonerOffence']['offence']);
+                // debug($appeal_sentence);
                 //get sentence details -- END --
                 $viewDetail .= '<b>Case File No : </b>'.$appeal_case_file_no.'<br>';
                 $viewDetail .= '<b>Offence : </b>'.$appeal_offence.'<br>';

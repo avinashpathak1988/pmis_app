@@ -814,14 +814,6 @@ class VisitorsController   extends AppController {
     }
 
 	public function add() { 
-        $menuId = $this->getMenuId("/visitors");
-        $moduleId = $this->getModuleId("visitor");
-        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
-        if($isAccess != 1){
-                $this->Session->write('message_type','error');
-                $this->Session->write('message','Not Authorized!');
-                $this->redirect(array('action'=>'../sites/dashboard')); 
-        }
 
         $this->loadModel('Visitor');
         $this->loadModel('PPCash');
@@ -839,14 +831,7 @@ class VisitorsController   extends AppController {
         //debug($this->request->data);exit;
            
            //edit data
-        $menuId = $this->getMenuId("/Visitors");
-        $moduleId = $this->getModuleId("visitor");
-        $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
-        if($isAccess != 1){
-                $this->Session->write('message_type','error');
-                $this->Session->write('message','Not Authorized!');
-                $this->redirect(array('action'=>'../sites/dashboard')); 
-        }
+       
         if(isset($this->data['VisitorEdit']['id']) && (int)$this->data['VisitorEdit']['id'] != 0){
             $menuId = $this->getMenuId("/visitors");
             $moduleId = $this->getModuleId("visitor");
@@ -879,7 +864,14 @@ class VisitorsController   extends AppController {
             }
         }else{
             //save new
-
+             $menuId = $this->getMenuId("/Visitors");
+            $moduleId = $this->getModuleId("visitor");
+            $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
+            if($isAccess != 1){
+                    $this->Session->write('message_type','error');
+                    $this->Session->write('message','Not Authorized!');
+                    $this->redirect(array('action'=>'../sites/dashboard')); 
+            }
             if (isset($this->data['Visitor']) && is_array($this->data['Visitor']) && count($this->data['Visitor'])>0){          //save prisoner
             $db = ConnectionManager::getDataSource('default');
             $db->begin();
@@ -910,7 +902,7 @@ class VisitorsController   extends AppController {
             if(count($visitor['VisitorPrisonerCashItem'])>0){
                 foreach ($visitor['VisitorPrisonerCashItem'] as $key => $item) {
                    // debug($item);
-                    if($item['pp_amount'] == ''){
+                    if(isset($item['pp_amount']) && $item['pp_amount'] == ''){
                         unset($visitor['VisitorPrisonerCashItem'][$key]);
                     }
                 }
@@ -948,8 +940,8 @@ class VisitorsController   extends AppController {
                 if($category == 'Private Visit'){
                     //for private visit only
 
-                                if(isset($visitor['Visiter']['prisoner_id'])){
-                                    $prionerId = $visitor['Visiter']['prisoner_id'];
+                                if(isset($visitor['Visitor']['prisoner_id'])){
+                                    $prionerId = $visitor['Visitor']['prisoner_id'];
                                     $prisoner = $this->Prisoner->findById($prionerId);
                                     $prisonerToVisit = $this->Prisoner->findById($prionerId);
                                     $visitorNamesRequest = $visitor['VisitorName'];
@@ -977,8 +969,9 @@ class VisitorsController   extends AppController {
             //debug($this->data['VisitorPrisonerItem']);exit;
 
             if($allAllowed == 1){
-
-
+/*
+                                            debug($this->data['VisitorPrisonerItem']);
+                                            exit;*/
                 //save data begin
                 if ($this->Visitor->saveAll($visitor)) {
 
@@ -1009,16 +1002,20 @@ class VisitorsController   extends AppController {
                                             );  
                                             $this->VisitorPrisonerItem->updateAll($fields, $conds);
                                             }
-                                            
                                             foreach ($this->data['VisitorPrisonerItem'] as $prisonerItem) {
                                                 //debug($prisonerItem);
 
                                                 $visitorPrisonerItem=array();
+                                               // debug($prisonerItem);exit;
                                                 if(isset($prisonerItem['quantity']) && $prisonerItem['quantity'] != ''){
                                                     $visitorPrisonerItem['VisitorPrisonerItem']['item_type'] =$prisonerItem['item_type'];
                                                 $visitorPrisonerItem['VisitorPrisonerItem']['quantity'] =$prisonerItem['quantity'];
                                                 $visitorPrisonerItem['VisitorPrisonerItem']['weight'] =$prisonerItem['weight'];
                                                 $visitorPrisonerItem['VisitorPrisonerItem']['weight_unit'] =$prisonerItem['weight_unit'];
+                                                if(isset($prisonerItem['property_type']) && $prisonerItem['property_type'] !=''){
+                                                    $visitorPrisonerItem['VisitorPrisonerItem']['property_type'] =$prisonerItem['property_type'];
+                                                }   
+                                                
 
                                                 $propertyItem =  $this->Propertyitem->findById($prisonerItem['item_type']);
 
@@ -1455,16 +1452,16 @@ public function getPropertyTypeNew($id=''){
                 if(isset($propertyItem['Propertyitem']['is_allowed'])){
 
                 if($propertyItem['Propertyitem']['is_allowed'] == 1){
-                    echo 'allowed';
+                    return 'allowed';
                 }else if(isset($propertyItem['Propertyitem']['is_prohibited']) && $propertyItem['Propertyitem']['is_prohibited'] == 1){
-                    echo 'prohibited,'.$propertyItem['Propertyitem']['property_type_prohibited'];
+                    return 'prohibited,'.$propertyItem['Propertyitem']['property_type_prohibited'];
                 }
 
             }else{
-                echo 'failure';
+                return 'failure';
             }
         }else{
-            echo 'failure';
+            return 'failure';
 
         }
        

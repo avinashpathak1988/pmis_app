@@ -428,6 +428,21 @@ class CourtattendancesController  extends AppController {
 					'Prisoner.uuid'		=> $uuid,
 				),
 			));
+              $courtLevelList  = $this->Courtlevel->find('list', array(
+                    'recursive'     => -1,
+                    'fields'        => array(
+                        'Courtlevel.id',
+                        'Courtlevel.name',
+                    ),
+                    'conditions'    => array(
+                        'Courtlevel.is_enable'    => 1,
+                        'Courtlevel.is_trash'     => 0
+                    ),
+                    'order'         => array(
+                        'Courtlevel.name'
+                    ),
+                ));
+            // debug($prisonerData); exit;
 			
 						
             $this->loadModel('Magisterial');
@@ -968,6 +983,20 @@ class CourtattendancesController  extends AppController {
 							'Court.name'
 						),
 					));
+                      $courtList  = $this->Court->find('list', array(
+                    'recursive'     => -1,
+                    'fields'        => array(
+                        'Court.id',
+                        'Court.name',
+                    ),
+                    'conditions'    => array(
+                        'Court.is_enable'    => 1,
+                        'Court.is_trash'     => 0
+                    ),
+                    'order'         => array(
+                        'Court.name'
+                    ),
+                ));
 				
 				
 				
@@ -1171,6 +1200,9 @@ class CourtattendancesController  extends AppController {
 					'prison_id'          	=> $this->Auth->user('prison_id'),
 					'prisoner_no'           => $prisonerData['Prisoner']['prisoner_no'],
                     'magisterialList'       => $magisterialList,
+
+                    'prisonerData'          =>$prisonerData,
+
 					'offencecountList'		=> $offencecountList,
                     //'causeList'             => $causeList,
                     'caseTypeList'          => $caseTypeList,
@@ -1195,6 +1227,8 @@ class CourtattendancesController  extends AppController {
 					'remand_prisoner' => $remand_prisoner,
 					'fromcourtfile' => $fromcourtfile,
 					'casefilesToCourt'=>$casefilesToCourt,
+                    'courtLevelList'  =>$courtLevelList,
+                    'courtList'       =>$courtList,
 					'appeal_cause_list'=>@$appeal_cause_list
 					
 					
@@ -4719,5 +4753,317 @@ class CourtattendancesController  extends AppController {
 		 
 		echo $options;
 	}
+    //PARTHA CODE START PETETION IN COURT ATTENDANCE
+     function isPetition($prisoner_id)
+    {
+        $count = $this->Prisoner->find('count', array(
+            'recursive'=>-1,
+            'joins' => array(
+                array(
+                'table' => 'prisoner_sentences',
+                'alias' => 'PrisonerSentence',
+                'type' => 'inner',
+                'conditions'=> array('Prisoner.id = PrisonerSentence.prisoner_id')
+                )
+            ),
+            'fields'=>array('PrisonerSentence.sentence_of'),
+            'conditions'    => array(
+                'PrisonerSentence.prisoner_id' => $prisoner_id,
+                //'Prisoner.is_long_term_prisoner' => 1,
+                '0' => '(PrisonerSentence.sentence_of = 4 OR PrisonerSentence.sentence_of = 5 OR Prisoner.is_long_term_prisoner = 1)'
+            )
+        ));
+        return $count;
+    }
+
+     function prisonerPetition(){
+        //debug($this->request->data);
+        if(isset($this->request->data["PrisonerPetition"]) && count($this->request->data["PrisonerPetition"])>0)
+                        {
+                            // debug($this->request->data);exit;
+                            if($this->request->data['PrisonerPetition']['petition_date'] != '')
+                            {
+                                $this->request->data['PrisonerPetition']['petition_date'] = date('Y-m-d', strtotime($this->request->data['PrisonerPetition']['petition_date']));
+                            }
+                            
+                            // $appealData['PrisonerPetition'] = $this->request->data['PrisonerPetition'];
+                            
+
+                            //debug($this->request->data['PrisonerPetition']);exit;
+                            $this->loadModel('PrisonerPetition');
+                                if($this->PrisonerPetition->saveAll($this->request->data))
+                                {   //echo '1';exit;
+                                    $this->Session->write('message_type','success');
+                                    $this->Session->write('message','Petition Saved Successfully !');
+
+                                    $this->redirect(array('action'=>'/index/'.$this->request->data['PrisonerPetition']['uuid'].'#petition_tab')); 
+                                }
+                                else 
+                                {   //echo '2';exit;
+                                    $this->Session->write('message_type','error');
+                                    $this->Session->write('message','Petition Saving Failed !');
+                                    $this->redirect(array('action'=>'/index'.$this->request->data['PrisonerPetition']['uuid'].'#petition_tab')); 
+                                }
+
+                                    
+                            }
+                            
+    }
+
+    function petitionAjax(){
+        $this->layout   = 'ajax';
+        $prisoner_id      = '';
+        $editPrisoner = 0;
+        $this->loadModel('PrisonerPetition');
+        $condition      = array(
+            'PrisonerPetition.is_trash'         => 0,
+        );
+        // Display result as per status and user type --START--
+        // if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
+        // {
+        //     $condition      += array('PrisonerSentence.status !='=>'Draft');
+        // }
+        // else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+        // { 
+        //     $condition      += array('PrisonerSentence.status not in ("Draft","Saved","Review-Rejected")');
+        // }
+        // else if($this->Session->read('Auth.User.usertype_id') != Configure::read('RECEPTIONIST_USERTYPE'))
+        // {
+        //     $condition      += array('PrisonerSentence.status'=>'Approved');
+        // }
+        // Display result as per status and user type --END--
+        $editPrisoner = 0;
+        
+        if(isset($this->params['named']['prisoner_id']) && $this->params['named']['prisoner_id'] != ''){
+            $prisoner_id = $this->params['named']['prisoner_id'];
+            $condition += array('PrisonerPetition.prisoner_id' => $prisoner_id );
+        }
+        if(isset($this->params['named']['editPrisoner']) && $this->params['named']['editPrisoner'] != ''){
+            $editPrisoner = $this->params['named']['editPrisoner'];
+        }
+        if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
+            if($this->params['named']['reqType']=='XLS'){
+                $this->layout='export_xls';
+                $this->set('file_type','xls');
+                $this->set('file_name','mis_report_'.date('d_m_Y').'.xls');
+            }else if($this->params['named']['reqType']=='DOC'){
+                $this->layout='export_xls';
+                $this->set('file_type','doc');
+                $this->set('file_name','mis_report_'.date('d_m_Y').'.doc');
+            }else if($this->params['named']['reqType']=='PDF'){
+                $this->layout='pdf';
+                $this->set('file_type','pdf');
+                $this->set('file_name','gatepass_list_report_'.date('d_m_Y').'.pdf');
+            }else if($this->params['named']['reqType']=='PRINT'){
+                $this->layout='print';
+            }
+            $this->set('is_excel','Y');         
+            $limit = array('limit' => 2000,'maxLimit'   => 2000);
+        }else{
+            $limit = array('limit'  => 20);
+        }               
+        $this->paginate = array(
+            'conditions'    => $condition,
+            'order'         => array(
+                'PrisonerPetition.modified',
+            ),
+            'limit'         => 20,
+        );
+        $petetionresult = array("Petetion Discharge"=>"Petetion Discharge","Commutation of Sentence"=>"Commutation of Sentence");
+        $datas = $this->paginate('PrisonerPetition');
+        $this->set(array(
+            'datas'         =>  $datas,  
+            'prisoner_id'   =>  $prisoner_id,
+            'editPrisoner'  =>  $editPrisoner,
+            'funcall'       =>  $this,
+            'editPrisoner'  =>  $editPrisoner,
+            'login_user_id' => $this->Session->read('Auth.User.id'),
+            'login_user_type_id' => $this->Session->read('Auth.User.usertype_id'),
+            'petetionresult' => $petetionresult
+        ));
+    }
+
+    function getPetitionOffence($case_id)
+    {
+        $this->autoRender=false;
+        $result = array(); 
+        // if($prisoner_id != '')
+        // {
+            $result   = $this->PrisonerOffence->find('list', array(
+                'joins' => array(
+                    array(
+                    'table' => 'prisoner_case_files',
+                    'alias' => 'PrisonerCaseFile',
+                    'type' => 'inner',
+                    'conditions'=> array('PrisonerOffence.prisoner_case_file_id = PrisonerCaseFile.id')
+                    ),
+                    array(
+                    'table' => 'prisoner_sentences',
+                    'alias' => 'PrisonerSentence',
+                    'type' => 'inner',
+                    'conditions'=> array('PrisonerSentence.case_id = PrisonerCaseFile.id')
+                    ),
+                ), 
+                'fields'=>array(
+                    'PrisonerOffence.id',
+                    'PrisonerOffence.offence_no'
+                ),
+                'conditions'    => array(
+                    'PrisonerCaseFile.is_trash'     => 0,
+                   // 'PrisonerSentence.wish_to_appeal'=> 1,
+                    'PrisonerOffence.prisoner_case_file_id'  => $case_id
+                )
+            ));
+        //}
+            //debug($result);
+        if(is_array($result) && count($result)>0){
+                echo '<option value=""></option>';
+                foreach($result as $resultKey=>$resultVal){
+                    echo '<option value="'.$resultKey.'">'.$resultVal.'</option>';
+                }
+            }else{
+                echo '<option value=""></option>';
+            }
+    }
+    public function appealAjax(){
+        
+        $this->layout   = 'ajax';
+        $prisoner_id      = '';
+        $condition      = array(
+            'PrisonerSentenceAppeal.is_trash'         => 0,
+        );
+        // Display result as per status and user type --START--
+        if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
+        {
+            $condition      += array('PrisonerSentenceAppeal.status !='=>'Draft');
+        }
+        else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+        { 
+            $condition      += array('PrisonerSentenceAppeal.status not in ("Draft","Saved","Review-Rejected")');
+        }
+        else if($this->Session->read('Auth.User.usertype_id') != Configure::read('RECEPTIONIST_USERTYPE'))
+        {
+            $condition      += array('PrisonerSentenceAppeal.status'=>'Approved');
+        }
+        // Display result as per status and user type --END--
+        $editPrisoner = 0;
+        if(isset($this->params['named']['editPrisoner']) && $this->params['named']['editPrisoner'] != ''){
+            $editPrisoner = $this->params['named']['editPrisoner'];
+        }
+        if(isset($this->params['named']['prisoner_id']) && $this->params['named']['prisoner_id'] != ''){
+            $prisoner_id = $this->params['named']['prisoner_id'];
+            $condition += array('PrisonerSentenceAppeal.prisoner_id' => $prisoner_id );
+        }
+        if(isset($this->params['named']['puuid']) && $this->params['named']['puuid'] != ''){
+            $puuid = $this->params['named']['puuid'];
+        }
+        if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
+            if($this->params['named']['reqType']=='XLS'){
+                $this->layout='export_xls';
+                $this->set('file_type','xls');
+                $this->set('file_name','mis_report_'.date('d_m_Y').'.xls');
+            }else if($this->params['named']['reqType']=='DOC'){
+                $this->layout='export_xls';
+                $this->set('file_type','doc');
+                $this->set('file_name','mis_report_'.date('d_m_Y').'.doc');
+            }else if($this->params['named']['reqType']=='PDF'){
+                $this->layout='pdf';
+                $this->set('file_type','pdf');
+                $this->set('file_name','gatepass_list_report_'.date('d_m_Y').'.pdf');
+            }else if($this->params['named']['reqType']=='PRINT'){
+                $this->layout='print';
+            }
+            $this->set('is_excel','Y');         
+            $limit = array('limit' => 2000,'maxLimit'   => 2000);
+        }else{
+            $limit = array('limit'  => 20);
+        }            
+        $this->paginate = array(
+            'conditions'    => $condition,
+            'order'         => array(
+                'PrisonerSentenceAppeal.modified',
+            ),
+            'limit'         => 20,
+        ); 
+        $datas = $this->paginate('PrisonerSentenceAppeal'); 
+        $this->set(array(
+            'datas'         =>  $datas,  
+            'prisoner_id'   =>  $prisoner_id,
+            'puuid'         =>  $puuid,
+            'editPrisoner'  =>  $editPrisoner,
+            'funcall'       =>  $this
+        ));
+    }
+     function courtList()
+    {
+        $this->autoRender = false;
+        $courtlevel_id = $this->request->data['courtlevel_id'];
+        //$courtHtml = '<option value="">-- Select Court --</option>';
+        $courtHtml = '<option value=""></option>';
+        if(isset($courtlevel_id) && (int)$courtlevel_id != 0)
+        {
+            $courtList = $this->Court->find('list', array(
+                'recursive'     => -1,
+                'fields'        => array(
+                    'Court.id',
+                    'Court.name',
+                ),
+                'conditions'    => array(
+                    'Court.courtlevel_id'     => $courtlevel_id,
+                    'Court.is_enable'      => 1,
+                    'Court.is_trash'       => 0,
+                ),
+                'order'         => array(
+                    'Court.name'
+                ),
+            ));    
+            //$stateHtml = '';
+            foreach($courtList as $courtKey=>$courtVal)
+            {
+                $courtHtml .= '<option value="'.$courtKey.'">'.$courtVal.'</option>';
+            }
+        }
+        //$countryHtml .= '<option value="other">Other</option>';
+        echo $courtHtml;  
+    }
+    function getCaseFile($prisoner_id=''){
+        $this->loadModel('PrisonerCaseFile');
+        
+        $condition = array(
+            'PrisonerCaseFile.prisoner_id'    => $prisoner_id
+        );
+          $prisonerCaseFile = $this->PrisonerCaseFile->find('list', array(
+            'recursive'     => -1,
+            'fields'        => array(
+                'PrisonerCaseFile.id',
+                'PrisonerCaseFile.file_no'
+
+            ),
+            'conditions'    => $condition
+        ));
+            return implode(",", $prisonerCaseFile);
+       
+       //  return $prisonerCaseFile['PrisonerCaseFile']['file_no'];
+     }
+     function getOffence($prisoner_id=''){
+        $this->loadModel('PrisonerOffence');
+        
+        $condition = array(
+            'PrisonerOffence.prisoner_id'    => $prisoner_id
+        );
+          $prisonerOffence = $this->PrisonerOffence->find('list', array(
+            'recursive'     => -1,
+            'fields'        => array(
+                'PrisonerOffence.id',
+                'PrisonerOffence.offence_no'
+
+            ),
+            'conditions'    => $condition
+        ));
+            return implode(",", $prisonerOffence);
+       
+       //  return $prisonerCaseFile['PrisonerCaseFile']['file_no'];
+     }
+    //PARTHA CODE END PETETION IN COURT ATTENDANCE
 	
 }

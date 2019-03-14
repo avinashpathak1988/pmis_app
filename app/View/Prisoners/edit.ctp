@@ -1796,7 +1796,7 @@ $next_date_after_6months = date('d-m-Y',strtotime("+6 months"));
                                         </div>   
                                         <div class="span6">
                                             <div class="control-group">
-                                                <label class="control-label">Subcategory Disability <?php echo $req; ?>:</label>
+                                                <label class="control-label">Subcategory Disability :</label>
                                                 <div class="controls">
                                                     <?php echo $this->Form->input('type_of_disability',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','options'=>'', 'options'=>$typeOfDisabilityList, 'empty'=>'','id'=>'type_of_disability', 'required'=>false));?>
                                                 </div>
@@ -4168,10 +4168,10 @@ $.validator.addMethod("loginRegex", function(value, element) {
                     required: true,
                     valueNotEquals: "0",
                 },
-                'data[PrisonerSpecialNeed][type_of_disability]': {
-                    required: true,
-                    valueNotEquals: "0",
-                },
+                // 'data[PrisonerSpecialNeed][type_of_disability]': {
+                //     required: true,
+                //     valueNotEquals: "0",
+                // },
                 
             },
             messages: {
@@ -4182,10 +4182,10 @@ $.validator.addMethod("loginRegex", function(value, element) {
                     required: "Please select Type of Disability",
                     valueNotEquals: "Please select Type of Disability"
                 },
-                'data[PrisonerSpecialNeed][type_of_disability]': {
-                    required: "Please select subcategory of Disability",
-                    valueNotEquals: "Please select subcategory of Disability"
-                },
+                // 'data[PrisonerSpecialNeed][type_of_disability]': {
+                //     required: "Please select subcategory of Disability",
+                //     valueNotEquals: "Please select subcategory of Disability"
+                // },
             },
                
     });

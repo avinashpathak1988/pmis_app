@@ -63,7 +63,7 @@
                          <?php echo $this->Form->input('LodgerPrisonerCashItem.'.$i.'.pp_amount',array('div'=>false,'label'=>false,'placeholder'=>'Enter pp cash amount','class'=>'form-control  numeric','id'=>'pp_amount','required'=>'Please enter PP cash amount','required'));?>
                     </div>
                     <div class="span3">
-                        <?php echo $this->Form->input('LodgerPrisonerCashItem.'.$i.'.pp_cash',array('div'=>false,'label'=>false,'class'=>'form-control ','type'=>'select','id'=>'pp_cash','empty'=>'--Select--','options'=>$ppcash,'required','style'=>'width:180px;','title'=>'Please select type of pp cash'));?>
+                        <?php echo $this->Form->input('LodgerPrisonerCashItem.'.$i.'.pp_cash',array('div'=>false,'label'=>false,'class'=>'form-control pmis_select','type'=>'select','id'=>'pp_cash','empty'=>'','options'=>$ppcash,'required','style'=>'width:180px;','title'=>'Please select type of pp cash'));?>
                     </div>
                     
                     

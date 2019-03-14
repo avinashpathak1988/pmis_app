@@ -40,6 +40,8 @@ if(isset($this->request->data['CauseList']['next_date']) && $this->request->data
                             <li><a href="#produceToCourt" id="produceToCourtBtn" onclick="ToCourt()">To Court</a></li>
 						
                             <li><a href="#returnFromCourt" id="returnFromCourt" onclick="returnFromCourt()">From Court</a></li>
+
+                            <li><a href="#petiontab" id="petiontab" onclick="petionfrom()">Petition</a></li>
                         </ul>
                         <div class="tabscontent">
 							<?php if($remand_prisoner!='yes') { ?>	
@@ -233,6 +235,31 @@ if(isset($this->request->data['CauseList']['next_date']) && $this->request->data
                                 </div>
                                 <div class="table-responsive" id="causeListDiv"></div>
                             </div>
+
+                             <div id="petiontab" align="center">
+                                <?php //debug($prisonerData); ?>
+                                <div id="pf98">
+                                        <?php echo $this->Html->link('PF-98',array('controller'=>'ExtractPrisonersRecord','action'=>'add/'.$prisoner_id),array('escape'=>false,'class'=>'btn btn-success btn-mini')); ?>
+                                </div>
+                                    <?php //if($editPrisoner == 1)
+                                    //debug($this->data);
+                                    //{?>
+                                        <?php echo $this->Form->create('PrisonerPetition',array('class'=>'form-horizontal','enctype'=>'multipart/form-data','url' => '/Courtattendances/prisonerPetition'));
+                                        echo $this->Form->input('id',array('type'=>'hidden'));
+                                        echo $this->Form->input('uuid',array('type'=>'hidden', 'value'=>$prisonerData['Prisoner']['uuid']));
+                                       
+                                        echo $this->element('petition_courtattendance');
+
+                                        ?>
+                                        
+                                        <div class="form-actions petition_hide" align="center"><!-- <input type="submit" name="" value="Save"> -->
+                                            <button type="submit" tabcls="next" id="petitionSaveBtn" class="btn btn-success formSaveBtn">Save</button>
+                                        </div>
+                                        <?php echo $this->Form->end();?>
+                                    <?php //}?>
+                                    <div id="petition_listview"></div>
+
+                            </div>
 							
 							<?php } ?>
 							
@@ -256,7 +283,7 @@ if(isset($this->request->data['CauseList']['next_date']) && $this->request->data
                                                     </div>
                                                 </div>
                                             </div> -->
-											
+											<?php //debug($this->request->data); ?>
                                              <div class="span6">
                                                 <div class="control-group">
                                                     <label class="control-label">Authority<?php echo $req; ?> :</label>
@@ -288,11 +315,11 @@ if(isset($this->request->data['CauseList']['next_date']) && $this->request->data
 													$readonly = '';	
 													if(isset($appeal_cause_list) && $appeal_cause_list != '')
 													{
-															$slected = 'selected';
+															
 															$val = '2';
 															$readonly = 'readonly';
 													}													
-                                                     echo $this->Form->input('authority_type',array('value'=>$val,$slected,$readonly,'div'=>false,'label'=>false,'type'=>'select','empty'=>'','options'=>$authority,'onchange' => 'showAuthority(this.value)', 'class'=>'form-control pmis_select','required','id'=>'authority_id','title'=>'Please select cause list'));
+                                                     echo $this->Form->input('authority_type',array('default'=>$val,$readonly,'div'=>false,'label'=>false,'type'=>'select','empty'=>'','options'=>$authority,'onchange' => 'showAuthority(this.value)', 'class'=>'form-control pmis_select','required','id'=>'authority_id','title'=>'Please select cause list'));
 													?>
                                                     </div>
                                                 </div>
@@ -421,7 +448,7 @@ if(isset($this->request->data['CauseList']['next_date']) && $this->request->data
 												<div class="control-group">
 													<label class="control-label">Date Of Cause List<?php echo $req; ?>:</label>
 													<div class="controls">
-														<?php echo $this->Form->input('cause_date',array('div'=>false,'label'=>false,'class'=>'form-control maxCurrentDate span11 causelisttab','type'=>'text','placeholder'=>'Enter Appeal date to court.','id'=>'cause_date','readonly','title'=>'Please select  causelist date'));?>
+														<?php echo $this->Form->input('cause_date',array('div'=>false,'label'=>false,'class'=>'form-control maxCurrentDate span11 causelisttab','type'=>'text','placeholder'=>'Enter Appeal date to court.','id'=>'cause_date','readonly','title'=>'Please select  causelist date','value'=>date('d-m-Y')));?>
 													</div>
 												</div>
 											</div>
@@ -430,7 +457,8 @@ if(isset($this->request->data['CauseList']['next_date']) && $this->request->data
 												<div class="control-group">
 													<label class="control-label">Session  Commence Date<?php echo $req; ?>:</label>
 													<div class="controls">
-														<?php echo $this->Form->input('commence_date',array('div'=>false,'label'=>false,'class'=>'form-control mydate span11 causelisttab','type'=>'text','placeholder'=>'Enter session commence date.','id'=>'commence_date','readonly','title'=>'Please enter session commence date'));?>
+														 <?php echo $this->Form->input('commence_date',array('div'=>false,'label'=>false,'class'=>'form-control mydate span11','type'=>'text','placeholder'=>'Enter session commence date.','readonly'=>true,'id'=>'commence_date','readonly','title'=>'Please enter session commence date','value'=>date('d-m-Y')));?> 
+                                                      
 													</div>
 												</div>
 											</div>
@@ -1031,6 +1059,7 @@ $ajaxfromCauseListUrl = $this->Html->url(array('controller'=>'courtattendances',
 $ajaxGotoAppeal = $this->Html->url(array('controller'=>'prisoners','action'=>'edit',$uuid.'#appeal_against_sentence'));
 $cancelurl = Router::url('/', true).'/courtattendances/index/'.$uuid.'#produceToCourt';
 $ajaxgetFromCourt = $this->Html->url(array('controller'=>'courtattendances','action'=>'getFromCourtOffence'));
+$ajaxUrl_petition = $this->Html->url(array('controller'=>'courtattendances','action'=>'petitionAjax'));
 
 $ajaxtoCourtlistUrl        = $this->Html->url(array('controller'=>'courtattendances','action'=>'getTocourtListData'));
 
@@ -1048,6 +1077,7 @@ echo $this->Html->scriptBlock("
     jQuery(function($) {
         //$('select').select2();
         showCommonHeader();
+        // showDataPetition();
 
         if($('#CourtattendanceId').val()==''){
                $('#magisterial_id').select2('val', '');
@@ -1058,7 +1088,8 @@ echo $this->Html->scriptBlock("
                 $('#court_id').select2('val', '".$court_id."');
                 $('#court_level').val('".$court_level."');
                 
-        }
+        }   
+		
 		//showProduceToCourtData();
         //causeListData();
         
@@ -1174,7 +1205,7 @@ echo $this->Html->scriptBlock("
             $('#causeListDiv').html(res);
         });           
     }
-
+     
 	function tocourtListData(){
         var url   = '".$ajaxtoCourtlistUrl."';
         var uuid  = '".$uuid."';
@@ -1471,7 +1502,23 @@ function returnFromCourt(){
 	$('#r_next_session_div').css('display','none');		
 	courtReturnData();
 }
+function petionfrom(){
 
+    
+    showDataPetition();
+}
+function showDataPetition(){
+         var url = "<?php echo $ajaxUrl_petition?>";
+		var prisoner_id = $('#prisoner_id').val();
+         url = url + '/prisoner_id:'+ prisoner_id;
+         $.post(url, {}, function(res) {
+             if (res) {
+                 $('#petition_listview').html(res);
+              
+				}
+        
+			});
+}
 /* for rulling status */
 function dissplayRulling(val)
 {
@@ -2669,8 +2716,11 @@ $('#from_cause_list').click(function(){
 
 });
 
+
 <?php if(isset($this->request->data['Courtattendance']['authority_type']) && $this->request->data['Courtattendance']['authority_type'] != ''){ ?>
 $(document).ready(function(){
+    // $("#authority_type").select2('val', '');
+
 	<?php if($this->request->data['Courtattendance']['authority_type']==1)
 	{
 	?>
@@ -2897,6 +2947,7 @@ function showAuthority(isdual)
 
 
     $(function(){
+
 
 	$("#file_no").select2();
 	$("#offence_no2").select2();
@@ -3561,6 +3612,90 @@ function dissplaySentence(sentence_option)
 		<?php } ?>
 	}
 }
+// function getCourtList(id, cnt)
+// {
+//     var is_valid = '';
+//     if(is_remand == 1)
+//     {
+//         is_valid = "<span style='color:red;'>*</span>";
+//     }
+//     $('#'+cnt+'_magistrate_level').text("Presiding Judicial Officer:");
+//     var strURL = '<?php echo $this->Html->url(array('controller'=>'prisoners','action'=>'courtList'));?>';
+//     $.post(strURL,{"courtlevel_id":id},function(data){ 
+        
+//         if(data) { 
+//             $('#'+cnt+'_court_id').html(data); 
+//         }
+//         else
+//         {
+//             alert("Error...");  
+//         }
+//     }); 
+//     $('#'+cnt+'_court_id').select2({
+//         placeholder: "-- Select --",
+//         allowClear: true
+//     });
+
+//     if(id == 8)
+//     {
+//         $('#'+cnt+'_highcourt_file_no_reqd').removeClass('hidden');
+//         $('#'+cnt+'_court_file_no_reqd').addClass('hidden');
+//         $('#'+cnt+'_court_file_no').prop('required', false);
+//         $('#'+cnt+'_highcourt_file_no').prop('required', true);
+//     }
+//     else 
+//     {
+//         $('#'+cnt+'_highcourt_file_no_reqd').addClass('hidden');
+//         $('#'+cnt+'_court_file_no_reqd').removeClass('hidden', '');
+//         $('#'+cnt+'_highcourt_file_no').removeAttr('required', '');
+//         $('#'+cnt+'_court_file_no').attr('required', 'required');
+//     }
+//     if(id == 5 || id == 6)
+//     {
+//         //Magistrate Grade 1 / Magistrate Grade 2
+//         $('#'+cnt+'_magistrate_level').html("Magistrate"+is_valid+":");
+//         $('#'+cnt+'_judicial_officer').attr("placeholder","Magistrate");
+//         $('#'+cnt+'_judicial_officer').attr("title","Enter Magistrate");
+//     }
+//     if(id == 7)
+//     {
+//         //Chief Magistrate
+//         $('#'+cnt+'_magistrate_level').html("Chief Magistrate"+is_valid+":");
+//         $('#'+cnt+'_judicial_officer').attr("placeholder","Chief Magistrate");
+//         $('#'+cnt+'_judicial_officer').attr("title","Enter Chief Magistrate");
+//     }
+//     if(id == 8)
+//     {
+//         //High Court
+//         $('#'+cnt+'_magistrate_level').html("Judges"+is_valid+":");
+//         $('#'+cnt+'_judicial_officer').attr("placeholder","Judges");
+//         $('#'+cnt+'_judicial_officer').attr("title","Enter Judges");
+//     }
+//     if(id == 9 || id == 10)
+//     {
+//         //supreme court/court of appeal
+//         $('#'+cnt+'_magistrate_level').html("Panel Of Justices"+is_valid+":");
+//         $('#'+cnt+'_judicial_officer').attr("placeholder","Panel Of Justices");
+//         $('#'+cnt+'_judicial_officer').attr("title","Enter Panel Of Justices");
+//         $('#'+cnt+'_judges_btn').removeClass('hidden');
+//     }
+//     else 
+//     {   
+//         $('#'+cnt+'_judges_btn').addClass('hidden');
+//     }
+
+
+//     // if(id == 5 || id == 6 || id == 7)
+//     // {
+//     //     $('#'+cnt+'_crb_no_reqd').removeClass('hidden');
+//     //     $('#'+cnt+'_crb_no').prop('required',true);
+//     // }
+//     // else 
+//     // {
+//     //     $('#'+cnt+'_crb_no_reqd').addClass('hidden');
+//     //     $('#'+cnt+'_crb_no').prop('required',false);
+//     // }
+// }
 /* for rulling status */
 
 /* appeal status */

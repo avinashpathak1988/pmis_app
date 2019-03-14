@@ -31,31 +31,59 @@
                        
                     </div>
                     <div class="row input_fields_wrap" id="inputfields">
-                    	<div class="row more-feilds">
-	                        <div class="span6 removeclass">
-	                            <div class="control-group">
-	                                <label class="control-label">Cell Name:</label>
-	                                <div class="controls">
-	                                    <?php echo $this->Form->input('cell_name.',array('div'=>false,'label'=>false,'placeholder'=>'Enter Cell Name','class'=>'form-control','required'=>false));?>
-	                                </div>
-	                            </div>
-	                        </div>
-	                        <div class="span6 removeclass">
-	                            <div class="control-group">
-	                                <label class="control-label">Cell No<?php echo MANDATORY; ?> :</label>
-	                                <div class="controls">
-	                                    <?php echo $this->Form->input('cell_no.',array('div'=>false,'label'=>false,'placeholder'=>'Enter Cell No','class'=>'form-control','required'));?>
-	                                </div>
-	                            </div>
-	                        </div>
+                       <?php if(isset($this->request->data['WardCell']['id']) && $this->request->data['WardCell']['id'] != ''){ ?>
+                        <div class="row more-feilds">
+                            <div class="span6 removeclass">
+                                <div class="control-group">
+                                    <label class="control-label">Cell Name:</label>
+                                    <div class="controls">
+                                        <?php echo $this->Form->input('cell_name.',array('div'=>false,'label'=>false,'placeholder'=>'Enter Cell Name','class'=>'form-control','required'=>false,'value'=>$this->request->data['WardCell']['cell_name'][0]));?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span6 removeclass">
+                                <div class="control-group">
+                                    <label class="control-label">Cell No<?php echo MANDATORY; ?> :</label>
+                                    <div class="controls">
+                                        <?php echo $this->Form->input('cell_no.',array('div'=>false,'label'=>false,'placeholder'=>'Enter Cell No','class'=>'form-control','required','value'=>$this->request->data['WardCell']['cell_no'][0]));?>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                       <?php }else{ ?>
+                       <div class="row more-feilds">
+                            <div class="span6 removeclass">
+                                <div class="control-group">
+                                    <label class="control-label">Cell Name:</label>
+                                    <div class="controls">
+                                        <?php echo $this->Form->input('cell_name.',array('div'=>false,'label'=>false,'placeholder'=>'Enter Cell Name','class'=>'form-control','required'=>false));?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span6 removeclass">
+                                <div class="control-group">
+                                    <label class="control-label">Cell No<?php echo MANDATORY; ?> :</label>
+                                    <div class="controls">
+                                        <?php echo $this->Form->input('cell_no.',array('div'=>false,'label'=>false,'placeholder'=>'Enter Cell No','class'=>'form-control','required'));?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       <?php } ?>
+                          
+                       
                     </div>
+
                     
 				    <div class="form-actions">
-						        <label for="">&nbsp;</label><br/>
-						       <!--  <a class="btn btn-success add-more">+ Add More</a> -->
-						        <button type="button" id="btn1">Add More</button>
+                         
+                          <label for="">&nbsp;</label><br/>
+                               <!--  <a class="btn btn-success add-more">+ Add More</a> -->
+                                <button type="button" id="btn1">Add More</button>
                                 <button type="button" class="hidden btn-danger" id="remove_cell">Remove</button>
+                      
+						      
 				    </div>
 						
                     <div class="form-actions" align="center">

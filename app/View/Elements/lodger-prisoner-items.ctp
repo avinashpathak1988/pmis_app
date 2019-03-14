@@ -124,7 +124,7 @@
                 <div class="entry2 visitorItemEntry input-group row-fluid uradioBtn">
                     <div class="span2">
                         
-                        <?php echo $this->Form->input('LodgerPrisonerItem.0.item_type',array('div'=>false,'label'=>false,'class'=>'form-control','type'=>'select','data-index'=>0,'options'=>$propertyItemList, 'empty'=>array(''=>'-- Select Item --'),'required'=>false, 'style'=>'width:92%','id'=>'item_id2'));?>
+                        <?php echo $this->Form->input('LodgerPrisonerItem.0.item_type',array('div'=>false,'label'=>false,'class'=>'form-control pmis_select','type'=>'select','data-index'=>0,'options'=>$propertyItemList, 'empty'=>'','required'=>false, 'style'=>'width:92%','id'=>'item_id2'));?>
                                     
                     </div>
                     <div class="span2">
@@ -137,7 +137,7 @@
                     </div>
                      <div class="span2 property_type">
 
-                        <?php echo $this->Form->input('LodgerPrisonerItem.0.property_type',array('div'=>false,'label'=>false,'class'=>'form-control','type'=>'select','options'=>array(), 'empty'=>array(''=>'-- Select Item --'),'required'=>false, 'style'=>'width:90%'));?>
+                        <?php echo $this->Form->input('LodgerPrisonerItem.0.property_type',array('div'=>false,'label'=>false,'class'=>'form-control pmis_select','type'=>'select','options'=>array(), 'empty'=>array(''=>''),'required'=>false, 'style'=>'width:90%'));?>
                     </div>
                     <span class="input-group-btn">
                         <button class="btn btn-success btn-add2" type="button" style="padding: 8px 8px;margin-bottom: 13px;">
@@ -205,13 +205,13 @@ $(function()
         $('#visitorPrisonerItemsDiv input[name*="quantity"]:last').attr('id',quantity_name_id);
         $('#visitorPrisonerItemsDiv input[name*="quantity"]:last').attr('required','required');
 
-
          var quantity_name = "data[LodgerPrisonerItem]["+scount2+"][weight]";
         var quantity_name_id = "LodgerPrisonerItem"+scount2+"weight";
         $('#visitorPrisonerItemsDiv input[name*="weight"]:last').attr('name',quantity_name);
         $('#visitorPrisonerItemsDiv input[name*="weight"]:last').attr('id',quantity_name_id);
         $('#visitorPrisonerItemsDiv input[name*="weight"]:last').attr('required','required');
-
+        $('#'+quantity_name_id).val('');
+        
 
         var item_id_name = "data[LodgerPrisonerItem]["+scount2+"][weight_unit]";
         var item_id_id = "LodgerPrisonerItem"+scount2+"weight_unit";

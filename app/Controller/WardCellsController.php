@@ -75,7 +75,8 @@ class WardCellsController extends AppController {
         $ward_id  = '';
         $cell_name  = '';
         $prison_id ='';
-        $condition = array('WardCell.is_trash'	=> 0);
+        $condition = array('WardCell.is_trash'	=> 0,'WardCell.prison_id'=>$this->Session->read('Auth.User.prison_id'));
+
         if(isset($this->params['named']['ward_id']) && (int)$this->params['named']['ward_id'] != 0){
             $prison_id = $this->params['named']['ward_id'];
             $condition += array('WardCell.ward_id' => $prison_id );
@@ -89,41 +90,47 @@ class WardCellsController extends AppController {
             $condition += array("WardCell.cell_name LIKE '%$cell_name%'");
         } 
         $this->paginate = array(
-            'recursive'=> -1,
-            'joins' => array(
-                array(
-                    'table' => 'ward_cells',
-                    'alias' => 'WardCell',
-                    'type' => 'inner',
-                    'conditions'=> array('WardCell.prison_id = Prison.id')
-                ),
-                array(
-                    'table' => 'wards',
-                    'alias' => 'Ward',
-                    'type' => 'inner',
-                    'conditions'=> array('WardCell.ward_id = Ward.id')
-                ),
-            ), 
-            //'conditions'    => $condition,
-            // 'order'         =>array(
+            // 'recursive'=> -1,
+            // 'joins' => array(
+            //     array(
+            //         'table' => 'ward_cells',
+            //         'alias' => 'WardCell',
+            //         'type' => 'inner',
+            //         'conditions'=> array('WardCell.prison_id = Prison.id')
+            //     ),
+            //     array(
+            //         'table' => 'wards',
+            //         'alias' => 'Ward',
+            //         'type' => 'inner',
+            //         'conditions'=> array('WardCell.ward_id = Ward.id')
+            //     ),
+            // ), 
+            'conditions'    => $condition,//array(
+            //     'WardCell.is_trash'    => 0,
+            //     'WardCell.prison_id'    => $this->Session->read('Auth.User.prison_id'),
+
+            // ),
+            'order'         =>array(
                
-            //     'WardCell.id'  => 'DESC'
+                'WardCell.id'  => 'DESC'
               
-            // ),  
+            ),  
             // 'fields'  => array(
             //      'WardCell.ward_id',                   
+            //      'Ward.name',                   
             //      'WardCell.cell_name',
-            //      'WardCell.cell_no' 
+            //      'WardCell.cell_no', 
+            //      'WardCell.prison_id' 
             // ),        
-            'group'=>array(
-               'Ward.id'
+            // 'group'=>array(
+            //    'Ward.id'
 
-            ),
-            'limit'         => 20,
+            // ),
+            // 'limit'         => 20,
         );
 
-        $datas  = $this->paginate('Prison');
-        debug($datas); exit;
+        $datas  = $this->paginate('WardCell');
+        // debug($datas); exit;
         $this->set(array(
             'ward_id'          => $ward_id,
             'cell_name'        => $cell_name,
@@ -151,6 +158,7 @@ class WardCellsController extends AppController {
 	public function add() { 
 		$this->loadModel("WardCell"); 
 		$this->loadModel('Ward');
+        //debug($this->request);exit;
 		if (isset($this->data['WardCell']) && is_array($this->data['WardCell']) && count($this->data['WardCell'])>0){
             $fibalarray = array();
             foreach ($this->data['WardCell']['cell_name'] as $key => $value) {
@@ -191,11 +199,21 @@ class WardCellsController extends AppController {
                 $this->Session->write('message','Saving Failed !');
 			}
 		}
-        if(isset($this->data['WardCellEdit']['id']) && (int)$this->data['WardCellEdit']['id'] != 0){
+
+        if(isset($this->data['WardCellEdit']['id']) && (int)$this->data['WardCellEdit']['id'] != 0 && $this->data['WardCellEdit']['id']!='')  {
             if($this->WardCell->exists($this->data['WardCellEdit']['id'])){
-                $this->data = $this->WardCell->findById($this->data['WardCellEdit']['id']);
+                 $wardCell = $this->WardCell->findById($this->data['WardCellEdit']['id']);
+                $this->request->data = $wardCell;
+                $this->request->data['WardCell']['cell_name']=[];
+                $this->request->data['WardCell']['cell_no']=[];
+                $this->request->data['WardCell']['cell_name'][0]= $wardCell['WardCell']['cell_name'];
+                $this->request->data['WardCell']['cell_no'][0]= $wardCell['WardCell']['cell_no'];
+
+
+                // /debug($this->request->data);
             }
-        }		
+        }
+
 		$wardList = $this->Ward->find('list', array(
 			'recursive'		=> -1,
 			'fields'		=> array(

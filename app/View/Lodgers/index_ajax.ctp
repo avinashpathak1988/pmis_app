@@ -340,7 +340,7 @@ foreach($datas as $data){
           <?php } ?>
           <?php if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE')){?>
             <td>
-             <?php if(!isset($is_excel) && $data['Lodger']['ward_id']=='') { ?>
+             <?php if($data['Lodger']['ward_id']=='') { ?>
                 <!-- Trigger the modal with a button -->
                     <button type="button" class="btn btn-info btn-mini" data-toggle="modal" data-target="#myModalWard<?php echo $data['Lodger']['id']; ?>">Update Ward</button>
 

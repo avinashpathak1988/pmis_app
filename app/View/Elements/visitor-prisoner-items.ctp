@@ -50,29 +50,34 @@
                         <?php echo $this->Form->input('VisitorPrisonerItem.'.$i.'.quantity',array('div'=>false,'label'=>false,'class'=>'form-control numeric span11 quan','type'=>'text','maxlength'=>'3' ,'placeholder'=>'Quantity','required','value'=>$VisitorItem["quantity"]));?>
                         
                     </div>
-                    <div class="span4">
-                        <?php echo $this->Form->input('VisitorPrisonerItem.'.$i.'.weight',array('div'=>false,'label'=>false,'class'=>'form-control ','type'=>'text','maxlength'=>'10' ,'placeholder'=>'Weight','style'=>'width:50%','required','value'=>$VisitorItem["weight"]));?>
+                    <div class="span2">
+                        <?php echo $this->Form->input('VisitorPrisonerItem.'.$i.'.weight',array('div'=>false,'label'=>false,'class'=>'form-control ','type'=>'text','maxlength'=>'10' ,'placeholder'=>'Weight','required','value'=>$VisitorItem["weight"]));?>
+                        
+                    </div>
+                    <div class="span2">
                         <?php echo $this->Form->input('VisitorPrisonerItem.'.$i.'.weight_unit',array('div'=>false,'label'=>false,'class'=>'form-control','style'=>'width:20%','type'=>'select','options'=>$weight_units, 'empty'=>array(''=>'-- Select unit --'),'required', 'style'=>'width:92%'));?>
                         <?php echo $this->Form->input('VisitorPrisonerItem.'.$i.'.is_collected',array('div'=>false,'label'=>false,'type'=>'hidden' ,'required'=>false,'value'=> $VisitorItem["is_collected"]==1?'true':'false'));?>
                     </div>
                      <div class="span2 property_type">
                         <?php 
                             $types =array();
-                            $res = $funcall->getPropertyTypeNew($physicalPropertyItem['item_type']);
+                            $res = $funcall->getPropertyTypeNew($VisitorItem['item_type']);
                             $match = explode(',', $res);
+                            //debug($res);
                             if($match[0] == 'allowed'){
                                 $types += array('In Use'=>'In Use','In Store'=>'In Store');
                                /* array_push($types, 'In Use'=>'In Use');
                                 array_push($types, 'In Store'=>'In Store');*/
 
-                            }else{
+                            }else if(isset($match[1])){
                                 $types += array($match[1]=>$match[1]);
 
                                 //array_push($types, "'".$match[1]. "'" =>"'". $match[1] ."'");
                             }
-                           //debug($types);
+                            $defaultType = $VisitorItem['property_type'];
+                           //debug($defaultType);
                         ?>
-                        <?php echo $this->Form->input('VisitorPrisonerItem'.$i.'property_type',array('div'=>false,'label'=>false,'class'=>'form-control','type'=>'select','options'=>$types, 'empty'=>array(''=>'-- Select Item --'),'required'=>true, 'style'=>'width:90%'));?>
+                        <?php echo $this->Form->input('VisitorPrisonerItem'.$i.'property_type',array('div'=>false,'label'=>false,'class'=>'form-control','type'=>'select','options'=>$types, 'empty'=>array(''=>'-- Select Item --'),'required'=>true, 'style'=>'width:90%','default'=>$defaultType));?>
                     </div>
                     <?php if($i == 0)
                         {?>
@@ -90,6 +95,7 @@
                                 </button>
                             </span>
                         <?php }?>
+                        <br/>
                         <span>
                            <?php if( $VisitorItem["is_collected"] ==1 ){ ?>
                                 <span style="color:green;">Collected</span>

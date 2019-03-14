@@ -233,6 +233,7 @@ class LodgersController extends AppController {
                 'Lodger.modified'  => 'DESC',
             ),
         )+$limit;
+        // debug($condition);
         $datas = $this->paginate('Lodger');
         $this->set(array(
             'datas'         => $datas,
@@ -1774,7 +1775,7 @@ class LodgersController extends AppController {
             'recursive'     => -1,
             'conditions'    => array(
                 'Ward.gender'       => $gender_id,
-                // 'Ward.prison'       => $this->Session->read('Auth.User.prison_id'),
+                'Ward.prison'       => $this->Session->read('Auth.User.prison_id'),
                 // 'Ward.ward_type'    => $ward_type,
             ),
             'fields'        => array(
@@ -1912,8 +1913,8 @@ class LodgersController extends AppController {
     }
 
     public function escapedPrisonerAjax(){
-        $this->layout   = 'ajax';
-        $data = $this->Discharge->find('first', array(
+         $this->layout   = 'ajax';
+         $data = $this->Discharge->find('first', array(
            
             'conditions'=>array(
                 'Discharge.prisoner_id'         => $this->data['prisoner_id'],
