@@ -69,10 +69,10 @@ class DATABASE_CONFIG {
 	public $default = array(
 		'datasource' => 'Database/Mysql',
 		'persistent' => false,
-		'host' => '192.168.1.220',
+		'host' => 'localhost',
 		'login' => 'root',
-		'password' => 'lipl123#',
-		'database' => 'uganda_testing',
+		'password' => 'password',
+		'database' => 'uganda_live_14_03_2019',
 		'prefix' => '',
 		//'encoding' => 'utf8',
 	);

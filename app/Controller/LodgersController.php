@@ -1925,4 +1925,106 @@ class LodgersController extends AppController {
             'data'=>$data,
         ));
     }
+
+    public function copyPrisoner($prisoner_id){
+        $this->loadModel('Prisoner');
+        $prison_id = 1;
+        $logged_in_user = 1;
+        $logged_in_user = 1;
+
+        $tableArray = array(
+            "Prisoner"  => array(
+                "table"=>array(
+                    "PrisonerIdDetail" => array(
+                        "table"             => array(),
+                        "overwrite_columns" => array(
+                            "prisoner_id"   => $prisoner_id,
+                            "puuid"         => $puuid,
+                        ),
+                    ),
+                    "PrisonerKinDetail" => array(
+                        "table"             => array(),
+                        "overwrite_columns" => array(
+                            "prisoner_id"   => $prisoner_id,
+                            "puuid"         => $puuid,
+                        ),
+                    ),
+                    "PrisonerChildDetail" => array(
+                        "table"             => array(),
+                        "overwrite_columns" => array(
+                            "prisoner_id"   => $prisoner_id,
+                            "puuid"         => $puuid,
+                        ),
+                    ),
+                    "PrisonerSpecialNeed" => array(
+                        "table"             => array(),
+                        "overwrite_columns" => array(
+                            "prisoner_id"   => $prisoner_id,
+                            "puuid"         => $puuid,
+                            "prison_station"=> $prison_id,
+                        ),
+                    ),
+                    "PrisonerAdmission" => array(
+                        "table"             => array(
+                            "PrisonerCaseFile"   => array(
+                                "table"             => array(
+                                    "PrisonerOffence" => array(
+                                        "table"             => array(),
+                                        "overwrite_columns" => array(
+                                            "prisoner_admission_id" => $prisoner_admission_id,
+                                            "prisoner_case_file_id" => $prisoner_case_file_id,
+                                            "prisoner_id" => $prisoner_id,
+                                            "login_user_id" => $login_user_id,
+                                        ),
+                                    ),
+                                ),
+                                "overwrite_columns" => array(
+                                    "prisoner_id"   => $prisoner_id,
+                                    "puuid"         => $puuid,
+                                    "prisoner_admission_id"=> $prisoner_admission_id,
+                                    "login_user_id"=> $prison_id,
+                                ),
+                            ),
+                        ),
+                        "overwrite_columns" => array(
+                            "prisoner_id"       => $prisoner_id,
+                            "puuid"             => $puuid,
+                            "prison_station"    => $prison_id,
+                        ),
+                    ),
+                    "PrisonerSentence"   => array(
+                        "table"             => array(),
+                        "overwrite_columns"     => array(
+                            "prisoner_id"       => $prisoner_id,
+                            "puuid"             => $puuid,
+                            "prisoner_admission_id"=> $prisoner_admission_id,
+                            "login_user_id"=> $prison_id,
+                        ),
+                    ),
+                    "PrisonerSentenceAppeal"    => array(
+                        "table"             => array(),
+                        "overwrite_columns" => array(
+                            "prisoner_id"      => $prisoner_id,
+                            "login_user_id"    => $login_user_id,
+                            "case_file_id"     => $case_file_id,
+                            "offence_id"       => $offence_id,
+                        ),
+                    ),
+                ),
+                "overwrite_columns" => array(
+                    'prison_id'         => $prison_id,
+                    'final_save_by'     => $logged_in_user,
+                    'prisoner_no'       => $prisoner_no,
+                )
+            ),
+        );
+
+        debug($this->Prisoner->find("first",array(
+            "recursive" => 2,
+            "conditions"    => array(
+                "Prisoner.id"   => $prisoner_id,
+            ),
+        )));
+        exit;
+    }
 }

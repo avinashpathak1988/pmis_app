@@ -1635,7 +1635,7 @@ class DischargesController    extends AppController {
 		}
 		
 		if($pendingText!=''){
-			return 1;
+			return $pendingText;
 		}else{
 			return 1;
 		}
