@@ -5,6 +5,8 @@ class InPrisonOffenceCaptureController   extends AppController {
     public $uses=array('InPrisonOffenceCapture','InternalOffence','Prisoner','InPrisonPunishment','InternalPunishment','Courtattendance','Offence','StageAssign','Stage', 'DisciplinaryProceeding','Privilege','User','PrisonerSaving','EarningGradePrisoner','EarningGrade','StageHistory','EarningRate','WorkingPartyPrisoner','RuleRegulation','PrisonerWardHistory','Stage');
 
     public function index($uuid){       
+       
+
         if($uuid){
             $prisonList = $this->Prisoner->find('first', array(
                 'recursive'     => -1,
@@ -2017,7 +2019,7 @@ class InPrisonOffenceCaptureController   extends AppController {
             ),
         )+$limit;
         $datas = $this->paginate('DisciplinaryProceeding');
-        // debug($datas);
+        // debug($datas);exit;
         $this->set(array(
             'datas'         => $datas,
             'prisoner_id'   => $prisoner_id,

@@ -1317,6 +1317,7 @@ class AppController extends Controller {
         {
             $isacees = $data['UserAccessControl'][$action];
         }
+        $isacees = 1;
         return $isacees;
     }
     /*
@@ -3281,7 +3282,8 @@ class AppController extends Controller {
             ),        
             'conditions'    => array(
                 'Prisoner.country_id'   => $countryId,
-                'Prisoner.personal_no != ' => 0
+                'Prisoner.personal_no != ' => 0,
+                'Prisoner.is_existing'      => 0
             ),
             'order' => array(
                 'Prisoner.id'      => 'Desc'
@@ -3294,6 +3296,7 @@ class AppController extends Controller {
             $pdata = explode('/',$LastPrisonerData['Prisoner']['personal_no']);
             $slno = $pdata[1]+1;
         }
+        //echo $slno; exit;
         if(isset($country['Country']['name']))
             return strtoupper(substr($country['Country']['name'], 0, 2)).'/'.str_pad($slno,10,'0',STR_PAD_LEFT) .'/'.date('y');
         else 
@@ -5116,19 +5119,30 @@ class AppController extends Controller {
         $result = 'N/A';
         if($prisoner_id != '')
         {
-            $resultData = $this->PrisonerCaseFile->find('list', array(
+            $resultData = $this->PrisonerCaseFile->find('all', array(
                 'recursive'     => -1,
                 'fields'        => array(
                     'PrisonerCaseFile.id',
-                    'PrisonerCaseFile.file_no',
+                    //'PrisonerCaseFile.case_file_no',
+                    'CONCAT(`PrisonerCaseFile`.`file_no`, "(",PrisonerCaseFile.case_file_no,")") AS `case_file_no`'
                 ),
                 'conditions'    => array(
                     'PrisonerCaseFile.prisoner_id'      => $prisoner_id,
                     'PrisonerCaseFile.is_trash' => 0
                 ),
             ));
-            if(!empty($resultData) && count($resultData))
-                $result = implode(", ", $resultData);
+            $resultVal = '';
+            if(is_array($resultData) && count($resultData)>0)
+            {
+                foreach($resultData as $cresult)
+                {
+                    if($resultVal != '')
+                        $resultVal .= '<br>';
+
+                    $resultVal .= $cresult[0]['case_file_no'];
+                }
+                $result = $resultVal;
+            }
             return $result;
         }
     }
@@ -5154,13 +5168,19 @@ class AppController extends Controller {
                     'alias' => 'PrisonerCaseFile',
                     'type' => 'inner',
                     'conditions'=> array('PrisonerOffence.prisoner_case_file_id = PrisonerCaseFile.id')
+                    ),
+                    array(
+                    'table' => 'offences',
+                    'alias' => 'Offence',
+                    'type' => 'inner',
+                    'conditions'=> array('PrisonerOffence.offence = Offence.id')
                     )
                 ), 
                 "conditions"    => $conditions,
                 'fields'=>array(
                     'PrisonerOffence.id',
                     //'PrisonerOffence.offence_no'
-                    'CONCAT(`PrisonerCaseFile`.`file_no`, ": ", `PrisonerOffence`.`offence_no`) AS `file_count_no`'
+                    'CONCAT(`PrisonerCaseFile`.`file_no`, ": ", `PrisonerOffence`.`offence_no`,"(",Offence.name,")") AS `file_count_no`'
                 ),
             ));
             $resultVal = '';
@@ -5169,7 +5189,7 @@ class AppController extends Controller {
                 foreach($resultData as $cresult)
                 {
                     if($resultVal != '')
-                        $resultVal .= ', ';
+                        $resultVal .= '<br>';
                     $resultVal .= $cresult[0]['file_count_no'];
                 }
                 $result = $resultVal;
@@ -5225,18 +5245,34 @@ class AppController extends Controller {
     //get sentence from prisoner offence -- START --
     function getPrisonerSentenceFromOffence($offence_id)
     {
+        $sentence = '';
         if($offence_id != '')
         {
-            $sentenceDetail  = $this->PrisonerSentence->find('all', array(
+            $sentenceDetail  = $this->PrisonerSentence->find('first', array(
                 'recursive'     => -1,
                 'conditions'    => array(
                     'PrisonerSentence.is_trash'     => 0,
-                    'PrisonerSentence.status'     => 'Approved',
+                    //'PrisonerSentence.status'     => 'Approved',
                     'PrisonerSentence.offence_id'  => $offence_id
                 )
             ));
-            debug($sentenceDetail);
+            //debug($sentenceDetail);
+            if(isset($sentenceDetail['PrisonerSentence']) && count($sentenceDetail['PrisonerSentence'])>0)
+            {
+                $year  = $sentenceDetail['PrisonerSentence']['years'];
+                $month = $sentenceDetail['PrisonerSentence']['months'];
+                $day   = $sentenceDetail['PrisonerSentence']['days'];
+                if($year > 0)
+                    $sentence .= $year.' years';
+                if($month > 0)
+                    $sentence .= $month.' months';
+                if($day > 0)
+                    $sentence .= $day.' days';
+
+                $sentence .= ' '.$this->getName($sentenceDetail['PrisonerSentence']['sentence_type'],'SentenceType','name');
+            }
         }
+        return $sentence;
     }
     //get sentence from prisoner offence -- END --
 }

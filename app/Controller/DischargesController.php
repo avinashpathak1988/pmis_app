@@ -232,16 +232,32 @@ class DischargesController    extends AppController {
 				));
 
 				// debug($relaseonpardon);
-				
-
-				
 
 				if(isset($relaseonpardon['PrisonerPetition']['petition_result']) && $relaseonpardon['PrisonerPetition']['petition_result']=='Discharge'){
-						$dischargeTypeCondi = array("DischargeType.id IN (14)");
-					}
+					$dischargeTypeCondi = array("DischargeType.id IN (14)");
+				}
+
+				// condition on release on medical ground ========
+
+				$this->loadModel('MedicalRelease');
+				$medicalRelease = $this->MedicalRelease->find("first", array(
+					"conditions"	=> array(
+						"MedicalRelease.prisoner_id"	=> $prisonerData['Prisoner']['id'],
+						"MedicalRelease.status"=>'Approved'
+					),
+					"order"			=> array(
+						"MedicalRelease.id"	=> "desc",
+					),
+				));
+
+				// debug($relaseonpardon);
+
+				if(isset($medicalRelease['MedicalRelease']['status']) && $medicalRelease['MedicalRelease']['status']=='Approved'){
+					$dischargeTypeCondi = array("DischargeType.id IN (11)");
+				}
 				
 
-				
+				// debug($dischargeTypeCondi);
 				//==========================================
 				$dischargetypeList = $this->DischargeType->find('list', array(
 					'recursive'		=> -1,
@@ -1290,7 +1306,7 @@ class DischargesController    extends AppController {
     			$pendingCases = $this->PrisonerSentence->find("count", array(
     				"conditions"=> array(
     					"PrisonerSentence.prisoner_id"=>$this->params['named']['prisoner_id'],
-    					"PrisonerSentence.waiting_for_confirmation"=>0,
+    					"PrisonerSentence.is_convicted"=>0,
     					"PrisonerSentence.status"=>'Approved',
     					)
     				));
@@ -1375,11 +1391,11 @@ class DischargesController    extends AppController {
     			if($prisonerDetails['Prisoner']['prisoner_type_id']!=Configure::read('CONVICTED')){
     				// echo "This prisoner not convicted";exit;
     			}
-    			$this->loadModel('PrisonerSentenceAppeal');    			
-    			$pendingCases = $this->PrisonerSentenceAppeal->find("count", array(
+    			$this->loadModel('PrisonerSentence');    			
+    			$pendingCases = $this->PrisonerSentence->find("count", array(
     				"conditions"=> array(
-    					"PrisonerSentenceAppeal.prisoner_id"=>$this->params['named']['prisoner_id'],
-    					"PrisonerSentenceAppeal.prisoner_waiting_confirmation"=>0
+    					"PrisonerSentence.prisoner_id"=>$this->params['named']['prisoner_id'],
+    					"PrisonerSentence.is_convicted"=>1
     					)
     				));
     			if($pendingCases != 0){
@@ -1553,6 +1569,84 @@ class DischargesController    extends AppController {
 				$pendingText .= "Medical Pending, ";
 			}			
 		}
+		//get prisoner properties
+			$this->loadModel('PhysicalProperty');
+			$this->loadModel('PhysicalPropertyItem');
+			$this->loadModel('CashItem');
+
+
+			$physicalProperties = $this->PhysicalProperty->find('all',array(
+				'recursive'=>-1,
+				'conditions'=>array(
+					'PhysicalProperty.prisoner_id'=>$prisoner_id,
+					'PhysicalProperty.is_trash'=>0
+				)
+			));
+		//get properties end
+			$physicalPropertyPending = false;
+			$cashPropertyPending = false;
+
+			foreach ($physicalProperties as $property) {
+            		$propertyType = $property['PhysicalProperty']['property_type'];
+            		$propertyId = $property['PhysicalProperty']['id'];
+            		if($propertyType == 'Physical Property'){
+
+							//check prisoner physical Property Items
+            				$propertyItems = $this->PhysicalPropertyItem->find('all',array(
+			                    'recursive' =>-1,
+			                    'conditions'=>array(
+			                        'PhysicalPropertyItem.physicalproperty_id'=> $propertyId,
+			                        'PhysicalPropertyItem.is_trash'=> 0,
+			                    )
+			                ));
+			                foreach ($propertyItems as $item) {
+			                	if($item['PhysicalPropertyItem']['item_status'] == 'Outgoing' || $item['PhysicalPropertyItem']['item_status'] == 'Supplementary Outgoing'){
+			                		if($item['PhysicalPropertyItem']['outgoing_status'] == 'Approved'){
+			                			continue;
+			                		}else{
+			                			$physicalPropertyPending =true;break;
+			                		}
+			                	}else{
+			                		$physicalPropertyPending =true;break;
+			                	}
+			                }
+							//check physical property end
+            		}else if($propertyType == 'Cash'){
+	            			//check prisoner cash property items
+
+
+		                $cashItems = $this->CashItem->find('all',array(
+		                    'recursive' =>-1,
+		                    'conditions'=>array(
+		                        'CashItem.physicalproperty_id'=> $propertyId,
+		                        'CashItem.is_trash'=> 0
+
+		                    )
+		                ));
+		                $allCredits=array();
+		                foreach ($cashItems as $item) {
+		                	$currency = '"'.$item['CashItem']['currency_id'] . '"';
+		                	$credit = $item['CashItem']['amount'];
+
+		                	if(isset($allCredits[$currency])){
+		                		$amount = (float)$allCredits[$currency] + (float)$credit;
+		                	}else{
+		                		$allCredits[$currency] =  (float)$credit;
+		                	}
+		                }
+						//check cash property end
+            		}
+					
+			}
+
+			if($physicalPropertyPending){
+				$pendingText .= "Physical Property Pending, ";
+			}
+			$pendingText .="test,";
+			return $pendingText;
+
+			
+/*
 		$pendingMedicalCheckup = $this->PhysicalPropertyItem->find("all", array(
 			"recursive"	=> -1,
 			"joins" => array(
@@ -1575,9 +1669,9 @@ class DischargesController    extends AppController {
 				"PhysicalPropertyItem.item_status",
 				"sum(PhysicalPropertyItem.quantity) as count",
 			),
-		));
+		));*/
 
-		if(isset($pendingMedicalCheckup) && count($pendingMedicalCheckup)>0){
+		/*if(isset($pendingMedicalCheckup) && count($pendingMedicalCheckup)>0){
 			$incomingProperty = 0;
 			$outgoingProperty = 0;
 			foreach ($pendingMedicalCheckup as $key => $value) {
@@ -1595,10 +1689,10 @@ class DischargesController    extends AppController {
 			if($incomingProperty != $outgoingProperty){
 				$pendingText .= "Property Pending, ";
 			}
-		}
+		}*/
 
 		// checking for cash property 
-		$cashItem = $this->PropertyTransaction->find("all", array(
+		/*$cashItem = $this->PropertyTransaction->find("all", array(
 			"recursive"	=> -1,			
 			"conditions"=> array(
 				"PropertyTransaction.prisoner_id"=>$prisoner_id,
@@ -1627,12 +1721,12 @@ class DischargesController    extends AppController {
 			if($incomingProperty != $outgoingProperty){
 				$pendingText .= "Cash Property Pending, ";
 			}
-		}
+		}*/
 		// =========================================================
 		
-		if($this->PrisonerSaving->field("total_amount",array("prisoner_id"=>$prisoner_id),"id desc") != 0){
+		/*if($this->PrisonerSaving->field("total_amount",array("prisoner_id"=>$prisoner_id),"id desc") != 0){
 			$pendingText .= "Earning Pending, ";
-		}
+		}*/
 		
 		if($pendingText!=''){
 			return $pendingText;

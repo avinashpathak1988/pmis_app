@@ -102,7 +102,7 @@ echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal',
         <?php
         if(!isset($is_excel)){
           ?>
-        <th>
+        <th class="aprrov">
             <?php echo $this->Form->input('checkAll', array(
                   'type'=>'checkbox', 'hiddenField' => false, 'label'=>false, 'id'=>'checkAll',
                   'format' => array('before', 'input', 'between', 'label', 'after', 'error' ) 
@@ -139,7 +139,7 @@ foreach($datas as $data){
         <?php
         if(!isset($is_excel)){
           ?>
-            <td>
+            <td class="aprrov">
             <?php
             if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE') && ($data['Courtattendance']['status'] == 'Draft'))
             { 
@@ -191,7 +191,7 @@ foreach($datas as $data){
                   </div>
 				
                   <div class="modal-body">
-				    <table class="table table-bordered data-table table-responsive">
+				    <table class="partha table-bordered data-table table-responsive">
                         <tbody>
                             <tr>
                                 <td><b>CRB No.</b></td>

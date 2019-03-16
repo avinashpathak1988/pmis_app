@@ -273,7 +273,7 @@ if($discharge_type_id==2){
                         }
                     }
                     echo implode(", ", $remission);
-                    debug($prisonerDetails['Prisoner']['is_death']);
+                    // debug($prisonerDetails['Prisoner']['is_death']);
                     ?>
                 </div>
             </div>
@@ -422,7 +422,7 @@ if($discharge_type_id==3){
     </div>    
        <div class="span6">
         <div class="control-group">
-            <label class="control-label">Telephone Normal :</label>
+            <label class="control-label">Telephone No :</label>
             <div class="controls">
                 <?php 
                echo $this->data['Discharge']['prison_death_telephone']; ?>
@@ -648,6 +648,7 @@ if($discharge_type_id==8){
 }
 if(!in_array($discharge_type_id, array(5))){
 ?>
+<table class="table table-responsive table-bordered">
     <tr>
         <td>
             <div class="control-group">

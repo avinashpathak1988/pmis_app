@@ -257,7 +257,10 @@ class MedicalRecordsController  extends AppController {
 		// 		//'MedicalRelease.check_up'        => $check_up
 		// 	),
 		// ));
-		$prisonerReleaseListCond = array("Prisoner.id NOT IN (".implode(",", $medicalReleaseData).")");
+		if(isset($medicalReleaseData) && is_array($medicalReleaseData) && count($medicalReleaseData)>0){
+			$prisonerReleaseListCond = array("Prisoner.id NOT IN (".implode(",", $medicalReleaseData).")");		
+		
+		}
 		$prisonerReleaseListData = $this->Prisoner->find('list', array(
 			'joins' => array(
                 array(
@@ -282,6 +285,7 @@ class MedicalRecordsController  extends AppController {
 				'Prisoner.prison_id'			=> $this->Auth->user('prison_id')
 			)+$prisonerReleaseListCond,
 		));
+		
 		$deathListArr = $this->MedicalDeathRecord->find('list', array(
 				'fields'		=> array(
 					'MedicalDeathRecord.id',
@@ -566,6 +570,7 @@ class MedicalRecordsController  extends AppController {
 	                    //notification on approval of Disciplinary proceeding list --END--
                     }
 
+
                     if($modelname=='MedicalRelease'){
                     	//notification on approval of Disciplinary proceeding list --START--
 	                    if($this->Session->read('Auth.User.usertype_id')==Configure::read('MEDICALOFFICE_USERTYPE'))
@@ -607,14 +612,45 @@ class MedicalRecordsController  extends AppController {
 	                            $this->addNotification(array(
 	                                "user_id"   => $notifyUser['User']['id'],
 	                                "content"   => $notification_msg,
-	                                "url_link"   => "medicalRecords/add#seriouslyill",
+	                                "url_link"   => "medicalRecords/add#release_recom",
 	                            ));
 	                        }
 	                    }
-	                    //notification on approval of Disciplinary proceeding list --END--
-                    }
 
-                    
+	                    if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE'))
+	                    {
+	                    	if(isset($this->request->data['ApprovalProcess']) && is_array($this->request->data['ApprovalProcess']) && count($this->request->data['ApprovalProcess'])>0){
+	                    		foreach ($this->request->data['ApprovalProcess'] as $appKey => $appValue) {
+	                    			$usertypes = array(
+						                Configure::read('RECEPTIONIST_USERTYPE'),
+						                Configure::read('PRINCIPALOFFICER_USERTYPE'),
+						                Configure::read('OFFICERINCHARGE_USERTYPE')
+						            );
+			                        $notification_msg = "Recommended For Release list of prisoner are Aprroved";
+			                        $notifyUser = $this->User->find('list',array(
+			                            'recursive'     => -1,
+			                            'fields'=>array(
+			                            	'User.id',
+			                            	'User.id'
+			                            ),
+			                            'conditions'    => array(
+			                                'User.usertype_id IN ('.implode(",", $usertypes).')',
+			                                'User.is_trash'     => 0,
+			                                'User.is_enable'     => 1,
+			                                'User.prison_id'  => $this->getName($appValue['fid'],"MedicalRelease","prison_id")
+			                            )
+
+			                        ));
+			                        $uuid = $this->getName($this->getName($appValue['fid'],"MedicalRelease","prisoner_id"),"Prisoner","uuid");
+			                        if(isset($notifyUser) && is_array($notifyUser) && count($notifyUser)>0)
+			                        {
+			                            $this->addManyNotification($notifyUser, $notification_msg, "discharges/index/".$uuid);
+			                        }
+	                    		}
+	                    	}  
+	                    }
+	              
+                   }
                     //$this->redirect('/medicalRecords/add#health_checkup');
                 }
                 else 
@@ -4158,10 +4194,10 @@ function prisonerStateListAjax(){
             $this->paginate = array(
                 'conditions'    => $condition,
                 'order'         => array(
-                    'UnfitHistory.modified1'   => 'DESC',
+                    'UnfitHistory.modified'   => 'DESC',
                 ),
             );
-            //debug($condition);
+            // debug($condition);
             $datas = $this->paginate('UnfitHistory');
             //debug($datas);
             $this->set(array(
@@ -4253,17 +4289,39 @@ function prisonerStateListAjax(){
                         'Prisoner.id'
                     )
                 ));
+	     if ($this->Session->read('Auth.User.prison_id')!='') {
+	     
 	     $prisonListname = $this->Prison->find('list',array(
                     'recursive'     => -1,
                     'fields'        => array(
                         'Prison.id',
                         'Prison.name'
                     ),
+                    'conditions'=>array(
+                    	'Prison.id'=>$this->Session->read('Auth.User.prison_id')
+                    ),
                     
                     'order'=>array(
                         'Prison.id'
                     )
                 ));
+		 }else{
+		 	 
+	     $prisonListname = $this->Prison->find('list',array(
+                    'recursive'     => -1,
+                    'fields'        => array(
+                        'Prison.id',
+                        'Prison.name'
+                    ),
+                    'conditions'=>array(
+                    	// 'Prison.id'=>$this->Session->read('Auth.User.prison_id')
+                    ),
+                    
+                    'order'=>array(
+                        'Prison.id'
+                    )
+                ));
+		 }
 	     $this->set(array(
 			
 			'prisonerListname'  => $prisonerListname,

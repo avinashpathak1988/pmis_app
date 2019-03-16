@@ -76,10 +76,10 @@ echo $this->Html->scriptBlock("
          if(usertype_id==user_typercpt)
          {
             if($('#status').val()=='Saved' || $('#status').val()=='Approved' || $('#status').val()=='Approve-Rejected'){
-                 $('td:first-child').each(function() {
+                 $('.approved td:first-child').each(function() {
                        $(this).remove();
                 });
-                 $('th:first-child').each(function() {
+                 $('.approved th:first-child').each(function() {
                        $(this).remove();
                 });
             }
@@ -87,10 +87,10 @@ echo $this->Html->scriptBlock("
          if(usertype_id==user_typepoi)
          {
             if($('#status').val()=='Reviewed' || $('#status').val()=='Approved' || $('#status').val()=='Approve-Rejected'){
-                 $('td:first-child').each(function() {
+                 $('.approved td:first-child').each(function() {
                        $(this).remove();
                 });
-                 $('th:first-child').each(function() {
+                 $('.approved th:first-child').each(function() {
                        $(this).remove();
                 });
             }
@@ -98,10 +98,10 @@ echo $this->Html->scriptBlock("
          if(usertype_id==user_typeoiu)
          {
             if($('#status').val()=='Approved'){
-                 $('td:first-child').each(function() {
+                 $('.approved td:first-child').each(function() {
                        $(this).remove();
                 });
-                 $('th:first-child').each(function() {
+                 $('.approved th:first-child').each(function() {
                        $(this).remove();
                 });
             }

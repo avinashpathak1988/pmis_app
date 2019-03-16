@@ -33,7 +33,7 @@ echo $this->Form->input('data_type',array('type'=>'hidden','value'=> 'petition_t
   <!-- Verify Modal END -->
 <?php } if(!isset($is_excel)){?>
 
-<button type="button" onclick="ShowKinConfirmYesNo();" tabcls="next" id="PetitionforwardBtn" style="display:none;" class="btn btn-success btn-mini"><?php echo $btnName2;?></button>
+<button type="button" onclick="ShowPetitionConfirmYesNo();" tabcls="next" id="PetitionforwardBtn" style="display:none;" class="btn btn-success btn-mini"><?php echo $btnName2;?></button>
 <?php
 }
 //Approval process start
@@ -139,7 +139,7 @@ if(!isset($is_excel)){
 
         $id = $data['PrisonerPetition']['id'];
         $puuid = $data['PrisonerPetition']['puuid'];
-        $offenceNames = $funcall->getPrisonerOffenceNames($data['PrisonerPetition']['offence_id']);
+        $offenceNames = $funcall->getPrisonerOffenceData($data['PrisonerPetition']['prisoner_id']);
 ?>
         <tr class="<?php if($rowCnt == count($datas)) {echo 'lastrow';}?>">
              <?php 
@@ -174,31 +174,33 @@ if(!isset($is_excel)){
             <td><?php echo $rowCnt; ?></td>
             <td>
                 <?php 
-                echo $data['PrisonerPetition']['petition_name'];
-                //echo $$offenceNames; ?>
-                    
+                echo $data['PrisonerPetition']['petition_name'];?>
+                      <div id="pf98">
+                                        <?php echo $this->Html->link('PF-98',array('controller'=>'ExtractPrisonersRecord','action'=>'add/'.$prisoner_id."/".$data['PrisonerPetition']['id']),array('escape'=>false,'class'=>'btn btn-success btn-mini', 'target'=>'_blank')); ?>
+                      </div> 
             </td>
             <td><?php echo date('d-m-Y', strtotime($data['PrisonerPetition']['petition_date'])); ?></td>
             <td>
                 <?php 
-                echo $data['PrisonerPetition']['courtlevel_id'];
-                //echo $$offenceNames; ?>
-            </td>
-            <td>
-                <?php 
-                echo $data['PrisonerPetition']['court_id'];
-                //echo $$offenceNames; ?>
-            </td>
-            <td>
-            <?php 
-           
-            echo $funcall->getCaseFile($data['PrisonerPetition']['prisoner_id']);
+                echo $data['PrisonerPetition']['courtlevel_id']? $data['PrisonerPetition']['courtlevel_id']: Configure::read('NA');
                 ?>
             </td>
             <td>
                 <?php 
-                  if ($offenceNames!='') {
-                  echo $data['PrisonerPetition']['petition_court_file_no'];
+                echo $data['PrisonerPetition']['court_id']? $data['PrisonerPetition']['court_id']: Configure::read('NA');
+                ?>
+            </td>
+            <td>
+            <?php 
+           
+            echo $funcall->getPrisonerFileData($data['PrisonerPetition']['prisoner_id']);
+                ?>
+            </td>
+            <td>
+                <?php 
+                $highCourtfileNo = $funcall->getPrisonerHighCourtFileNo($data['PrisonerPetition']['prisoner_id']);
+                  if ($highCourtfileNo!='') {
+                  echo $highCourtfileNo;
                 }else{ echo Configure::read('NA');}
                
                  ?>
@@ -237,10 +239,11 @@ if(!isset($is_excel)){
           }
           else 
           {
-            if($data['PrisonerPetition']['status'] == 'Approved' && $this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE'))?>
-              <!-- Trigger the modal with a button -->
-              <button type="button" class="btn btn-info mypetitionmodalopen" onclick="javascript:openPetitionResultModal('<?php echo $id;?>');">Set Result</button>
-          <?php }?>
+            if($data['PrisonerPetition']['status'] == 'Approved' && $this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE')){?>
+                <!-- Trigger the modal with a button -->
+                <button type="button" class="btn btn-info mypetitionmodalopen" onclick="javascript:openPetitionResultModal('<?php echo $id;?>');">Set Result</button>
+          <?php }
+          }?>
           </td>
 <?php
         if(!isset($is_excel)){
@@ -255,15 +258,12 @@ if(!isset($is_excel)){
 ?>
     </tbody>
 </table>
-<?php 
-echo $this->Form->end();
-?>
 
 
 
                
 <?php
-echo $this->Js->writeBuffer();
+
 //pagination start 
 if(!isset($is_excel)){
 ?>
@@ -279,7 +279,7 @@ if(!isset($is_excel)){
         'url'                       => array(
             'controller'            => 'Prisoners',
             'action'                => 'petitionAjax',
-            'prisoner_id'             => $prisoner_id,
+            'prisoner_id'             => $prisoner_id
 
         )
     ));         
@@ -297,7 +297,7 @@ echo $this->Paginator->counter(array(
 ));
 ?>
 <?php
-    $exUrl = "petitionAjax/prisoner_id:$prisoner_id";
+    $exUrl = "petitionAjax";
     $urlExcel = $exUrl.'/reqType:XLS';
     $urlDoc = $exUrl.'/reqType:DOC';
     echo($this->Html->link($this->Html->image("excel-2012.jpg",array("height" => "20","width" => "20","title"=>"Download Excel")),$urlExcel, array("escape" => false)));
@@ -308,6 +308,8 @@ echo $this->Paginator->counter(array(
 </div>
 <?php
     }
+    echo $this->Form->end();
+    echo $this->Js->writeBuffer();
 //pagination end 
 ?>
   <script type="text/javascript">
@@ -377,17 +379,17 @@ function openMyModal(){
 
   
 }
-function ShowKinConfirmYesNo() {
+function ShowPetitionConfirmYesNo() {
     AsyncConfirmYesNo(
             "Are you sure want to "+btnName2+"?",
             btnName2,
             'Cancel',
-            KinMyYesFunction,
-            KinMyNoFunction
+            PetitionMyYesFunction,
+            PetitionMyNoFunction
         );
 }
 
-function KinMyYesFunction() {
+function PetitionMyYesFunction() {
   if(isModal2 == 1)
   {
     $('.verifyPopupModal').modal('show');
@@ -397,15 +399,13 @@ function KinMyYesFunction() {
     $('#ApprovalProcessFormPetitionAjaxForm').submit();
   }
 }
-function KinMyNoFunction() {
+function PetitionMyNoFunction() {
     
 }
 //Dynamic confirmation modal -- END --
 </script> 
 <?php 
 }else{
-?>
-    ...
-<?php    
+echo Configure::read('NO-RECORD');  
 }
 ?>                    

@@ -223,7 +223,7 @@ foreach($datas as $data){
                   // debug($data['Gatepass']['gatepass_type']);
                   // debug(strtotime(date("Y-m-d 17:00:00")) < strtotime(date("Y-m-d H:i:s")));
                   // debug(strtotime(date("Y-m-d H:i:s")) < strtotime(date("Y-m-d 08:00:00")));
-                  if((in_array($data['Gatepass']['gatepass_type'],array('Court Attendance','Transfer')) && strtotime(date("Y-m-d 17:00:00")) < strtotime(date("Y-m-d H:i:s"))) || in_array($data['Gatepass']['gatepass_type'],array('Court Attendance','Transfer')) && strtotime(date("Y-m-d H:i:s")) < strtotime(date("Y-m-d 07:00:00"))){
+                  /*if((in_array($data['Gatepass']['gatepass_type'],array('Court Attendance','Prisoner Transfer')) && strtotime(date("Y-m-d 17:00:00")) < strtotime(date("Y-m-d H:i:s"))) || in_array($data['Gatepass']['gatepass_type'],array('Court Attendance','Prisoner Transfer')) && strtotime(date("Y-m-d H:i:s")) < strtotime(date("Y-m-d 07:00:00"))){
                     
                   }else{
                     ?>
@@ -243,7 +243,7 @@ foreach($datas as $data){
             </td>
             <td>
             <?php
-            if(isset($data['Gatepass']['in_time']) && $data['Gatepass']['in_time']=='0000-00-00 00:00:00' && $this->Session->read('Auth.User.usertype_id')==Configure::read('GATEKEEPER_USERTYPE')  && $data['Gatepass']['gatepass_status']=='out' && $data['Gatepass']['is_verify']==1 && !in_array($data['Gatepass']['gatepass_type'], array('Discharge','Transfer'))){
+            if(isset($data['Gatepass']['in_time']) && $data['Gatepass']['in_time']=='0000-00-00 00:00:00' && $this->Session->read('Auth.User.usertype_id')==Configure::read('GATEKEEPER_USERTYPE')  && $data['Gatepass']['gatepass_status']=='out' && $data['Gatepass']['is_verify']==1 && !in_array($data['Gatepass']['gatepass_type'], array('Discharge','Prisoner Transfer'))){
                 if(!isset($is_excel)){
 
                     ?>
@@ -304,6 +304,9 @@ foreach($datas as $data){
             }
           ?>
           <td>
+              <button type="button" class="btn btn-success btn-mini button-gap" data-toggle="modal" onclick="setRecieveForm('<?php echo $data['Gatepass']['reference_id']; ?>');" data-target="#recieveNow">
+                  Recieve
+                </button>
             <?php 
             if(isset($data['Gatepass']['is_verify']) && $data['Gatepass']['is_verify']==1 && isset($data['Gatepass']['inverification_verify']) && trim($data['Gatepass']['inverification_verify'])==0){
 
@@ -397,6 +400,15 @@ echo Configure::read("NO-RECORD");
 }
  echo $this->Js->writeBuffer();
 ?>    
+
+<?php 
+    $getPropertyRowAjaxUrl= $this->Html->url(array('controller'=>'Gatepasses','action'=>'getPropertyRow'));
+
+    $ajaxAddNewItemUrl =  $this->Html->url(array('controller'=>'Gatepasses','action'=>'ajaxAddNewItem'));
+    
+    $ajaxAddNewCashItemUrl =$this->Html->url(array('controller'=>'Gatepasses','action'=>'ajaxAddNewCashItem'));
+
+ ?>
 <?php if(@$file_type != 'pdf') { ?>
 <script>
 $(document).ready(function(){
@@ -424,6 +436,50 @@ $(document).ready(function(){
 });
 var btnName = '<?php echo $btnName;?>';
 var isModal = '<?php echo $isModal;?>';
+
+function addNewItem(itemName,itemQuantity,transfer_id){
+        var url =<?php echo '\''.$ajaxAddNewItemUrl.'\'' ?>;
+        var data ={itemName:itemName,itemQuantity:itemQuantity,transfer_id:transfer_id}
+                $.post(url,data, function(res) {
+                    if (res) {
+                       setRecieveForm(transfer_id);
+                     }
+                    });
+      }
+function addNewCashItem(amount,currency,transfer_id){
+        var url =<?php echo '\''.$ajaxAddNewCashItemUrl.'\'' ?>;
+        var data ={amount:amount,currency:currency,transfer_id:transfer_id}
+                $.post(url,data, function(res) {
+                    if (res) {
+                       setRecieveForm(transfer_id);
+                     }
+                    });
+      }
+function setRecieveForm(id){
+  $('#RecieveItemCashTransferId').val(id);
+  url = <?php echo '\''.$getPropertyRowAjaxUrl.'\'' ?>;
+      $.post(url, {transferId:id}, function(res) {
+            if (res) {
+              var allCollectedResponse = $(res).filter("#allCollectedResponse");
+                $('#RecieveItemCashGatepassTransferListForm #PhysicalPropertyDiv').html(res);
+                 if(allCollectedResponse.html() == 'true'){
+                    $('#recievedAllBtn').css('display','inline-block');
+                    $('#recieveBtn').css('display','none');
+                    $('.add_more_property').css('display','none');
+                    $('.add_more_cash').css('display','none');
+
+                     
+                  }else{
+                    $('#recievedAllBtn').css('display','none');
+                    $('#recieveBtn').css('display','inline-block');
+                    $('.add_more_property').css('display','inline-block');
+                    $('.add_more_cash').css('display','inline-block');
+
+                  }
+
+                }
+            });
+}
 function ShowConfirmYesNo() {
     AsyncConfirmYesNo(
             "Are you sure want to "+btnName+"?",

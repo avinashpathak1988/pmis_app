@@ -105,18 +105,19 @@ if(!isset($is_excel)){
                 $sentenceData = (array)json_decode($sentenceData);
                 $appeal_case_file_no = $data['PrisonerCaseFile']['case_file_no'];
                 $appeal_offence = $sentenceData['data']->Offence->name;
-                $appeal_sentence = $sentenceData['data']->PrisonerSentence->sentenceData;
+                //$appeal_sentence = $sentenceData['data']->PrisonerSentence->sentenceData;
 
+                //debug($data['PrisonerOffence']['offence']);
                 // $appeal_case_file_no = $sentenceData['data']->PrisonerCaseFile->case_file_no;
                 // $appeal_case_file_no = $data['PrisonerCaseFile']['case_file_no'];
                 // //debug($data); exit;
                 // // $appeal_offence = $sentenceData['data']->Offence->name;
                 // // $appeal_offence = $funcall->getName($data['PrisonerOffence']['offence']);
-                // $appeal_offence = $funcall->getName($data['PrisonerOffence']['offence']);
+                $appeal_offence = $funcall->getName($data['PrisonerOffence']['offence'],'Offence','name');
                 // // debug($appeal_offence);
                 // // $appeal_sentence = $sentenceData['data']->PrisonerSentence->sentenceData;
                 // $appeal_sentence = $data['PrisonerSentence']['sentenceData'];
-                // $appeal_sentence = getPrisonerSentenceFromOffence($data['PrisonerOffence']['offence']);
+                $appeal_sentence = $funcall->getPrisonerSentenceFromOffence($data['PrisonerOffence']['id']);
                 // debug($appeal_sentence);
                 //get sentence details -- END --
                 $viewDetail .= '<b>Case File No : </b>'.$appeal_case_file_no.'<br>';

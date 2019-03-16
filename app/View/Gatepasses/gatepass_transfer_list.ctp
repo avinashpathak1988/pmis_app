@@ -38,7 +38,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="span6">
+                                <!-- <div class="span6">
                                     <div class="control-group">
                                         <label class="control-label">Gatepass Type</label>
                                         <div class="controls">
@@ -53,7 +53,7 @@
                                             <?php echo $this->Form->input('gatepass_status',array('div'=>false,'label'=>false,'type'=>'select','empty'=>'-- Select Type --','options'=>array("Created"=>"Created","OUT"=>"OUT","IN"=>"IN"), 'class'=>'form-control', 'id'=>'gatepass_status'));?>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                                 <div class="span6" style="display:<?php echo ($this->Session->read('Auth.User.usertype_id')==Configure::read("OFFICERINCHARGE_USERTYPE")) ? 'block': 'none'; ?>">
                                     <div class="control-group">
                                         <label class="control-label">Verify Status</label>
@@ -87,7 +87,43 @@
                      </div>           
                     <div class="table-responsive" id="listingDiv">
 
-                    </div>                    
+                    </div> 
+
+                   <!--  recieve modal -->
+                    <div class="modal fade" id="recieveNow" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                          <?php echo $this->Form->create('RecieveItemCash',array('class'=>'form-horizontal'));?>
+                          <?php echo $this->Form->input('transfer_id',array('div'=>false,'label'=>false,'type'=>'hidden','readonly','required'=>true));?>
+                          <!-- <?php echo $this->Form->input('row_id',array('div'=>false,'label'=>false,'type'=>'hidden','readonly','required'=>true));?> -->
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Prisoner Item/Cash Details</h5> 
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                               
+                              <div class="span12" >
+                                  <div id="PhysicalPropertyDiv">
+                                      
+                                  </div>
+                              </div>
+                          
+                      </div>
+                      <div class="modal-footer">
+                        <span  id="recievedAllBtn" style="color: green;">All Items Recieved</span>
+
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-success" id="recieveBtn" onclick="submitRecieveItemCash()">Recieve</button>
+                      </div>
+                          <?php echo $this->Form->end();?>
+
+                    </div>
+                  </div>
+                </div>   
+
+             <!--    modal ends -->                
                 </div>
             </div>
         </div>
@@ -96,9 +132,10 @@
 <?php
 $verifyAjax = $this->Html->url(array('controller'=>'Biometrics','action'=>'verify'));
 $biometricSearchAjax = $this->Html->url(array('controller'=>'Biometrics','action'=>'getLastPunch'));
-$ajaxUrl            = $this->Html->url(array('controller'=>'Gatepasses','action'=>'gatepassListAjax'));
+$ajaxUrl            = $this->Html->url(array('controller'=>'Gatepasses','action'=>'gatepassTransferListAjax'));
 $commonHeaderUrl    = $this->Html->url(array('controller'=>'Prisoners','action'=>'getCommonHeder'));
 $saveInverification    = $this->Html->url(array('controller'=>'Gatepasses','action'=>'saveInverification'));
+$ajaxUrlSubmitRecieveItemCash =$this->Html->url(array('controller'=>'Gatepasses','action'=>'recieveTransferItemCash'));
 echo $this->Html->scriptBlock("
     function verifyData(val,id){
         var a = confirm('Are you sure you want to verify this data ?');
@@ -121,6 +158,23 @@ echo $this->Html->scriptBlock("
         }
         
     }
+    function submitRecieveItemCash(){
+        var url ='".$ajaxUrlSubmitRecieveItemCash."';
+                $.post(url,$('#RecieveItemCashGatepassTransferListForm').serialize(), function(res) {
+                    if (res) {
+                        if(res.trim()=='success'){
+                            console.log('Item/Cash Recieved Successfully !');
+                        }else if(res.trim()=='failed'){
+                            console.log('Failed to recieve !');
+                        }else{
+                            console.log(res);
+                        }
+
+                         $('#recieveNow').modal('toggle');
+                     }
+                    });
+      }
+
     function submitInVerification(){
         $('#verifyBtn').hide();
         var url   = '".$saveInverification."';
@@ -208,6 +262,66 @@ echo $this->Html->scriptBlock("
 ?>
 <script type="text/javascript">
  $(document).ready(function(){
+
+    $(document).on('click', '#RecieveItemCashGatepassTransferListForm .add_more_property', function(e){
+        e.preventDefault();
+        var classes = $('#RecieveItemCashGatepassTransferListForm .add_more_property span').attr('class');
+        if(classes.indexOf('icon-plus') > -1){
+          $('#RecieveItemCashGatepassTransferListForm #add_item_form').css('display','block');
+          $('#RecieveItemCashGatepassTransferListForm .add_more_property span').removeClass('icon-plus');
+          $('#RecieveItemCashGatepassTransferListForm .add_more_property span').addClass('icon-minus');
+        }else{
+          $('#RecieveItemCashGatepassTransferListForm #add_item_form').css('display','none');
+          $('#RecieveItemCashGatepassTransferListForm .add_more_property span').removeClass('icon-minus');
+          $('#RecieveItemCashGatepassTransferListForm .add_more_property span').addClass('icon-plus');
+        }
+    });
+
+    $(document).on('click', '#RecieveItemCashGatepassTransferListForm .insert_property_item', function(e){
+        e.preventDefault();
+        var itemName = $('#RecieveItemCashGatepassTransferListForm  #newItemName').val();
+        var itemQuantity = $('#RecieveItemCashGatepassTransferListForm  #newItemQuantity').val();
+        var transfer_id = $('#RecieveItemCashGatepassTransferListForm  #RecieveItemCashTransferId').val();
+
+        if(itemName == '' || itemQuantity == '' ){
+          confirm("Please fill required fields");
+        }else{
+          addNewItem(itemName,itemQuantity,transfer_id);
+        }
+    });
+
+    $(document).on('click', '#RecieveItemCashGatepassTransferListForm .add_more_cash', function(e){
+        e.preventDefault();
+        
+        var classes = $('#RecieveItemCashGatepassTransferListForm .add_more_cash span').attr('class');
+        if(classes.indexOf('icon-plus') > -1){
+          $('#RecieveItemCashGatepassTransferListForm #add_more_cash_form').css('display','block');
+          $('#RecieveItemCashGatepassTransferListForm .add_more_cash span').removeClass('icon-plus');
+          $('#RecieveItemCashGatepassTransferListForm .add_more_cash span').addClass('icon-minus');
+        }else{
+          $('#RecieveItemCashGatepassTransferListForm #add_more_cash_form').css('display','none');
+          $('#RecieveItemCashGatepassTransferListForm .add_more_cash span').removeClass('icon-minus');
+          $('#RecieveItemCashGatepassTransferListForm .add_more_cash span').addClass('icon-plus');
+        }
+         console.log("here");
+    });
+
+
+    $(document).on('click', '#RecieveItemCashGatepassTransferListForm .insert_property_cash_item', function(e){
+        e.preventDefault();
+        var amount = $('#RecieveItemCashGatepassTransferListForm  #newItemAmount').val();
+        var currency = $('#RecieveItemCashGatepassTransferListForm  #newItemCurrency').val();
+        var transfer_id = $('#RecieveItemCashGatepassTransferListForm  #RecieveItemCashTransferId').val();
+
+        if(amount == '' || currency == '' ){
+          confirm("Please fill required fields");
+        }else{
+          addNewCashItem(amount,currency,transfer_id);
+        }
+    });
+
+
+
     $('#prisoner_id').select2('val', '');
     var defaultStatus = '<?php echo $default_status;?>';
     $('#status').select2('val', defaultStatus);

@@ -18,7 +18,7 @@
                                 <div class="control-group">
                                     <label class="control-label">Prisoner No:</label>
                                     <div class="controls">
-                                        <?php echo $this->Form->input('prisoner_no',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','empty'=>'-- Select--','id'=>'prisoner_no','options'=>$prisonerListname));?>
+                                        <?php echo $this->Form->input('prisoner_no',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','empty'=>'','id'=>'prisoner_no','options'=>$prisonerListname));?>
                                     </div>
                                 </div>
                             </div>
@@ -26,7 +26,7 @@
                                 <div class="control-group">
                                     <label class="control-label">Prisoner Station:</label>
                                     <div class="controls">
-                                        <?php echo $this->Form->input('prison_id',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','empty'=>'-- Select --','id'=>'prison_id','options' => $prisonListname));?>
+                                        <?php echo $this->Form->input('prison_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','empty'=>'','id'=>'prison_id','options' => $prisonListname));?>
                                     </div>
                                 </div>
                             </div>

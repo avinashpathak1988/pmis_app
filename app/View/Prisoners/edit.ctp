@@ -1952,7 +1952,7 @@ $next_date_after_6months = date('d-m-Y',strtotime("+6 months"));
                                         <?php echo $this->Html->link('PF-98',array('controller'=>'ExtractPrisonersRecord','action'=>'add/'.$prisoner_id),array('escape'=>false,'class'=>'btn btn-success btn-mini')); ?>
                                     </div>
                                     <?php //if($editPrisoner == 1)
-                                    //debug($this->data);
+                                    // debug($this->data);
                                     //{?>
                                         <?php echo $this->Form->create('PrisonerPetition',array('class'=>'form-horizontal','enctype'=>'multipart/form-data','url' => '/prisoners/PrisonerPetition'));
                                         echo $this->Form->input('id',array('type'=>'hidden'));
@@ -1971,6 +1971,7 @@ $next_date_after_6months = date('d-m-Y',strtotime("+6 months"));
                                                 'class'=>'prisoner_id',
                                                 'value'=>$this->request->data['Prisoner']['uuid']
                                               ));
+                                          echo $this->Form->input('petition_type',array('type'=>'hidden', 'value'=>'Admission petition'));
                                         echo $this->element('petition');
                                         ?>
                                         <div class="form-actions petition_hide" align="center">

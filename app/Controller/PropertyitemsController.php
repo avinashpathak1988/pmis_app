@@ -3,6 +3,8 @@ App::uses('AppController', 'Controller');
 class PropertyitemsController extends AppController {
 	public $layout='table';
 	public function index() {
+
+        $default= 'admin';
         $menuId = $this->getMenuId("/Propertyitems");
                 $moduleId = $this->getModuleId("property");
                 $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
@@ -14,6 +16,10 @@ class PropertyitemsController extends AppController {
 		$this->loadModel('Propertyitem'); 
         if(isset($this->data['PropertyitemDelete']['id']) && (int)$this->data['PropertyitemDelete']['id'] != 0){
         	if($this->Propertyitem->exists($this->data['PropertyitemDelete']['id'])){
+                $pItem = $this->Propertyitem->findById($this->data['PropertyitemDelete']['id']);
+                if(isset($pItem['Propertyitem']['added_by_recep']) && $pItem['Propertyitem']['added_by_recep'] == 1){
+                    $default= 'receptionist';
+                }
                 $db = ConnectionManager::getDataSource('default');
                 $db->begin();                  
         		if($this->Propertyitem->updateAll(array('Propertyitem.is_trash'	=> 1), array('Propertyitem.id'	=> $this->data['PropertyitemDelete']['id']))){
@@ -38,6 +44,7 @@ class PropertyitemsController extends AppController {
 
          if($this->request->is(array('post','put')))
         {
+            $default='receptionist';
             //if search data exists 
             if(isset($this->request->data['ApprovalProcess']) && count($this->request->data['ApprovalProcess']) > 0)
             {
@@ -159,12 +166,19 @@ class PropertyitemsController extends AppController {
                 }
             }
         }
+
+        $this->set(array(
+            'default'         => $default,
+            
+        )); 
     }
     
     public function indexAjax(){
       	$this->loadModel('Propertyitem'); 
         $this->layout = 'ajax';
         $name  = '';
+        $type='';
+        $added_by='';
         $condition = array('Propertyitem.is_trash'	=> 0);
         if(isset($this->params['named']['name']) && $this->params['named']['name'] != ''){
             $name = $this->params['named']['name'];
@@ -197,14 +211,14 @@ class PropertyitemsController extends AppController {
                        $showAdmin = 'true';
                     }
                 }else{
-                       $showAdmin = 'true';
+                       $showAdmin = 'false';
                 }
             }
 
             if($showAdmin == 'false'){
                      if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE'))
                         {
-                            $condition      += array('Propertyitem.added_by_recep'=>1,'Propertyitem.status in ("Draft","Approved")');
+                            $condition      += array('Propertyitem.added_by_recep'=>1,'Propertyitem.status in ("Draft")');
                         }
                     if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
                         {
@@ -212,7 +226,7 @@ class PropertyitemsController extends AppController {
                         }
                     if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
                         {
-                            $condition      += array('Propertyitem.added_by_recep'=>1,'Propertyitem.status in ("Reviewed","Approved") ');
+                            $condition      += array('Propertyitem.added_by_recep'=>1,'Propertyitem.status in ("Reviewed") ');
                         }
             }
        
@@ -228,7 +242,10 @@ class PropertyitemsController extends AppController {
         $datas  = $this->paginate('Propertyitem');
         $this->set(array(
             'name'         => $name,
-            'datas'             => $datas,
+            'added_by'=>$added_by,
+            'type' =>$type,
+            'datas' => $datas,
+            'showAdmin' => $showAdmin
         )); 
     }
 	public function add() { 

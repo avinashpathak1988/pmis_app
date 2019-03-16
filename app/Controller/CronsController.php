@@ -511,8 +511,9 @@ class CronsController extends AppController{
                 'Prisoner.is_enable'        => 1,
                 'Prisoner.is_trash'         => 0,
                 'Prisoner.present_status'   => 1,
-                'Prisoner.is_approve'       => 0,
+                'Prisoner.is_approve'       => 1,
                 'Prisoner.transfer_id'      => 0,
+                'Prisoner.dor NOT IN ("1970-01-01","0000-00-00")',
                 
             )
         ));

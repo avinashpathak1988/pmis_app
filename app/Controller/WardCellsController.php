@@ -30,6 +30,23 @@ class WardCellsController extends AppController {
         	}
         }
          $wardList   = $this->Ward->find('list');
+         if ($this->Session->read('Auth.User.prison_id')!='') {
+           $prisonlist = $this->Prison->find('list', array(
+            'recursive'     => -1,
+            'fields'        => array(
+                'Prison.id',
+                'Prison.name',
+            ),
+            'conditions'    => array(
+                'Prison.is_enable'      => 1,
+                'Prison.is_trash'       => 0,
+                'Prison.id'       => $this->Session->read('Auth.User.prison_id')
+            ),
+            'order'         => array(
+                'Prison.name'
+            ),
+        ));
+         }else{
         $prisonlist = $this->Prison->find('list', array(
             'recursive'     => -1,
             'fields'        => array(
@@ -38,12 +55,14 @@ class WardCellsController extends AppController {
             ),
             'conditions'    => array(
                 'Prison.is_enable'      => 1,
-                'Prison.is_trash'       => 0
+                'Prison.is_trash'       => 0,
+                // 'Prison.id'       => $this->Session->read('Auth.User.prison_id')
             ),
             'order'         => array(
                 'Prison.name'
             ),
         ));
+    }
         //$countryList = '';
         // if(isset($this->data["WardCell"]["station_id"]) && (int)$this->data["WardCell"]["station_id"] != 0){
         //     $prisonList = $this->Ward->find('list', array(
@@ -75,7 +94,10 @@ class WardCellsController extends AppController {
         $ward_id  = '';
         $cell_name  = '';
         $prison_id ='';
-        $condition = array('WardCell.is_trash'	=> 0,'WardCell.prison_id'=>$this->Session->read('Auth.User.prison_id'));
+        $condition = array('WardCell.is_trash'	=> 0);
+        if ($this->Session->read('Auth.User.prison_id')!='') {
+           $condition += array('WardCell.prison_id'=>$this->Session->read('Auth.User.prison_id'));
+        }
 
         if(isset($this->params['named']['ward_id']) && (int)$this->params['named']['ward_id'] != 0){
             $prison_id = $this->params['named']['ward_id'];
@@ -89,6 +111,7 @@ class WardCellsController extends AppController {
             $cell_name = $this->params['named']['cell_name'];
             $condition += array("WardCell.cell_name LIKE '%$cell_name%'");
         } 
+        // debug($condition);
         $this->paginate = array(
             // 'recursive'=> -1,
             // 'joins' => array(
@@ -229,6 +252,8 @@ class WardCellsController extends AppController {
 			),
 		));
           $this->loadModel('Prison');
+          if ($this->Session->read('Auth.User.prison_id')!='') {
+             
         $prisonlist = $this->Prison->find('list', array(
             'recursive'     => -1,
             'fields'        => array(
@@ -237,12 +262,32 @@ class WardCellsController extends AppController {
             ),
             'conditions'    => array(
                 'Prison.is_enable'      => 1,
-                'Prison.is_trash'       => 0
+                'Prison.is_trash'       => 0,
+                'Prison.id'       =>  $this->Session->read('Auth.User.prison_id')
+
             ),
             'order'         => array(
                 'Prison.name'
             ),
         ));
+        }else{
+            $prisonlist = $this->Prison->find('list', array(
+            'recursive'     => -1,
+            'fields'        => array(
+                'Prison.id',
+                'Prison.name',
+            ),
+            'conditions'    => array(
+                'Prison.is_enable'      => 1,
+                'Prison.is_trash'       => 0,
+                // 'Prison.id'       =>  $this->Session->read('Auth.User.prison_id')
+
+            ),
+            'order'         => array(
+                'Prison.name'
+            ),
+        ));
+        }
 		$this->set(array(
 			'wardList'		=> $wardList,
             'prisonlist'    => $prisonlist,
@@ -279,6 +324,35 @@ class WardCellsController extends AppController {
         }
         $countryHtml .= '<option value="other">Other</option>';
         echo $countryHtml;  
+    }
+    public function showWardCell() {
+        $this->autoRender = false;
+        $this->loadModel("Ward");
+        debug($this->params['named']);
+        if(isset($this->params['named']['prison_id']) && (int)$this->params['named']['prison_id'] != 0){
+            $disabilityList = $this->Ward->find('list', array(
+                'recursive'     => -1,
+                'conditions'    => array(
+                    'Ward.prison '=> $this->params['named']['prison_id'],
+
+                ),
+                'fields'        => array(
+                    'Ward.id',
+                    'Ward.name',
+                ),
+            ));
+            if(is_array($disabilityList) && count($disabilityList)>0){
+                echo '<option value=""></option>';
+                foreach($disabilityList as $disabilityListKey=>$disabilityListVal){
+                    echo '<option value="'.$disabilityListKey.'">'.$disabilityListVal.'</option>';
+                }
+            }else{
+                echo '<option value="">-- Select  Ward --</option>';
+            }
+        }else{
+            echo '<option value="">-- Select Ward--</option>';
+        }
+
     }
    
 }

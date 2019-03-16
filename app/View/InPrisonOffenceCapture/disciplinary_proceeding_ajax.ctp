@@ -398,17 +398,18 @@ foreach($datas as $data){
           <td style="text-align: center;">
             <?php 
             if($data['DisciplinaryProceeding']['status']=='Draft'){
-              if($funcall->isAccess("discipline","is_edit")){
+              
                 echo $this->Form->create('DisciplinaryProceedingEdit',array('url'=>'/inPrisonOffenceCapture/index/'.$uuid.'#disciplinaryProceedings','admin'=>false));?> 
                   <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $disciplinary_proceeding_id)); ?>
                   <?php echo $this->Form->button("Update Discplinary Proceeding", array('label'=>false,'class'=>'btn btn-primary','div'=>false,'escape'=>false)); 
                   echo $this->Form->end();
-                }
+                
                 echo '&nbsp;';
-                if($funcall->isAccess("discipline","is_delete")){
+               
                   echo $this->Form->button('<i class="icon-trash"></i>', array('type'=>'button', 'div'=>false, 'label'=>false, 'class'=>'btn btn-danger', 'onclick'=>"javascript:deleteDisciplinaryProceeding('$disciplinary_proceeding_id');"));
-                }
+                
             }
+
             ?>
         </td>
         <?php

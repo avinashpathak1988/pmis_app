@@ -544,7 +544,7 @@ class GatepassesController    extends AppController {
                 $this->redirect('gatepassList');
             }
         }
-        $prisonerListData = $this->Gatepass->find('list', array(
+        /*$prisonerListData = $this->Gatepass->find('list', array(
             "recursive"     => -1,
             "joins" => array(
                 array(
@@ -564,8 +564,30 @@ class GatepassesController    extends AppController {
             'conditions'    => array(
                 'Gatepass.prison_id IN ('.$this->Session->read('Auth.User.prison_id').')',
             ),
+        ));*/
+        $this->loadModel('PrisonerTransfer');
+        $prisonerListData = $this->PrisonerTransfer->find('list', array(                    
+            'joins' => array(
+                array(
+                    'table' => 'prisoners',
+                    'alias' => 'Prisoner',
+                    'type' => 'left',
+                    'conditions'=> array('PrisonerTransfer.prisoner_id = Prisoner.id'),
+                ),
+            ),
+            'fields'        => array(
+                'PrisonerTransfer.prisoner_id',
+                'Prisoner.prisoner_no',
+            ),
+            'conditions'    => array(
+                'Prisoner.is_enable'      => 1,
+                'Prisoner.is_trash'       => 0,
+                'PrisonerTransfer.transfer_to_station_id IN ('.$this->Session->read('Auth.User.prison_id').')',
+            ),
+            'order'         => array(
+                'PrisonerTransfer.prisoner_id'
+            ),
         ));
-
         $default_status = '';
         $statusList = '';
         $statusInfo = $this->getApprovalStatusInfo();
@@ -592,20 +614,19 @@ class GatepassesController    extends AppController {
             'gatepassType'    => $gatepassType
         ));
     }
-    public function gatepassTransferListAjax() {
+    
+        public function gatepassTransferListAjax() {
         $this->layout   = 'ajax';
         $searchData = $this->params['named'];
         $condition              = array(
             'Gatepass.is_trash'      => 0,
-            'date(Gatepass.created)'      => date("Y-m-d"),
-            'Gatepass.prison_id IN ('.$this->Session->read('Auth.User.prison_id').')',
+            'Gatepass.model_name' => 'PrisonerTransfer',
+            'Gatepass.gatepass_type' => 'Prisoner Transfer',
+            //'Gatepass.in_time' => '0000-00-00 00:00:00',
+           // 'Gatepass.out_time !=' => '0000-00-00 00:00:00',
+            'PrisonerTransfer.transfer_to_station_id IN ('.$this->Session->read('Auth.User.prison_id').')',
         );
-        if(isset($this->params['named']['status']) && $this->params['named']['status'] != ''){
-            $status = $this->params['named']['status'];
-            $condition += array(
-                'Gatepass.status'   => $status,
-            );
-        }else{
+        
             if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE'))
             {
                 $condition      += array('Gatepass.status'=>'Draft');
@@ -619,25 +640,17 @@ class GatepassesController    extends AppController {
             {
                 $condition      += array('Gatepass.status'=>'Draft');
             }   
-        }
+        
         // debug($this->Session->read('Auth.User.usertype_id'));
-        if($this->Session->read('Auth.User.usertype_id')==Configure::read('MAIN_GATEKEEPER_USERTYPE')){
+        /*if($this->Session->read('Auth.User.usertype_id')==Configure::read('MAIN_GATEKEEPER_USERTYPE')){
             $gatepass_status = 'OUT';
             $condition += array(
                 'Gatepass.gatepass_status'   => 'OUT',
             );
-        }
+        }*/
         
 
-        if(isset($this->params['named']['gatepass_status']) && $this->params['named']['gatepass_status'] != ''){
-            if(isset($condition['Gatepass.gatepass_status'])){
-                unset($condition['Gatepass.gatepass_status']);
-            }
-            $gatepass_status = $this->params['named']['gatepass_status'];
-            $condition += array(
-                'Gatepass.gatepass_status'   => $gatepass_status,
-            );
-        }
+        
         if(isset($this->params['named']['prisoner_id']) && $this->params['named']['prisoner_id'] != ''){
             $prisoner_id = $this->params['named']['prisoner_id'];
             $condition += array(
@@ -645,20 +658,15 @@ class GatepassesController    extends AppController {
             );
         }
 
-        if(isset($this->params['named']['gatepass_type']) && $this->params['named']['gatepass_type'] != ''){
-            $gatepass_type = $this->params['named']['gatepass_type'];
-            $condition += array(
-                'Gatepass.gatepass_type'   => $gatepass_type,
-            );
-        }
+        //debug($condition);exit;
 
-        if(isset($this->params['named']['date_from']) && $this->params['named']['date_from']!=''){
+        /*if(isset($this->params['named']['date_from']) && $this->params['named']['date_from']!=''){
             $date_from = $this->params['named']['date_from'];
             $date_to = $this->params['named']['date_to'];
             $condition += array(
                 "Gatepass.gp_date between '".date("Y-m-d", strtotime($date_from))."' and '".date("Y-m-d", strtotime($date_to))."'",
             );
-        }
+        }*/
         // debug($this->params['named']);
         // debug($condition);
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
@@ -682,20 +690,250 @@ class GatepassesController    extends AppController {
         }else{
             $limit = array('limit'  => 20);
         } 
-        // debug($condition);
+       // debug($condition);exit;
         $this->paginate = array(
             'conditions'    => $condition,
+            'joins' => array(
+                array(
+                    'table' => 'prisoner_transfers',
+                    'alias' => 'PrisonerTransfer',
+                    'type' => 'left',
+                    'conditions'=> array('PrisonerTransfer.id = Gatepass.reference_id'),
+                ),
+            ),
             'order'         => array(
                 'Gatepass.modified'  => 'DESC',
             ),
         )+$limit;
         $datas = $this->paginate('Gatepass');
+        // /debug($datas);exit;
         $this->set(array(
             'datas'         => $datas,
             'searchData'    => $searchData,
         ));
 
     }
+
+    
+    public function recieveTransferItemCash(){
+          
+        $this->loadModel('PrisonerTransferPhysicalProperty'); 
+        $this->loadModel('PrisonerTransferCashProperty'); 
+
+
+         $transferId = $this->request->data['RecieveItemCash']['transfer_id'];
+         //debug($this->request->data);exit;
+         $items = $this->request->data['RecievePrisonerItem'];
+         $cashItems =  $this->request->data['RecievePrisonerCashItem'];
+         foreach ($items as $item) {
+                if(isset($item['quantity']) && $item['quantity'] != ''){
+                    $updateFields = array(
+                        'PrisonerTransferPhysicalProperty.rcv_quentity'           => $item['quantity']
+                    );
+                    $updateConds =array(
+                        'PrisonerTransferPhysicalProperty.id'    => $item['id'],
+                    );
+
+                    $this->PrisonerTransferPhysicalProperty->updateAll($updateFields, $updateConds);
+                }
+             
+         }
+         foreach ($cashItems as $cashItem) {
+                if(isset($cashItem['amount']) && $cashItem['amount'] != ''){
+                    $updateFields = array(
+                        'PrisonerTransferCashProperty.rcv_amount' => $cashItem['amount']
+                    );
+                    $updateConds =array(
+                        'PrisonerTransferCashProperty.id'    => $cashItem['id'],
+                    );
+
+                    $this->PrisonerTransferCashProperty->updateAll($updateFields, $updateConds);
+                }
+             
+         }
+         echo "success";
+         //$transferId = 
+         exit;
+    }
+
+    
+      public function ajaxAddNewCashItem(){
+        $this->loadModel('PrisonerTransferCashProperty'); 
+
+        $this->layout = 'ajax';
+
+        $amount = $this->request->data['amount'];
+        $currency = $this->request->data['currency'];
+        $transferid = $this->request->data['transfer_id'];
+
+        $transferCashItem['PrisonerTransferCashProperty']['prisoner_transfer_id'] = $transferid;
+        $transferCashItem['PrisonerTransferCashProperty']['currency_id'] = $currency;
+        $transferCashItem['PrisonerTransferCashProperty']['amount'] = $amount;
+
+        $this->PrisonerTransferCashProperty->saveAll($transferCashItem);
+        echo "success";exit;
+    }
+    public function ajaxAddNewItem(){
+        $this->loadModel('PrisonerTransferPhysicalProperty'); 
+
+        $this->layout = 'ajax';
+
+        $itemName = $this->request->data['itemName'];
+        $itemQuantity = $this->request->data['itemQuantity'];
+        $transferId = $this->request->data['transfer_id'];
+
+        $prisonerItem['PrisonerTransferPhysicalProperty']['item_id'] = $itemName;
+        $prisonerItem['PrisonerTransferPhysicalProperty']['quantity'] = $itemQuantity;
+        $prisonerItem['PrisonerTransferPhysicalProperty']['prisoner_transfer_id'] = $transferId;
+
+        $this->PrisonerTransferPhysicalProperty->saveAll($prisonerItem);
+        echo "success";exit;
+    }
+
+
+    function getPropertyRow(){
+        $this->layout = 'ajax';
+        $this->loadModel('PrisonerTransferPhysicalProperty'); 
+        $this->loadModel('PrisonerTransferCashProperty'); 
+
+        $this->loadModel('Gatepass'); 
+        $this->loadModel('Propertyitem'); 
+
+        $transferId = $this->data['transferId'];
+
+        $tranferPropertyItems = $this->PrisonerTransferPhysicalProperty->find('all',array(
+            'recursive'=>-1,
+            'conditions'=>array(
+                'PrisonerTransferPhysicalProperty.prisoner_transfer_id'=>$transferId
+            )
+        ));
+
+        $tranferCashItems = $this->PrisonerTransferCashProperty->find('all',array(
+            'recursive'=>-1,
+            'conditions'=>array(
+                'PrisonerTransferCashProperty.prisoner_transfer_id'=>$transferId
+            )
+        ));
+
+        $propertyItemList = $this->Propertyitem->find('all',array(
+                'recursive'     => -1,
+                'conditions'    => array(
+                    'Propertyitem.is_enable'    => 1,
+                    'Propertyitem.is_trash'     => 0,
+
+                )
+            ));
+        
+        $data ='';
+        $count =0;
+        $allCollected ='true';
+        $data .= '<div><h5 style="display:inline-block;"">Prisoner Property Items</h5><button style="display:inline-block;margin-left:10px;" class="add_more_property btn btn-success"><span class="icon icon-plus"></span></button></div>';
+        $data .= '<div id="add_item_form" style="display:none">';
+         $data .= '<table class="table table-bordered table-striped table-responsive"><thead><tr><th>Item Name</th><th>Quantity</th><th>Action</th></tr></thead><tbody>';
+         $data .= '<tr><td><select  name="newItemName" id="newItemName">';
+         foreach ($propertyItemList as $pitem) {
+            $data .= '<option value="'.$pitem["Propertyitem"]["id"].'">'.$pitem["Propertyitem"]["name"].'</option>';
+
+         }
+         $data .= '</select></td><td><input type="number" name="newItemQuantity" id="newItemQuantity"></td><td><button class="btn btn-success insert_property_item">add</button></td></tr>';
+         $data .= '</tbody></table></div>';
+        $data .= '<table class="table table-bordered table-striped table-responsive"><thead><tr><th>Item Name</th><th>Quantity</th></tr></thead><tbody>';
+        //debug($tranferPropertyItems);exit;
+        foreach ($tranferPropertyItems as $prisonerItemDetail) {
+                        $itemTypeId = $prisonerItemDetail['PrisonerTransferPhysicalProperty']['item_id'];
+                        $propertyItemName='';
+                        //debug($propertyItemList);
+                        foreach ($propertyItemList as $propertyItem) {
+                          //debug($propertyItem);
+                            if($propertyItem['Propertyitem']['id'] ==$itemTypeId ){
+                                $propertyItemName = $propertyItem['Propertyitem']['name'];
+                            }
+                        }
+                        $data .= '<tr>';
+
+                        $data .= '<td>';
+                        $data .= '<input type="hidden" name="data[RecievePrisonerItem]['.$count .'][id] " value="'. $prisonerItemDetail['PrisonerTransferPhysicalProperty']['id'] .'">';
+                        $data .= $propertyItemName .'</td>';
+                        if( $prisonerItemDetail['PrisonerTransferPhysicalProperty']['rcv_quentity'] != '' && $prisonerItemDetail['PrisonerTransferPhysicalProperty']['rcv_quentity'] != null){
+                            $data .= '<td>'. $prisonerItemDetail['PrisonerTransferPhysicalProperty']['quantity'] .'</td>';
+                            $allCollected ='true';
+                        }else{
+                            $data .= '<td><input type="number" name="data[RecievePrisonerItem]['.$count .'][quantity] " value="'. $prisonerItemDetail['PrisonerTransferPhysicalProperty']['quantity'] .'"></td>';
+                            $allCollected ='false';
+
+                        }
+                        //$data .= '<td>'. $prisonerItemDetail['PrisonerTransferPhysicalProperty']['quantity'] .'</td>';
+                       
+                        $data .='</tr>';
+                        $count++;
+                    }
+                        $data .= '</tbody></table>';
+
+        //get cash details
+
+        $this->loadModel('Currency');
+        $currencyList = $this->Currency->find('all',array(
+                    'recursive'     => -1,
+                    'conditions'    => array(
+                        'Currency.is_enable'    => 1,
+                        'Currency.is_trash'     => 0,
+                    ),
+                    
+                ));
+        $data .= '<div><h5 style="display:inline-block;">Prisoner Cash Items</h5><button class="add_more_cash btn btn-success" style="display:inline-block;margin-left:10px;"><span class="icon icon-plus"></span></button></div>';
+        $data .= '<div id="add_more_cash_form" style="display:none">';
+        $data .= '<table class="table table-bordered table-striped table-responsive"><thead><tr><th>Amount</th><th>Currency</th><th>Action</th></tr></thead><tbody>';
+        $data .= '<tr><td><input type="number" name="newItemAmount" id="newItemAmount"></td><td><select  name="newItemCurrency" id="newItemCurrency">';
+         foreach ($currencyList as $pitem) {
+            $data .= '<option value="'.$pitem["Currency"]["id"].'">'.$pitem["Currency"]["name"].'</option>';
+
+         }
+        $data .= '</select></td><td><button class="btn btn-success insert_property_cash_item">add</button></td></tr>';
+        $data .= '</tbody></table></div>';
+        $data .= '<table class="table table-bordered table-striped table-responsive"><thead><tr><th>Amount</th><th>Currency</th></tr></thead><tbody>';
+
+        $count=0;
+        foreach ($tranferCashItems as $prisonerCash) {
+                        // /debug($prisonerCash);
+                        $data .= '<tr>';
+
+                        $data .= '<td><input type="hidden" name="data[RecievePrisonerCashItem]['.$count .'][id] " value="'. $prisonerCash['PrisonerTransferCashProperty']['id'] .'">';
+
+                        if( $prisonerCash['PrisonerTransferCashProperty']['rcv_amount'] != '' && $prisonerCash['PrisonerTransferCashProperty']['rcv_amount'] != null){
+                            $data .=  $prisonerCash['PrisonerTransferCashProperty']['amount'];
+                            $allCollected ='true';
+                        }else{
+                            $data .= '<input type="number" name="data[RecievePrisonerCashItem]['.$count .'][amount] " value="'. $prisonerCash['PrisonerTransferCashProperty']['amount'] .'">';
+                            $allCollected ='false';
+
+                        }
+                        $data .='</td>';
+                        $currencyTypeId = $prisonerCash['PrisonerTransferCashProperty']['currency_id'];
+                        $currencyName= '';
+                        foreach ($currencyList as $currency) {
+                          //debug($propertyItem);
+                            if($currency['Currency']['id'] ==$currencyTypeId ){
+                                $currencyName = $currency['Currency']['name'];
+                            }
+                        }
+                            $data .= '<td>'. $currencyName .'</td>';
+                       
+                        
+                        $data .='</tr>';
+
+                        $count++;
+                    }         
+                        $data .= '</tbody></table>';
+
+        //end
+
+
+        $data .= '<div style="display:none;" id="allCollectedResponse">'.$allCollected.'</div>';
+
+
+        echo $data;exit;
+    }
+
 
     function gatepassPdf($gatepass_id)
     {
@@ -1203,12 +1441,56 @@ class GatepassesController    extends AppController {
 
     public function updatePhysicalProperty(){
         $this->loadModel('Gatepass');
-        debug($this->data);exit;
-        if($this->Gatepass->saveAll($this->data)){
-            echo "SUCC";
-        }else{
-            echo "FAIL";
-        }
-        exit;
+        //debug($this->data);exit;
+
+        $this->loadModel('PrisonerTransfer'); 
+        $this->loadModel('PrisonerTransferPhysicalProperty'); 
+        $this->loadModel('PrisonerTransferCashProperty'); 
+
+
+         $transferId = $this->request->data['Gatepass']['id'];
+         //debug($this->request->data);exit;
+         $items = $this->request->data['PrisonerTransferPhysicalProperty'];
+         $cashItems =  $this->request->data['PrisonerTransferCashProperty'];
+         foreach ($items as $item) {
+                if(isset($item['quantity']) && $item['quantity'] != ''){
+                    $updateFields = array(
+                        'PrisonerTransferPhysicalProperty.rcpt_rcv_quentity'           => $item['quantity']
+                    );
+                    $updateConds =array(
+                        'PrisonerTransferPhysicalProperty.id'    => $item['id'],
+                    );
+
+                    $this->PrisonerTransferPhysicalProperty->updateAll($updateFields, $updateConds);
+                }
+             
+         }
+         foreach ($cashItems as $cashItem) {
+                if(isset($cashItem['amount']) && $cashItem['amount'] != ''){
+                    $updateFields = array(
+                        'PrisonerTransferCashProperty.rcpt_rcv_amount' => $cashItem['amount']
+                    );
+                    $updateConds =array(
+                        'PrisonerTransferCashProperty.id'    => $cashItem['id'],
+                    );
+
+                    $this->PrisonerTransferCashProperty->updateAll($updateFields, $updateConds);
+                }
+             
+         }
+
+        
+         $prisonerTransfer = $this->PrisonerTransfer->findById($transferId);
+         $prisonerTransfer['PrisonerTransfer']['ward_id'] = $this->request->data['Gatepass']['ward_id'];
+         $prisonerTransfer['PrisonerTransfer']['ward_cell_id'] = $this->request->data['Gatepass']['ward_cell_id'];
+         $prisonerTransfer['PrisonerTransfer']['remarks'] = $this->request->data['Gatepass']['verify_remark'];
+         $prisonerTransfer['PrisonerTransfer']['instatus'] = 'Saved';
+
+         $this->PrisonerTransfer->saveAll($prisonerTransfer);
+
+
+         echo "SUCC";
+         //$transferId = 
+         exit;
     }
 }

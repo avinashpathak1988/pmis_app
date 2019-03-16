@@ -16,14 +16,14 @@
                          <div class="span6">
                           <label class="control-label">Prison Station Name<?php echo MANDATORY; ?> :</label>
                         <div class="controls">
-                            <?php echo $this->Form->input('prison_id',array('div'=>false,'label'=>false,'placeholder'=>'Enter Ward','class'=>'form-control','required','empty'=>'-- Select Prison --','options'=>$prisonlist));?>
+                            <?php echo $this->Form->input('prison_id',array('div'=>false,'label'=>false,'placeholder'=>'Enter Ward','id'=>'prison_id','class'=>'form-control pmis_select','required','empty'=>'','options'=>$prisonlist,'onchange'=>'showWard(this.value)'));?>
                         </div>
                   </div>
                         <div class="span6">
                             <div class="control-group">
                                 <label class="control-label">Ward<?php echo MANDATORY; ?> :</label>
                                 <div class="controls">
-                                    <?php echo $this->Form->input('ward_id',array('type'=>'select', 'div'=>false,'label'=>false,'class'=>'form-control','required','options'=>$wardList, 'empty'=>'--Select Ward--'));?>
+                                    <?php echo $this->Form->input('ward_id',array('type'=>'select', 'div'=>false,'label'=>false,'class'=>'form-control pmis_select','required','id'=>'ward_id', 'empty'=>''));?>
                                 </div>
                             </div>
                         </div>                    
@@ -95,6 +95,10 @@
         </div>
     </div>
 </div>
+<?php
+$wardjaxUrl = $this->Html->url(array('controller'=>'WardCells','action'=>'showWardCell'));
+
+?>
 <script type="text/javascript">
 	  $("#btn1").click(function(){ 
     	
@@ -118,6 +122,17 @@
             $('#remove_cell').addClass('hidden');
         }
     }); 
+
+    function showWard(id){
+        // alert(1);
+        var url = '<?php echo $wardjaxUrl ?>';
+        url = url + '/prison_id:' + id ;
+        $.post(url, {}, function(res){
+            if (res) {
+                $('#ward_id').html(res);
+            }
+        });
+    }
 
 	 
 $(function(){

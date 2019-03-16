@@ -343,7 +343,7 @@ if($discharge_type_id==3){
             <label class="control-label">Date & Time of Death :</label>
             <div class="controls">
                 <?php 
-                echo date("d-m-Y", strtotime($medicalDeathDetails['MedicalDeathRecord']['check_up_date'])); ?>
+                echo date("d-m-Y h:i A", strtotime($medicalDeathDetails['MedicalDeathRecord']['check_up_date'])); ?>
             </div>
         </div>
     </div>   

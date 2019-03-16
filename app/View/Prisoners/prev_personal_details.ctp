@@ -26,7 +26,7 @@ table.viewHalf label{display:inline-block;color: #A03230}
                             
                             <div class="row-fluid">
                                 <div class="span12 heading">
-                                    <h5>Previous Personal Details</h5>
+                                    <h5>Personal Details</h5>
                                 </div>
                             </div>
                            
@@ -817,6 +817,8 @@ table.viewHalf label{display:inline-block;color: #A03230}
 
                                        
 <?php 
+$prisoner_id = $data['Prisoner']['id'];
+$uuid = $data['Prisoner']['uuid'];
 $commonHeaderUrl    = $this->Html->url(array('controller'=>'Prisoners','action'=>'getCommonHeder'));
 echo $this->Html->scriptBlock("
     jQuery(function($) {

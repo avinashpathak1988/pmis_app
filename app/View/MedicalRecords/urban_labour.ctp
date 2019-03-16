@@ -10,10 +10,7 @@
             <div class="widget-box">
                 <div class="widget-title"> <span class="icon"> <i class="icon-align-justify"></i> </span>
                     <h5>Unfit Prisoner List</h5>
-                    <div style="float:right;padding-top:2px;">
-                        <?php echo $this->Html->link('Back',array('action'=>'index'),array('class' => 'btn btn-mini btn-primary'));?>
-                        &nbsp;&nbsp;
-                    </div>
+                    
                 </div>
                 <div class="widget-content nopadding">
                     <div class="">
@@ -23,7 +20,7 @@
                                 <div class="control-group">
                                     <label class="control-label">Prisoner No</label>
                                     <div class="controls">
-                                        <?php echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'type'=>'select','empty'=>'-- Select Prisoner --','options'=>$prisonerList, 'class'=>'form-control', 'id'=>'prisoner_id'));?>
+                                        <?php echo $this->Form->input('prisoner_id',array('div'=>false,'label'=>false,'type'=>'select','empty'=>'','options'=>$prisonerList, 'class'=>'form-control pmis_select', 'id'=>'prisoner_id'));?>
                                     </div>
                                 </div>
                             </div>

@@ -291,17 +291,22 @@ if(!isset($is_excel) && ($isAccess == 1)){
                 <?php //echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['MedicalCheckupRecord']['id'])); ?>
                 <?php //echo $this->Form->end(array('label'=>'Delete','class'=>'btn btn-danger btn-mini','div'=>false, 'onclick'=>"javascript:return confirm('Are you sure want to delete?')")); ?> -->
               <td nowrap="nowrap">
-                <?php if(true ) { // $data["MedicalCheckupRecord"]['status'] == 'Draft' ?>
-              <?php echo $this->Form->create('MedicalCheckupRecordEdit',array('url'=>'/medicalRecords/add#health_checkup','admin'=>false,'id'=>'MedicalCheckupRecordEdit'));?> 
+
+
+                <?php if(true ) {
+                if ($data["Prisoner"]["is_death"]!=1) {
+                    ?>
+                <?php echo $this->Form->create('MedicalCheckupRecordEdit',array('url'=>'/medicalRecords/add#health_checkup','admin'=>false));?> 
+                <?php echo $this->Form->end();?>
+              <?php echo $this->Form->create('MedicalCheckupRecordEdit',array('url'=>'/medicalRecords/add#health_checkup','admin'=>false, 'id'=>'MedicalCheckupRecordEdit'.$data['MedicalCheckupRecord']['id']));?> 
               <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['MedicalCheckupRecord']['id'])); ?>
-              <?php echo $this->Form->button('<i class="icon icon-edit"></i>',array('type'=>'button','class'=>'btn btn-primary btn-mini','div'=>false, 'onclick'=>"javascript:return editForm();")); ?> 
+              <?php echo $this->Form->button('<i class="icon icon-edit"></i>',array('type'=>'button','class'=>'btn btn-primary btn-mini','div'=>false, 'onclick'=>"javascript:return editForm(".$data['MedicalCheckupRecord']['id'].")")); ?> 
               <?php echo $this->Form->end();?>
 
-              <?php echo $this->Form->create('MedicalCheckupDelete',array('url'=>'/medicalRecords/add#health_checkup/','admin'=>false, 'id'=>'MedicalCheckupDelete'));?> 
-              <?php echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['MedicalCheckupRecord']['id'])); ?>
-              <?php //echo $this->Form->button('<i class="icon icon-trash"></i>',array('type'=>'button','class'=>'btn btn-danger btn-mini','div'=>false, 'onclick'=>"javascript:return deleteForm();")); ?>
-                <?php echo $this->Form->end();?>
-                <?php } ?>
+             
+                <?php }
+                else{echo "Death Prisoner";}
+                } ?>
                 <?php //echo $this->Form->create('MedicalCheckupDelete',array('url'=>'/medicalRecords/add#health_checkup/','admin'=>false));?> 
                 <?php //echo $this->Form->input('id',array('type'=>'hidden','value'=> $data['MedicalCheckupRecord']['id'])); ?>
                 <?php //echo $this->Form->end(array('label'=>'Delete','class'=>'btn btn-danger btn-mini','div'=>false, 'onclick'=>"javascript:return confirm('Are you sure want to delete?')")); ?>
@@ -361,13 +366,14 @@ function MyNoFunction() {
     
 }
 
-function editForm(){
+function editForm(id){
+  var ids = id;
       AsyncConfirmYesNo(
                 'Are you sure want to edit?',
                 'Yes',
                 'No',
-                function(){
-                    $('#MedicalCheckupRecordEdit').submit();
+                function(id){
+                    $('#MedicalCheckupRecordEdit'+ids).submit();
                 },
                 function(){
                     

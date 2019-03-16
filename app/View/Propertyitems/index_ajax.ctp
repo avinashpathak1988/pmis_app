@@ -12,9 +12,11 @@ if(is_array($datas) && count($datas)>0){
         //'before'                  => '$("#lodding_image").show();',
         //'complete'                => '$("#lodding_image").hide();',
         'url'                       => array(
-            'controller'            => 'Propertyitems',
+            'controller'            => 'propertyitems',
             'action'                => 'indexAjax',
-            'name'                  => $name,      
+            'name'                  => $name,
+            'property_type'         => $type,
+            'added_by'              => $added_by
         )
     ));         
     echo $this->Paginator->prev(__('prev'), array('tag' => 'li'), null, array('tag' => 'li','class' => 'disabled','disabledTag' => 'a'));
@@ -103,7 +105,9 @@ echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal',
       </th>
       <th><?php echo $this->Paginator->sort('is_enable'); ?></th>
       <?php if($this->Session->read('Auth.User.usertype_id')!=Configure::read('ADMIN_USERTYPE')){?>
-        <th>Status</th>
+        <?php if($showAdmin == 'false'){ ?>
+            <th>Status</th>
+         <?php } ?>
       <?php }?>
       <th><?php echo __('Action'); ?></th>
     </tr>
@@ -178,9 +182,12 @@ foreach($datas as $data){
       </td>
 
       <?php if($this->Session->read('Auth.User.usertype_id')!=Configure::read('ADMIN_USERTYPE')){?>
-        <td>
-        <?php echo $data['Propertyitem']['status'] ?>
-      </td>
+        <?php if($showAdmin == 'false'){ ?>
+            <td>
+              <?php echo $data['Propertyitem']['status'] ?>
+            </td>
+         <?php } ?>
+        
       <?php }?>
 
       

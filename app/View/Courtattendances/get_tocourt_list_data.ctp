@@ -45,6 +45,7 @@ echo $this->Paginator->counter(array(
     }
 ?> 
 <?php
+$judicialOfficerLevel = 'Presiding judge';
         if(isset($is_excel)){
           ?>
           <style type="text/css">
@@ -147,9 +148,13 @@ foreach($datas as $data){
                                 <td><b>Count</b></td>
                                 <td><?php echo $data['Courtattendance']['offence_count'];?></td>
                             </tr>
-							 
+							 <?php 
+								if(isset($data['Courtattendance']['court_level']) && $data['Courtattendance']['court_level'] != '') {
+									$judicialOfficerLevel = $funcall->getJudicialOfficerLevel($data['Courtattendance']['court_level']);
+								}
+							?>
 							 <tr>
-                                <td><b>Presiding Judge</b></td>
+                                <td><b><?php echo $judicialOfficerLevel; ?></b></td>
                                 <td><?php echo $data['Courtattendance']['presiding_judge'];?></td>
                             </tr>
 							 <tr>

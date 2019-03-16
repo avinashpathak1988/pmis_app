@@ -780,6 +780,111 @@ class PrisonerTransfersController   extends AppController {
             ),
         ));
 
+        // withdraw old properties
+        $this->loadModel('PhysicalProperty');
+        $this->loadModel('PhysicalPropertyItem');
+        $this->loadModel('CashItem');
+        
+        $oldPrisonerId = $from_prisonerdata['Prisoner']['id'];
+        $oldPhysicalProperties =  $this->PhysicalProperty->find('all',array(
+            'recursive'=>-1,
+            'conditions'=>array(
+                'PhysicalProperty.prisoner_id'=>$oldPrisonerId,
+                'PhysicalProperty.is_trash'=>0
+            )
+        ));
+        
+        foreach ($oldPhysicalProperties as $oldPhysicalProperty) {
+
+            $propertyType = $oldPhysicalProperty['PhysicalProperty']['property_type'];
+            $propertyId = $oldPhysicalProperty['PhysicalProperty']['id'];
+
+            if($propertyType == 'Physical Property'){
+                $propertyItems = $this->PhysicalPropertyItem->find('all',array(
+                    'recursive' =>-1,
+                    'conditions'=>array(
+                        'PhysicalPropertyItem.physicalproperty_id'=> $propertyId,
+                        'PhysicalPropertyItem.is_trash'=> 0,
+
+                    )
+                ));
+                //debug($this->PhysicalPropertyItem->findById(219));
+                
+                foreach ($propertyItems as $item) {
+                    $itemId = $item['PhysicalPropertyItem']['id'];
+                    $quantity = $item['PhysicalPropertyItem']['quantity'];
+
+                    $item['PhysicalPropertyItem']['item_status'] = 'Outgoing';
+                    $item['PhysicalPropertyItem']['outgoing_desc'] = 'Transfer';
+                    $item['PhysicalPropertyItem']['outgoing_source'] = 'Transfer';
+                    $item['PhysicalPropertyItem']['outgoing_status'] = 'Approved';
+                    $item['PhysicalPropertyItem']['outgoing_status_selected'] = 0;
+                    $item['PhysicalPropertyItem']['is_biometric_verified'] = 1;
+                    $item['PhysicalPropertyItem']['quantity_remaining'] = 0;
+                    $item['PhysicalPropertyItem']['quantity_outgoing'] =$quantity;
+
+
+                    $fields = array(
+                            'PhysicalPropertyItem.item_status'      => "'Outgoing'",
+                            'PhysicalPropertyItem.outgoing_desc'      => "'Transfer'",
+                            'PhysicalPropertyItem.outgoing_source'      => "'Transfer'",
+                            'PhysicalPropertyItem.outgoing_status'      => "'Approved'",
+                            'PhysicalPropertyItem.outgoing_status_selected'      => "'1'",
+                            'PhysicalPropertyItem.is_biometric_verified'      => "'1'",
+                            'PhysicalPropertyItem.quantity_remaining'      => "'0'",
+                            'PhysicalPropertyItem.quantity_outgoing'      => "'$quantity'",
+
+                        );
+                    $conds = array(
+                        'PhysicalPropertyItem.id' => $itemId
+                    );
+                    
+                    if($this->PhysicalPropertyItem->updateAll($fields,$conds)){
+                       // echo "saved";
+                        //debug($this->PhysicalPropertyItem->find("first",array()));
+                    }
+                }
+
+
+               // debug($this->PhysicalPropertyItem->findById(219));
+               // exit;
+                 // debug($item);exit;
+            }else if($propertyType == 'Cash'){
+
+
+
+                $propertyItems = $this->CashItem->find('all',array(
+                    'recursive' =>-1,
+                    'conditions'=>array(
+                        'CashItem.physicalproperty_id'=> $propertyId,
+                        'CashItem.is_trash'=> 0
+
+                    )
+                ));
+
+                foreach ($propertyItems as $item) {
+                    $itemId = $item['CashItem']['id'];
+
+                    $fields = array(
+                        'CashItem.item_status'      => "'Outgoing'",
+                        'CashItem.outgoing_source'      => "'Transfer'",
+                    );
+                    $conds = array(
+                        'CashItem.id' => $itemId
+                    );
+                    //debug($filelds);
+                    $this->CashItem->updateAll($fields, $conds);
+
+                }
+                 
+            }
+
+        }            
+
+        //debug(count($oldPhysicalProperties));exit;
+        //withdraw old property end
+
+
         // echo '<pre>'; print_r($from_prisonerdata);
         if(is_array($from_prisonerdata) && count($from_prisonerdata)>0)
         {
@@ -1121,11 +1226,13 @@ class PrisonerTransfersController   extends AppController {
         $db->begin(); 
         // debug($this->data); exit;
         if($this->Prisoner->saveAll($this->data)){
+
             //create prisoner no
             $prisoner_id    = $this->Prisoner->id;
+
             //========================================================
             //first close the exting prison records after inserting in outgoing property and debit cash
-            $this->loadModel('PrisonerTransferCashProperty');
+/*            $this->loadModel('PrisonerTransferCashProperty');
             $this->loadModel('PrisonerTransferPhysicalProperty');
             $cashPropertyData = $this->PrisonerTransferCashProperty->find("all", array(
                 "conditions"    => array(
@@ -1138,6 +1245,8 @@ class PrisonerTransfersController   extends AppController {
                     "PrisonerTransferPhysicalProperty.prisoner_transfer_id"     => $transfer_id,
                 ),
             ));
+*/
+            $this->savePrisonerProperties($transfer_id,$prisoner_id);
 
             //========================================================
             // then insert incoming property and credit cash in this prison
@@ -1208,6 +1317,110 @@ class PrisonerTransfersController   extends AppController {
         return $transferSuccess;
     }
 
+
+    function savePrisonerProperties($transfer_id,$prisoner_id){
+            $this->loadModel('PrisonerTransferCashProperty');
+            $this->loadModel('PrisonerTransferPhysicalProperty');
+            $this->loadModel('PhysicalProperty');
+            $this->loadModel('Propertyitem');
+            $this->loadModel('CashItem');
+
+            $cashPropertyData = $this->PrisonerTransferCashProperty->find("all", array(
+                "conditions"    => array(
+                    "PrisonerTransferCashProperty.prisoner_transfer_id"     => $transfer_id,
+                ),
+            ));
+
+            $physicalPropertyData = $this->PrisonerTransferPhysicalProperty->find("all", array(
+                "conditions"    => array(
+                    "PrisonerTransferPhysicalProperty.prisoner_transfer_id"     => $transfer_id,
+                ),
+            ));
+            if(count($physicalPropertyData) > 0){
+
+                        $physicalPropertyNew =array();
+                        $physicalPropertyNew['PhysicalProperty']['property_date_time']=date('Y-m-d H:i:s');
+                        $physicalPropertyNew['PhysicalProperty']['login_user_id']=$this->Session->read('Auth.User.id');
+                        $physicalPropertyNew['PhysicalProperty']['description']='Transfer';
+                        $physicalPropertyNew['PhysicalProperty']['source']='Transfer';
+                        $physicalPropertyNew['PhysicalProperty']['prisoner_id']=$prisoner_id;
+                        $physicalPropertyNew['PhysicalProperty']['property_type']='Physical Property';
+
+                        if($this->PhysicalProperty->saveAll($physicalPropertyNew['PhysicalProperty'])){
+
+                            foreach ($physicalPropertyData as $recievedItem) {
+                                $physicalPropertyItem=array();
+
+                                $physicalPropertyItem['PhysicalPropertyItem']['physicalproperty_id']=$this->PhysicalProperty->id;
+                                $physicalPropertyItem['PhysicalPropertyItem']['item_id']=$recievedItem['PrisonerTransferPhysicalProperty']['item_id'];
+                                $physicalPropertyItem['PhysicalPropertyItem']['quantity']=$recievedItem['PrisonerTransferPhysicalProperty']['rcpt_rcv_quentity'];
+                                $physicalPropertyItem['PhysicalPropertyItem']['prison_id'] =$this->Session->read('Auth.User.prison_id');
+
+                                $propertyItem =  $this->Propertyitem->findById($recievedItem['PrisonerTransferPhysicalProperty']['item_id']);
+
+                                if(isset($propertyItem['Propertyitem']['is_allowed'])){
+
+                                    if($propertyItem['Propertyitem']['is_allowed'] == 1){
+                                         $physicalPropertyItem['PhysicalPropertyItem']['is_provided'] =  'Allowed';
+                                            $physicalPropertyItem['PhysicalPropertyItem']['item_status'] =  'Incoming';
+                                            $physicalPropertyItem['PhysicalPropertyItem']['status'] =  'Approved';
+                                            $physicalPropertyItem['PhysicalPropertyItem']['property_type'] =  'In Use';
+                                    }else if(isset($propertyItem['Propertyitem']['is_prohibited']) && $propertyItem['Propertyitem']['is_prohibited'] == 1){
+                                       if($propertyItem['Propertyitem']['property_type_prohibited'] == 'Destroyed'){
+                                            $physicalPropertyItem['PhysicalPropertyItem']['is_provided'] =  'Prohibited';
+                                            $physicalPropertyItem['PhysicalPropertyItem']['item_status'] =  'Destroy';
+                                            $physicalPropertyItem['PhysicalPropertyItem']['destroy_status'] =  'Approved';
+                                            $physicalPropertyItem['PhysicalPropertyItem']['property_type'] =  'Destroyed';
+
+                                       }else{
+                                        $physicalPropertyItem['PhysicalPropertyItem']['is_provided'] =  'Prohibited';
+                                            $physicalPropertyItem['PhysicalPropertyItem']['item_status'] =  'Incoming';
+                                            $physicalPropertyItem['PhysicalPropertyItem']['status'] =  'Approved';
+                                            $physicalPropertyItem['PhysicalPropertyItem']['property_type'] =  'In Store';
+                                            
+                                       }
+                                    }
+
+                                }else{
+                                    continue;
+                                }
+
+                                $physicalPropertyItem['PhysicalPropertyItem']['bag_no']='0';
+                                $this->PhysicalPropertyItem->saveAll($physicalPropertyItem['PhysicalPropertyItem']);
+                            }
+                        }
+                    } //physical property added
+
+                if(count($cashPropertyData) > 0){
+                            $physicalPropertyNew =array();
+                            $physicalPropertyNew['PhysicalProperty']['property_date_time']=date('Y-m-d H:i:s');
+                            $physicalPropertyNew['PhysicalProperty']['login_user_id']=$this->Session->read('Auth.User.id');
+                            $physicalPropertyNew['PhysicalProperty']['description']='Transfer';
+                            $physicalPropertyNew['PhysicalProperty']['source']='Transfer';
+                            $physicalPropertyNew['PhysicalProperty']['prisoner_id']=$prisoner_id;
+                            $physicalPropertyNew['PhysicalProperty']['property_type']='Cash';
+
+                            if($this->PhysicalProperty->saveAll($physicalPropertyNew['PhysicalProperty'])){
+
+
+                                foreach ($cashPropertyData as $recievedCash) {
+
+                                                $cashItem['CashItem']['physicalproperty_id']=$this->PhysicalProperty->id;
+                                                $cashItem['CashItem']['amount']=$recievedCash['PrisonerTransferCashProperty']['rcpt_rcv_amount'];
+                                                $cashItem['CashItem']['currency_id']=$recievedCash['PrisonerTransferCashProperty']['currency_id'];
+                                                $cashItem['CashItem']['prison_id']=$this->Session->read('Auth.User.prison_id');
+                                                $cashItem['CashItem']['status']='Approved';
+                                                $cashItem['CashItem']['item_status']='Incoming';
+                                                $cashItem['CashItem']['credit_type']='PP Cash';
+
+                                                $this->CashItem->saveAll($cashItem);
+                                }
+                            }
+
+                }      
+            
+            return true;
+    }
     //functon for adding apply transfer request
     function add(){
         $check ="is_add";

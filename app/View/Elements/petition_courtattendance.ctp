@@ -50,7 +50,7 @@ $highCourtfileNo = $funcall->getPrisonerHighCourtFileNo($prisonerData['Prisoner'
                 <label class="control-label">Court Level:</label>
                 <div class="controls">
                     <?php $cid = "'petition'";
-                    echo $this->Form->input('courtlevel_id',array('div'=>false,'label'=>false,'onChange'=>'getCourtList(this.value,'.$cid.')','class'=>'form-control span11 pmis_select','type'=>'select','options'=>$courtLevelList, 'empty'=>'','required','id'=>'petition_courtlevel_id', 'title'=>'Select Court Level'));?>
+                    echo $this->Form->input('courtlevel_id',array('div'=>false,'label'=>false,'onChange'=>'getCourtList(this.value,'.$cid.')','class'=>'form-control span11 pmis_select','type'=>'select','options'=>$courtLevelList, 'empty'=>'','required'=>false,'id'=>'petition_courtlevel_id', 'title'=>'Select Court Level'));?>
                 </div>
             </div>
         </div>
@@ -61,9 +61,9 @@ $highCourtfileNo = $funcall->getPrisonerHighCourtFileNo($prisonerData['Prisoner'
                     <span id="admission_section_of_law_id_div"></span> :</label>
                 <div class="controls">
                     <?php 
-                    $courtList = array();
+                   // $courtList = array();
                     //$courtList = $funcall->getCourtList($caseData['PrisonerCaseFile']['courtlevel_id']);
-                    echo $this->Form->input('court_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select court_id','type'=>'select','options'=>$courtList, 'empty'=>'','id'=>'petition_court_id','title'=>'Select court name'));?>
+                    echo $this->Form->input('court_id',array('div'=>false,'label'=>false,'class'=>'form-control span11 pmis_select','type'=>'select','options'=>$courtList, 'empty'=>'','id'=>'petition_court_id','title'=>'Select court name'));?>
                 </div>
             </div>
         </div>

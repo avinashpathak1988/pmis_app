@@ -39,7 +39,11 @@
                                 <div class="clearfix"></div> 
                             </div>
                             <div class="form-actions" align="center">
-                            <button id="btnsearchcash" class="btn btn-success" type="button" formnovalidate="formnovalidate">Search</button>
+                            <button id="btnsearchcash" class="btn btn-success" type="button" formnovalidate="formnovalidate">
+                            Search</button>
+
+                            <?php echo $this->Form->input('Reset', array('type'=>'reset', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger', 'onclick'=>"resetData()"))?>
+
                                 
                             </div>
                             <?php echo $this->Form->end();?>
@@ -64,10 +68,18 @@ echo $this->Html->scriptBlock("
         url = url + '/discharge_transfer_id:'+discharge_transfer_id;
         url = url + '/discharge_type_id:'+id;
         $.post(url, {}, function(res) {
+            // alert(res);
             $('#show_details'+discharge_transfer_id).html(res)
         });           
     } 
-    
+    function resetData()
+    {
+        // alert(1);
+        $('#prisoner_id').val('');
+        $('#status').val('');
+       
+        showData();
+    }
     function showData(){
         var url   = '".$ajaxUrl."';
         url = url + '/prisoner_id:'+$('#prisoner_id').val();
@@ -132,4 +144,6 @@ echo $this->Html->scriptBlock("
     $(document).on('click',"#btnsearchcash", function () { // button name
         showData();
     });
+   
+
 </script>

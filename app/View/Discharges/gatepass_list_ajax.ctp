@@ -169,7 +169,7 @@ foreach($datas as $data){
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Details</h4>
                   </div>
-                  <div class="modal-body" id="show_details">
+                  <div class="modal-body" id="show_details<?php echo $data['Discharge']['id']; ?>">
                     <p><?php echo $data['Discharge']['id']; ?></p>
                   </div>
                   <div class="modal-footer">

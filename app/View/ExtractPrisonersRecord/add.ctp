@@ -68,7 +68,7 @@
     }
 
 </style>
-
+<?php //debug($this->data);?>
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span12">
@@ -88,6 +88,7 @@
                     <?php echo $this->Form->create('ExtractPrisonerRecord',array('class'=>'form-horizontal','enctype'=>'multipart/form-data'));?>
                             <?php echo $this->Form->input('id', array('type'=>'hidden' ))?>
                             <?php echo $this->Form->input('prisoner_id', array('type'=>'hidden','value'=>$prisoner['Prisoner']['id']))?>
+                            <?php echo $this->Form->input('petition_id', array('type'=>'hidden','value'=>$petition_id))?>
                     <div class="form-row italica">
 
                             <?php if($this->Session->read('Auth.User.usertype_id')==Configure::read('COMMISSIONERGENERAL_USERTYPE') && isset($data['ExtractPrisonerRecord']['id']))

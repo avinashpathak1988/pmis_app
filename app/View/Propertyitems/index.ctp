@@ -39,7 +39,7 @@
                                 <label class="control-label">Property Added by :</label>
                                 <div class="controls">
                                     <?php $addedByList = array('admin'=>'Admin','receptionist'=>'Receptionist'); ?>
-                                       <?php echo $this->Form->input('added_by',array('div'=>false,'label'=>false,'class'=>'span11 pmis_select','type'=>'select','options'=>$addedByList, 'empty'=>'','required'=>false,'default'=>'admin','id'=>'property_added_by')); ?>
+                                       <?php echo $this->Form->input('added_by',array('div'=>false,'label'=>false,'class'=>'span11 pmis_select','type'=>'select','options'=>$addedByList, 'empty'=>'','required'=>false,'default'=>$default,'id'=>'property_added_by')); ?>
                                     </div>
                             </div>
                         </div>    
@@ -69,7 +69,8 @@ echo $this->Html->scriptBlock("
     });
     function resetData()
     {
-        $('#SearchIndexForm').reset();
+       // alert('here');
+        $('#SearchIndexForm')[0].reset();
         showData();
     }
     function showData(){

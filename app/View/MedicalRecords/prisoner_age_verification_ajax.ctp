@@ -75,7 +75,7 @@ echo $this->Paginator->counter(array(
         <tr>
             <td><?php echo $rowCnt; ?></td>
             <td> <?php echo $funcall->getName($data['Prisoner']['prison_id'],"Prison","name");?></td>
-            <td><?php echo $data["Prisoner"]["first_name"];?></td>
+            <td><?php echo $data["Prisoner"]["first_name"]." ".$data["Prisoner"]["middle_name"]." ".$data["Prisoner"]["last_name"];?></td>
             <td><?php echo $data["Prisoner"]["prisoner_no"];?></td>
             <td><?php if ($data["Prisoner"]["doa"]!='0000-00-00') {
                echo date(Configure::read('UGANDA-DATE-FORMAT'),strtotime($data['Prisoner']['doa']));
@@ -113,7 +113,7 @@ echo $this->Paginator->counter(array(
                      <div class="span12">
                         <div class="control-group ">
                                                 
-                                                <label class="control-label" style="margin-right: 10px">Medical Examination<?php echo $req; ?> </label>
+                                                <label class="control-label" style="margin-right: 10px">Medical Examination</label>
                                                 <div class="controls uradioBtn">
                                                     <?php 
                                                     $age = "Under Age";
@@ -121,6 +121,7 @@ echo $this->Paginator->counter(array(
                                                     $attributes2 = array(
                                                         'legend' => false, 
                                                         'value' => $age,
+                                                       
                                                         'style' => 'float:left; margin-left: 10px'
                                                     );
                                                     echo $this->Form->radio('age', $options2, $attributes2);
@@ -151,7 +152,7 @@ echo $this->Paginator->counter(array(
                                                     <span id="x" class="remove_img">[X]</span>
                                                 </span>
                                                 <div class="clear"></div>
-                                                <?php echo $this->Form->input('photo',array('div'=>false,'label'=>false,'class'=>'form-control','type'=>'file','id'=>'photo', 'onchange'=>'readURL(this);', 'required'=>false));?>
+                                                <?php echo $this->Form->input('photo',array('div'=>false,'label'=>false,'class'=>'form-control','type'=>'file','id'=>'photo', 'onchange'=>'readURL(this);'));?>
                                                 <?php echo $this->Form->input('is_photo',array('div'=>false,'label'=>false,'type'=>'hidden','id'=>'is_photo', 'value'=>$is_photo));?>
                                             </div>
                                         </div>
@@ -226,4 +227,26 @@ echo $this->Form->end();
      
 
   }
+  $("#PrisonerAgeVerificationPrisonerAgeVerificationAjaxForm").validate({
+     
+      	ignore: "",
+            rules: {  
+                'data[PrisonerAgeVerification][age]': {
+                    required: true,
+                },
+                'data[PrisonerAgeVerification][photo]': {
+                    required: true,
+                },
+              
+                
+        	},     
+ 		messages: {
+                'data[PrisonerAgeVerification][age]': {
+                    required: "Please select age",
+                },
+                'data[PrisonerAgeVerification][photo]': {
+                    required: "Please upload photo",
+                },
+            }    
+    });
 </script>

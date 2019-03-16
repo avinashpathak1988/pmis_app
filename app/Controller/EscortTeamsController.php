@@ -4,7 +4,7 @@ class EscortTeamsController extends AppController {
 	public $layout='table';
 	public function index() {
         $menuId = $this->getMenuId("/EscortTeams");
-                $moduleId = $this->getModuleId("escort_team");
+                $moduleId = $this->getModuleId("transfer");
                 $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
                 if($isAccess != 1){
                         $this->Session->write('message_type','error');
@@ -83,8 +83,8 @@ class EscortTeamsController extends AppController {
         )); 
     }
 	public function add() { 
-         $menuId = $this->getMenuId("/EscortTeams/add");
-                $moduleId = $this->getModuleId("escort_team");
+          $menuId = $this->getMenuId("/EscortTeams");
+                $moduleId = $this->getModuleId("transfer");
                 $isAccess = $this->isAccess($moduleId,$menuId,'is_add');
                 if($isAccess != 1){
                         $this->Session->write('message_type','error');

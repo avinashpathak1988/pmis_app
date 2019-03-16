@@ -320,9 +320,7 @@ if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHAR
                                     </table>
                                     </div>
                                 </div>
-                            </div>   
-                            
-                           <br>
+                            </div>
                           </div>
                           <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -352,7 +350,6 @@ if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHAR
                     echo $this->Form->button('Approve', array('type'=>'button', 'div'=>false, 'label'=>false, 'class'=>'btn btn-warning singleBot','onclick'=>"javascript:verifyPrisonerSetData('".$data["PrisonerTransfer"]["id"]."');")); 
                 }
 		        ?>
-
                 <!-- Verify Modal START -->
                 <div id="verify<?php echo $data["PrisonerTransfer"]["id"]; ?>" class="modal fade" role="dialog">
                     <div class="modal-dialog">
@@ -558,7 +555,7 @@ if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHAR
                                                 <td><?php echo $value['PrisonerTransferPhysicalProperty']['rcv_quentity']; ?></td>
                                                 <td>
                                                     <?php echo $this->Form->input('PrisonerTransferPhysicalProperty.'.$i.'.id',array('type'=>'hidden','value'=>$value['PrisonerTransferPhysicalProperty']['id']));?>
-                                                    <?php echo $this->Form->input('PrisonerTransferPhysicalProperty.'.$i.'.rcpt_rcv_amount',array('type'=>'text', 'div'=>false,'label'=>false,'placeholder'=>'Enter Quentity','class'=>'form-control span11','required','value'=>$value['PrisonerTransferPhysicalProperty']['rcv_quentity']));?>
+                                                    <?php echo $this->Form->input('PrisonerTransferPhysicalProperty.'.$i.'.quantity',array('type'=>'text', 'div'=>false,'label'=>false,'placeholder'=>'Enter Quentity','class'=>'form-control span11','required','value'=>$value['PrisonerTransferPhysicalProperty']['rcv_quentity']));?>
                                                 </td>
                                             </tr>
                                             <?php
@@ -602,7 +599,7 @@ if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHAR
                                                 <td><?php echo $value['PrisonerTransferCashProperty']['rcv_amount']; ?></td>
                                                 <td>
                                                     <?php echo $this->Form->input('PrisonerTransferCashProperty.'.$i.'.id',array('type'=>'hidden','value'=>$value['PrisonerTransferCashProperty']['id']));?>
-                                                    <?php echo $this->Form->input('PrisonerTransferCashProperty.'.$i.'.rcpt_rcv_quentity',array('type'=>'text', 'div'=>false,'label'=>false,'placeholder'=>'Enter Amount','class'=>'form-control span11','required','value'=>$value['PrisonerTransferCashProperty']['rcv_amount']));?>
+                                                    <?php echo $this->Form->input('PrisonerTransferCashProperty.'.$i.'.amount',array('type'=>'text', 'div'=>false,'label'=>false,'placeholder'=>'Enter Amount','class'=>'form-control span11','required','value'=>$value['PrisonerTransferCashProperty']['rcv_amount']));?>
                                                 </td>
                                             </tr>
                                             <?php
@@ -614,6 +611,28 @@ if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHAR
                                             echo "No any cash property found.";
                                         }
                                         ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="span12">
+                                    <div class="control-group">
+                                        <label class="control-label">Ward Name :</label>
+                                        <div class="controls uradioBtn">
+                                            <?php
+                                            echo $this->Form->input("ward_id",array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>$funcall->showWard($data['Prisoner']['gender_id'],''), 'empty'=>'-- Select Ward --','required','title'=>'Please select ward','onchange'=>'showCell(this.value,'.$data["PrisonerTransfer"]["id"].')'));
+                                            ?>
+                                            <div style="clear:both;"></div>
+                                            <div class="error-message" id="verification_message_err<?php echo $data["PrisonerTransfer"]["id"]; ?>" style="display:none;">Verification type is required !</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="span12">
+                                    <div class="control-group">
+                                        <label class="control-label">Cell No. :</label>
+                                        <div class="controls uradioBtn">
+                                            <?php echo $this->Form->input('ward_cell_id',array('div'=>false,'label'=>false,'class'=>'form-control span11','type'=>'select','options'=>array(), "id"=>'ward_cell_id'.$data["PrisonerTransfer"]["id"],'empty'=>'-- Select Cell --','title'=>'Please select ward'));?>
+                                            <div style="clear:both;"></div>
+                                            <div class="error-message" id="verification_message_err<?php echo $data["PrisonerTransfer"]["id"]; ?>" style="display:none;">Verification type is required !</div>
                                         </div>
                                     </div>
                                 </div>

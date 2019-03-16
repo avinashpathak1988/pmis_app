@@ -8,7 +8,7 @@ class ExtractPrisonersRecordController extends AppController{
 
         $prison_id = $this->Session->read('Auth.User.prison_id');
 
-    	$default_status = '';
+        $default_status = '';
         $statusList = '';
         $statusInfo = $this->getApprovalStatusInfo();
         if(is_array($statusInfo) && count($statusInfo) > 0)
@@ -17,7 +17,7 @@ class ExtractPrisonersRecordController extends AppController{
             $statusList = $statusInfo['statusList']; 
         }
 
-    	$prisonersList = $this->Prisoner->find('list',array(
+        $prisonersList = $this->Prisoner->find('list',array(
                     'recursive'     => -1,
                     'fields'        => array(
                         'Prisoner.id',
@@ -83,53 +83,52 @@ class ExtractPrisonersRecordController extends AppController{
     }
 
     function addSelectPrisoner(){
-	        $prison_id = $this->Session->read('Auth.User.prison_id');
-	        if($this->request->is(array('post','put'))){
-	                if(isset($this->request->data['SelectPrisoner']['prisoner_id']) && $this->request->data['SelectPrisoner']['prisoner_id'] != ''){
-	                    $prisoner = $this->Prisoner->findById($this->request->data['SelectPrisoner']['prisoner_id']);
-	                    if(isset($prisoner['Prisoner']['id'])){
-	                        $this->redirect(array('action'=>'add',$prisoner['Prisoner']['id']));
+            $prison_id = $this->Session->read('Auth.User.prison_id');
+            if($this->request->is(array('post','put'))){
+                    if(isset($this->request->data['SelectPrisoner']['prisoner_id']) && $this->request->data['SelectPrisoner']['prisoner_id'] != ''){
+                        $prisoner = $this->Prisoner->findById($this->request->data['SelectPrisoner']['prisoner_id']);
+                        if(isset($prisoner['Prisoner']['id'])){
+                            $this->redirect(array('action'=>'add',$prisoner['Prisoner']['id']));
 
-	                    }
-	                }   
-	        }
-	        
-	        $condition=array(
+                        }
+                    }   
+            }
+            
+            $condition=array(
 
-	            'Prisoner.prison_id'        => $prison_id,
-	            'Prisoner.is_approve'   => 1,
-	            'Prisoner.present_status'   => 1,
-	            /*'Prisoner.prisoner_type_id'   => 2,*/
+                'Prisoner.prison_id'        => $prison_id,
+                'Prisoner.is_approve'   => 1,
+                'Prisoner.present_status'   => 1,
+                /*'Prisoner.prisoner_type_id'   => 2,*/
 
-	        );
-	        
-	        $prisonersList = $this->Prisoner->find('list',array(
-	                    'recursive'     => -1,
-	                    'fields'        => array(
-	                        'Prisoner.id',
-	                        'Prisoner.prisoner_no'
-	                    ),
-	                    'conditions'    => $condition,
-	                    'order'=>array(
-	                        'Prisoner.id'
-	                    )
-	                ));
+            );
+            
+            $prisonersList = $this->Prisoner->find('list',array(
+                        'recursive'     => -1,
+                        'fields'        => array(
+                            'Prisoner.id',
+                            'Prisoner.prisoner_no'
+                        ),
+                        'conditions'    => $condition,
+                        'order'=>array(
+                            'Prisoner.id'
+                        )
+                    ));
 
-	           $this->set(array(
-	            
-	            'prisonersList' => $prisonersList,
-	            
-	        ));
-	}
+               $this->set(array(
+                
+                'prisonersList' => $prisonersList,
+                
+            ));
+    }
 
 
-	function add($id=''){
+    function add($id='', $petition_id=''){
         $prison_id = $this->Session->read('Auth.User.prison_id');
         $prisonerId = $id;
         $extractPrisonerRecord =array();
         $offencePrisonDiscipline =array();
         if($id == ''){
-          
             $this->redirect(array('action'=>'index'));
         }else{
             $prisoner_id =$id;
@@ -147,12 +146,8 @@ class ExtractPrisonersRecordController extends AppController{
                         'OffencePrisonDiscipline.is_trash' => 0,
                         'OffencePrisonDiscipline.prisoner_id' => $prisonerId,
                     ),
-                    
             ));
-            
         }
-        
-
         $data= array();
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='PRINT'){
@@ -161,13 +156,12 @@ class ExtractPrisonersRecordController extends AppController{
             $this->set('is_excel','Y');         
 
         }
-
         //save Data
         if($this->request->is(array('post','put'))){
 
-
             //earliest_possible_dor
              $data = $this->request->data;
+             $data['petition_id'] = $petition_id;
              $data['ExtractPrisonerRecord']['earliest_possible_dor']=isset($data['ExtractPrisonerRecord']['earliest_possible_dor'])?date('Y-m-d',strtotime($data['ExtractPrisonerRecord']['earliest_possible_dor'])):'';
              $data['ExtractPrisonerRecord']['date_of_granted']=isset($data['ExtractPrisonerRecord']['date_of_granted'])?date('Y-m-d',strtotime($data['ExtractPrisonerRecord']['date_of_granted'])):'';
              if(isset($data['OffencePrisonDiscipline'][0]['date'])){
@@ -284,7 +278,7 @@ class ExtractPrisonersRecordController extends AppController{
             $offenceData = '';
             
 
-            if($prisonerData['Prisoner']['dor'] != null && $prisonerData['Prisoner']['dor'] != '' ){
+            if($prisonerData['Prisoner']['dor'] != null && $prisonerData['Prisoner']['dor'] != ''  && $prisonerData['Prisoner']['dor'] != '0000-00-00' ){
                      $this->request->data['ExtractPrisonerRecord']['earliest_possible_dor']=date('d-m-Y',strtotime($prisonerData['Prisoner']['dor']));
             }
 
@@ -587,7 +581,8 @@ class ExtractPrisonersRecordController extends AppController{
             'inPrisonPunishments'=>$inPrisonPunishments,
             'prisonerSentencesOld'=>$prisonerSentencesOld,
             'reporttitle'=>'Extract Prisoner Record',
-            'id'=>$id
+            'id'=>$id,
+            'petition_id'=>$petition_id
             
         ));
         

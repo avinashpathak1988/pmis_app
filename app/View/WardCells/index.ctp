@@ -16,7 +16,7 @@
             <div class="control-group">
                 <label class="control-label">Prison Station :</label>
                 <div class="controls">
-                    <?php echo $this->Form->input('prison_id', array('type'=>'select','class'=>'form-control','id'=>'prison_id','options'=> $prisonlist,'empty'=>'--All--','div'=>false,'label'=>false,'onchange'=>'showWard(this.value)'))?>
+                    <?php echo $this->Form->input('prison_id', array('type'=>'select','class'=>'form-control pmis_select','id'=>'prison_id','options'=> $prisonlist,'empty'=>'--All--','div'=>false,'label'=>false,'onchange'=>'showWard(this.value)'))?>
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
             <div class="control-group">
                 <label class="control-label">Ward :</label>
                 <div class="controls">
-                    <?php echo $this->Form->input('ward_id', array('type'=>'select','class'=>'form-control','id'=>'ward_id','options'=>$wardList,'empty'=>'--All--','div'=>false,'label'=>false,'onchange'=>''))?>
+                    <?php echo $this->Form->input('ward_id', array('type'=>'select','class'=>'form-control pmis_select','id'=>'ward_id','options'=>$wardList,'empty'=>'--All--','div'=>false,'label'=>false,'onchange'=>''))?>
                 </div>
             </div>
         </div>

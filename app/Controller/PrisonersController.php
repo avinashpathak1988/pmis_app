@@ -1861,6 +1861,7 @@ class PrisonersController extends AppController{
                     $this->request->data['Prisoner']['verify_by'] = $this->Session->read('Auth.User.id');
                     $this->request->data['Prisoner']['status'] = 'Reviewed';
                 }
+                $this->request->data['Prisoner']['doa']=date('Y-m-d',strtotime($this->data['Prisoner']['doa']));
                 //debug($this->request->data); exit;
                 if(($this->data['Prisoner']['country_id'] > 0) && $this->Prisoner->saveAll($this->data)){
                     $prisoner_id    = $this->Prisoner->id;
@@ -2859,6 +2860,7 @@ class PrisonersController extends AppController{
                             
                             //====================================
                             //save prisoner data
+                            
                             if($this->Prisoner->save($this->request->data)){
                                 
                                 //Insert audit log
@@ -6051,495 +6053,529 @@ class PrisonersController extends AppController{
             $sentence_data['PrisonerSentence'] = $sentence_data['PrisonerSentenceCapture'];
             unset($sentence_data['PrisonerSentenceCapture']);
         }
+        $sentence_data['PrisonerSentence']['login_user_id'] = $this->Session->read('Auth.User.id');  
+        
         $prisoner_id = $sentence_data['PrisonerSentence']['prisoner_id'];
         $date_of_conviction = $sentence_data['PrisonerSentence']['date_of_conviction'];
         $is_long_term_prisoner = 0;
         //debug($sentence_data); 
         //$date_of_conviction = date('Y-m-d', strtotime($date_of_conviction));
-        if(isset($sentence_data['PrisonerSentence']['sentence_of']))
+        //Check awaiting/sentence awarded
+        switch ($sentence_data['PrisonerSentence']['is_convicted']) 
         {
-            //if imprisonment -- START --
-            switch ($sentence_data['PrisonerSentence']['sentence_of']) 
-            {
-                case 1:
-                    //only imprisonment
-                    //calculate lpd, epd, remission for current sentence -- START --
-                    $current_sentence_data = $this->singleSentenceCalculation($sentence_data);
-                    $current_lpd = $lpd = $current_sentence_data['lpd'];
-                    $current_epd = $epd = $current_sentence_data['epd'];
-                    $current_sentenceLength = json_decode($current_sentence_data['sentenceLengthText']);
-                    //calculate lpd, epd, remission for current sentence -- END --
-                    //check if prisoner is habitual 
-                    $isHabitual = $this->getName($prisoner_id, 'Prisoner', 'habitual_prisoner');
-                    //get prisoner previous sentence length 
-                    $prisoner_sentence_length = $this->getName($prisoner_id, 'Prisoner', 'sentence_length');
-                    $prisoner_sentence_length_total = 0;
-                    if($prisoner_sentence_length != '')
+            case 1: //Awaiting
+                $this->saveAwaitingSentence($sentence_data);
+            break;
+            case 2: //Sentence awarded 
+                if(isset($sentence_data['PrisonerSentence']['sentence_of']))
+                {
+                    //if imprisonment -- START --
+                    switch ($sentence_data['PrisonerSentence']['sentence_of']) 
                     {
-                        $prisoner_sentence_length = json_decode($prisoner_sentence_length);
-                        $prisoner_sentence_length = (array)$prisoner_sentence_length;
-                        $prisoner_sentence_length_total = ($prisoner_sentence_length['years']*365)+($prisoner_sentence_length['months']*30)+$prisoner_sentence_length['days'];
-                    }
-                    //check if prisoner sentence length greater than 3 years for habitual prisoner and 
-                    //check if breach of contract license 
-                    if($isHabitual==1 && ($prisoner_sentence_length_total >= (3*365)) && ($date_of_conviction < $lpd1) && ($date_of_conviction > $epd1)) 
-                    {      
-                        //calculate ROS
-                        $ros = $this->getROS($lpd1,$epd1);
-                        $rosLength = json_encode($ros);
-                        $ros_day = $ros['days'];
-                        $ros_month = $ros['months'];
-                        $ros_year = $ros['years'];
-                        //calculate FDR
-                        $fdr = date('Y-m-d', strtotime("$epd2+".$ros_day." day"));
-                        $fdr = date('Y-m-d', strtotime("$fdr+".$ros_month." month"));
-                        $fdr = date('Y-m-d', strtotime("$fdr+".$ros_year." year"));
-                        $fdr = date('Y-m-d', strtotime($fdr));
-                        $dor = $fdr;
-                                    
-                        $sentence_data['PrisonerSentence']['sentence_length'] = $sentenceLengthText;
-                        $sentence_data['PrisonerSentence']['remission'] = $remissionText;
-                        $sentence_data['PrisonerSentence']['lpd'] = $lpd;
-                        $sentence_data['PrisonerSentence']['epd'] = $epd;
-                        $sentence_data['PrisonerSentence']['fdr'] = $fdr;
-                        $sentence_data['PrisonerSentence']['is_long_term_prisoner'] = $is_long_term_prisoner;
-                        //save prisoner sentence
-                        $this->saveSentence($sentence_data);
-                    }
-                    else 
-                    {
-                        //check prev sentence 
-                        $prevSentences = $this->isPrevSentence($prisoner_id, $sentence_data['PrisonerSentence']['id']);
-                        //debug($prevSentences);  exit;
-                        if(!empty($prevSentences) && count($prevSentences) > 0)
-                        {
-                            //Consecutive: 1
-                            //Concurrent: 2
-                            //PD: 3
-                            $i = 0;
-                            //get same doc sentence counts 
-                            $scount_on_same_day = array(
-                                '0' => array(
-                                    'years' => $sentence_data['PrisonerSentence']['years'],
-                                    'months' => $sentence_data['PrisonerSentence']['months'],
-                                    'days' => $sentence_data['PrisonerSentence']['days'],
-                                    'sentence_type' => $sentence_data['PrisonerSentence']['sentence_type']
-                                )
-                            );
-                            //debug($scount_on_same_day);
-                            $scount_on_diff_day = array();
-                            $isDiffDaySentence = 0;
-                            $old_date_of_conviction = '';
-                            //check date of conviction of old sentence 
-                            foreach($prevSentences as $prevSentence)
+                        case 1:
+                            //only imprisonment
+                            //calculate lpd, epd, remission for current sentence -- START --
+                            $current_sentence_data = $this->singleSentenceCalculation($sentence_data);
+                            $current_lpd = $lpd = $current_sentence_data['lpd'];
+                            $current_epd = $epd = $current_sentence_data['epd'];
+                            $current_sentenceLength = json_decode($current_sentence_data['sentenceLengthText']);
+                            //calculate lpd, epd, remission for current sentence -- END --
+                            //check if prisoner is habitual 
+                            $isHabitual = $this->getName($prisoner_id, 'Prisoner', 'habitual_prisoner');
+                            //get prisoner previous sentence length 
+                            $prisoner_sentence_length = $this->getName($prisoner_id, 'Prisoner', 'sentence_length');
+                            $prisoner_sentence_length_total = 0;
+                            if($prisoner_sentence_length != '')
                             {
-                                $prev_date_of_conviction = date('d-m-Y', strtotime($prevSentence['PrisonerSentence']['date_of_conviction']));
-                                if($date_of_conviction == $prev_date_of_conviction)
-                                {
-                                	// if($prevSentence['PrisonerSentence']['sentence_type'] != 3)
-                                	// {
-                                		$scnt = count($scount_on_same_day);
-                                        $scount_on_same_day[$scnt]['years'] = $prevSentence['PrisonerSentence']['years'];
-                                        $scount_on_same_day[$scnt]['months'] = $prevSentence['PrisonerSentence']['months'];
-                                        $scount_on_same_day[$scnt]['days'] = $prevSentence['PrisonerSentence']['days'];
-                                        $scount_on_same_day[$scnt]['sentence_type'] = $prevSentence['PrisonerSentence']['sentence_type'];
-                                	//}
-                                    
-                                }
-                                else 
-                                {
-                                    $isDiffDaySentence = 1;
-                                    $scnt = count($scount_on_diff_day);
-                                    if($old_date_of_conviction == '')
-                                        $old_date_of_conviction = $prevSentence['PrisonerSentence']['date_of_conviction'];
-                                    $scount_on_diff_day[$scnt]['years'] = $prevSentence['PrisonerSentence']['years'];
-                                    $scount_on_diff_day[$scnt]['months'] = $prevSentence['PrisonerSentence']['months'];
-                                    $scount_on_diff_day[$scnt]['days'] = $prevSentence['PrisonerSentence']['days'];
-                                    $scount_on_diff_day[$scnt]['sentence_type'] = $prevSentence['PrisonerSentence']['sentence_type'];
-                                }
-                                $epd1 = $prevSentence['PrisonerSentence']['epd'];
-                                $lpd1 = $prevSentence['PrisonerSentence']['lpd'];
-                                $doc1 = $prevSentence['PrisonerSentence']['date_of_conviction'];
-                            } 
-                            //debug($scount_on_same_day);  exit;
-                            if($isDiffDaySentence == 0)
-                            {
-                                //If no diff. day sentence count 
-                                //calculate sentence -- START --
-                                //get sentence length 
-                                $this->saveSameDaySentence($scount_on_same_day, $date_of_conviction, $sentence_data, $current_lpd);
-                                //calculate sentence -- END --
+                                $prisoner_sentence_length = json_decode($prisoner_sentence_length);
+                                $prisoner_sentence_length = (array)$prisoner_sentence_length;
+                                $prisoner_sentence_length_total = ($prisoner_sentence_length['years']*365)+($prisoner_sentence_length['months']*30)+$prisoner_sentence_length['days'];
+                            }
+                            //check if prisoner sentence length greater than 3 years for habitual prisoner and 
+                            //check if breach of contract license 
+                            if($isHabitual==1 && ($prisoner_sentence_length_total >= (3*365)) && ($date_of_conviction < $lpd1) && ($date_of_conviction > $epd1)) 
+                            {      
+                                //calculate ROS
+                                $ros = $this->getROS($lpd1,$epd1);
+                                $rosLength = json_encode($ros);
+                                $ros_day = $ros['days'];
+                                $ros_month = $ros['months'];
+                                $ros_year = $ros['years'];
+                                //calculate FDR
+                                $fdr = date('Y-m-d', strtotime("$epd2+".$ros_day." day"));
+                                $fdr = date('Y-m-d', strtotime("$fdr+".$ros_month." month"));
+                                $fdr = date('Y-m-d', strtotime("$fdr+".$ros_year." year"));
+                                $fdr = date('Y-m-d', strtotime($fdr));
+                                $dor = $fdr;
+                                            
+                                $sentence_data['PrisonerSentence']['sentence_length'] = $sentenceLengthText;
+                                $sentence_data['PrisonerSentence']['remission'] = $remissionText;
+                                $sentence_data['PrisonerSentence']['lpd'] = $lpd;
+                                $sentence_data['PrisonerSentence']['epd'] = $epd;
+                                $sentence_data['PrisonerSentence']['fdr'] = $fdr;
+                                $sentence_data['PrisonerSentence']['is_long_term_prisoner'] = $is_long_term_prisoner;
+                                //save prisoner sentence
+                                $this->saveSentence($sentence_data);
                             }
                             else 
                             {
-                                //get current sentence type 
-                                $current_sentence_type = $sentence_data['PrisonerSentence']['sentence_type'];
-                                switch ($current_sentence_type) 
+                                //check prev sentence 
+                                $prevSentences = $this->isPrevSentence($prisoner_id, $sentence_data['PrisonerSentence']['id']);
+                                //debug($prevSentences);  exit;
+                                if(!empty($prevSentences) && count($prevSentences) > 0)
                                 {
-                                    case 1: //conseutive on diff days
-                                        //save consecutive sentence -- START --
-                                        $scount_count = count($scount_on_diff_day);
-                                        //debug($doc1);
-                                        if(strtotime($epd1) > strtotime($date_of_conviction))
+                                    //Consecutive: 1
+                                    //Concurrent: 2
+                                    //PD: 3
+                                    $i = 0;
+                                    //get same doc sentence counts 
+                                    $scount_on_same_day = array(
+                                        '0' => array(
+                                            'years' => $sentence_data['PrisonerSentence']['years'],
+                                            'months' => $sentence_data['PrisonerSentence']['months'],
+                                            'days' => $sentence_data['PrisonerSentence']['days'],
+                                            'sentence_type' => $sentence_data['PrisonerSentence']['sentence_type']
+                                        )
+                                    );
+                                    //debug($scount_on_same_day);
+                                    $scount_on_diff_day = array();
+                                    $isDiffDaySentence = 0;
+                                    $old_date_of_conviction = '';
+                                    //check date of conviction of old sentence 
+                                    foreach($prevSentences as $prevSentence)
+                                    {
+                                        $prev_date_of_conviction = date('d-m-Y', strtotime($prevSentence['PrisonerSentence']['date_of_conviction']));
+                                        if($date_of_conviction == $prev_date_of_conviction)
                                         {
-                                            $date_of_conviction = $doc1;
-                                        }
-                                        
-                                        $scount_on_diff_day += array(
-                                            $scount_count => array(
-                                                'years' => $sentence_data['PrisonerSentence']['years'],
-                                                'months' => $sentence_data['PrisonerSentence']['months'],
-                                                'days' => $sentence_data['PrisonerSentence']['days'],
-                                                'sentence_type' => $sentence_data['PrisonerSentence']['sentence_type']
-                                            )
-                                        );
-                                        if(strtotime($date_of_conviction) == strtotime($epd1))
-                                        {
-                                            $scount_on_diff_day = array(
-                                                '0' => array(
-                                                    'years' => $sentence_data['PrisonerSentence']['years'],
-                                                    'months' => $sentence_data['PrisonerSentence']['months'],
-                                                    'days' => $sentence_data['PrisonerSentence']['days'],
-                                                    'sentence_type' => $sentence_data['PrisonerSentence']['sentence_type']
-                                                )
-                                            );
-                                            //debug($scount_on_diff_day); exit;
-                                            $this->saveSameDaySentence($scount_on_diff_day, $date_of_conviction, $sentence_data, $current_lpd);
+                                            // if($prevSentence['PrisonerSentence']['sentence_type'] != 3)
+                                            // {
+                                                $scnt = count($scount_on_same_day);
+                                                $scount_on_same_day[$scnt]['years'] = $prevSentence['PrisonerSentence']['years'];
+                                                $scount_on_same_day[$scnt]['months'] = $prevSentence['PrisonerSentence']['months'];
+                                                $scount_on_same_day[$scnt]['days'] = $prevSentence['PrisonerSentence']['days'];
+                                                $scount_on_same_day[$scnt]['sentence_type'] = $prevSentence['PrisonerSentence']['sentence_type'];
+                                            //}
+                                            
                                         }
                                         else 
                                         {
-                                            //debug($scount_on_diff_day);
-                                            if(count($scount_on_diff_day) > 0)
-                                            {
-                                                $this->saveSameDaySentence($scount_on_diff_day, $old_date_of_conviction, $sentence_data, $current_lpd);
-                                            }
+                                            $isDiffDaySentence = 1;
+                                            $scnt = count($scount_on_diff_day);
+                                            if($old_date_of_conviction == '')
+                                                $old_date_of_conviction = $prevSentence['PrisonerSentence']['date_of_conviction'];
+                                            $scount_on_diff_day[$scnt]['years'] = $prevSentence['PrisonerSentence']['years'];
+                                            $scount_on_diff_day[$scnt]['months'] = $prevSentence['PrisonerSentence']['months'];
+                                            $scount_on_diff_day[$scnt]['days'] = $prevSentence['PrisonerSentence']['days'];
+                                            $scount_on_diff_day[$scnt]['sentence_type'] = $prevSentence['PrisonerSentence']['sentence_type'];
                                         }
-                                        //save consecutive sentence -- END --
-                                        break;
-                                    case 2: //cuncurrent
-                                        //save cuncurrent sentence -- START --
-                                    	//check if any PD 
-                                    	$is_pd = $this->isAnyPD($prisoner_id);
-                                    	$pfr = $this->getName($prisoner_id, 'Prisoner', 'pfr');
-                                    	if($is_pd > 0 && $pfr != '')
-                                    	{
-                                    		//debug($lpd); 
-                                    		//get EPD -- START -- 
-                                    		$remissionText = $remission = $this->getName($prisoner_id, 'Prisoner', 'remission');
-                                    		$remission = json_decode($remission);
-                                    		$remission = (array)$remission;
-                                    		$epd = $this->calculateEPD($lpd, $remission);
-
-                                    		//calculate total in prisonment sentence length --START -- 
-                                    		$slength = array();
-                                    		$date2=date_create($prevSentences[0]['PrisonerSentence']['date_of_conviction']);
-                                            $date1=date_create($epd);
-                                            $diff=date_diff($date1,$date2);
-                                            $tpi = array();
-                                            if(isset($diff) && !empty($diff))
-                                            {
-                                                $slength = array(
-                                                    'years'=> $diff->y,
-                                                    'months'=> $diff->m,
-                                                    'days'=> $diff->d
-                                                );
-                                            }
-                                            $sentenceLengthText = json_encode($slength);
-                                            //calculate total in prisonment sentence length --END -- 
-
-                                    		//debug($remissionText); 
-                                    		//debug($epd); exit;
-                                    		//get EPD -- END --
-                                    		//save sentence 
-                                            $sentence_data['PrisonerSentence']['sentence_length'] = $sentenceLengthText;
-                                            $sentence_data['PrisonerSentence']['remission'] = $remissionText;
-                                            $sentence_data['PrisonerSentence']['lpd'] = $lpd;
-                                            $sentence_data['PrisonerSentence']['epd'] = $epd;
-                                            //$sentence_data['PrisonerSentence']['is_long_term_prisoner'] = $is_long_term_prisoner;
-                                            //save prisoner sentence
-                                            //debug($sentence_data); exit;
-                                            $this->saveSentence($sentence_data); 
-                                    	}
-                                    	else 
-                                    	{
-                                    		$lpd2 = $current_lpd;
-                                            $epd2 = $current_epd;
-                                            //debug($epd2); debug($epd1);
-
-                                            //debug($epd2); debug($epd1); exit;
-                                            if($lpd2 <= $lpd1)
-                                            {
-                                                $date_of_conviction = $doc1;
-                                                $total_sentence_length = $scount_on_diff_day;
-                                                $total_sentence_length += array(
-                                                    count($total_sentence_length) => array(
-                                                        'years'=>$current_sentenceLength->years,
-                                                        'months'=>$current_sentenceLength->months,
-                                                        'days'=>$current_sentenceLength->days,
-                                                        'sentence_type'=> '2'
+                                        $epd1 = $prevSentence['PrisonerSentence']['epd'];
+                                        $lpd1 = $prevSentence['PrisonerSentence']['lpd'];
+                                        $doc1 = $prevSentence['PrisonerSentence']['date_of_conviction'];
+                                    } 
+                                    //debug($scount_on_same_day);  exit;
+                                    if($isDiffDaySentence == 0)
+                                    {
+                                        //If no diff. day sentence count 
+                                        //calculate sentence -- START --
+                                        //get sentence length 
+                                        $this->saveSameDaySentence($scount_on_same_day, $date_of_conviction, $sentence_data, $current_lpd);
+                                        //calculate sentence -- END --
+                                    }
+                                    else 
+                                    {
+                                        //get current sentence type 
+                                        $current_sentence_type = $sentence_data['PrisonerSentence']['sentence_type'];
+                                        switch ($current_sentence_type) 
+                                        {
+                                            case 1: //conseutive on diff days
+                                                //save consecutive sentence -- START --
+                                                $scount_count = count($scount_on_diff_day);
+                                                //debug($doc1);
+                                                if(strtotime($epd1) > strtotime($date_of_conviction))
+                                                {
+                                                    $date_of_conviction = $doc1;
+                                                }
+                                                
+                                                $scount_on_diff_day += array(
+                                                    $scount_count => array(
+                                                        'years' => $sentence_data['PrisonerSentence']['years'],
+                                                        'months' => $sentence_data['PrisonerSentence']['months'],
+                                                        'days' => $sentence_data['PrisonerSentence']['days'],
+                                                        'sentence_type' => $sentence_data['PrisonerSentence']['sentence_type']
                                                     )
                                                 );
-                                                //get prisoner sentence length 
-                                                $sentenceLength = $this->getPrisonerSentenceLength($total_sentence_length);
-                                                $total_sentence = array();
-                                                $remission_sentence = array();
-                                                if(isset($sentenceLength))
+                                                if(strtotime($date_of_conviction) == strtotime($epd1))
                                                 {
-                                                    $sentenceLength = json_decode($sentenceLength);
-                                                    if(count($sentenceLength->total_sentence) > 0)
+                                                    $scount_on_diff_day = array(
+                                                        '0' => array(
+                                                            'years' => $sentence_data['PrisonerSentence']['years'],
+                                                            'months' => $sentence_data['PrisonerSentence']['months'],
+                                                            'days' => $sentence_data['PrisonerSentence']['days'],
+                                                            'sentence_type' => $sentence_data['PrisonerSentence']['sentence_type']
+                                                        )
+                                                    );
+                                                    //debug($scount_on_diff_day); exit;
+                                                    $this->saveSameDaySentence($scount_on_diff_day, $date_of_conviction, $sentence_data, $current_lpd);
+                                                }
+                                                else 
+                                                {
+                                                    //debug($scount_on_diff_day);
+                                                    if(count($scount_on_diff_day) > 0)
                                                     {
-                                                        $is_long_term_prisoner = $this->gePrisonerTermType($sentenceLength->total_sentence);
-                                                        $sentenceLengthText = json_encode($sentenceLength->total_sentence);
-                                                        $total_sentence = array(
-                                                            'years'=>$sentenceLength->total_sentence->years,
-                                                            'months'=>$sentenceLength->total_sentence->months,
-                                                            'days'=>$sentenceLength->total_sentence->days
-                                                        ); 
+                                                        $this->saveSameDaySentence($scount_on_diff_day, $old_date_of_conviction, $sentence_data, $current_lpd);
                                                     }
-                                                    if(count($sentenceLength->remission_sentence) > 0)
-                                                    {
-                                                        $remission_sentence = array(
-                                                            'years'=>$sentenceLength->remission_sentence->years,
-                                                            'months'=>$sentenceLength->remission_sentence->months,
-                                                            'days'=>$sentenceLength->remission_sentence->days
-                                                        ); 
-                                                        $remission = $this->calculateRemission($remission_sentence);
-                                                        
-                                                        if(count($remission) > 0)
-                                                        {
-                                                            $remissionText = json_encode($remission);
-                                                        }
-                                                    }
-                                                    //calculate lpd
-                                                    $lpd = $this->calculateLPD($date_of_conviction, $total_sentence);
+                                                }
+                                                //save consecutive sentence -- END --
+                                                break;
+                                            case 2: //cuncurrent
+                                                //save cuncurrent sentence -- START --
+                                                //check if any PD 
+                                                $is_pd = $this->isAnyPD($prisoner_id);
+                                                $pfr = $this->getName($prisoner_id, 'Prisoner', 'pfr');
+                                                if($is_pd > 0 && $pfr != '')
+                                                {
+                                                    //debug($lpd); 
+                                                    //get EPD -- START -- 
+                                                    $remissionText = $remission = $this->getName($prisoner_id, 'Prisoner', 'remission');
+                                                    $remission = json_decode($remission);
+                                                    $remission = (array)$remission;
                                                     $epd = $this->calculateEPD($lpd, $remission);
+
+                                                    //calculate total in prisonment sentence length --START -- 
+                                                    $slength = array();
+                                                    $date2=date_create($prevSentences[0]['PrisonerSentence']['date_of_conviction']);
+                                                    $date1=date_create($epd);
+                                                    $diff=date_diff($date1,$date2);
+                                                    $tpi = array();
+                                                    if(isset($diff) && !empty($diff))
+                                                    {
+                                                        $slength = array(
+                                                            'years'=> $diff->y,
+                                                            'months'=> $diff->m,
+                                                            'days'=> $diff->d
+                                                        );
+                                                    }
+                                                    $sentenceLengthText = json_encode($slength);
+                                                    //calculate total in prisonment sentence length --END -- 
+
+                                                    //debug($remissionText); 
+                                                    //debug($epd); exit;
+                                                    //get EPD -- END --
+                                                    //save sentence 
                                                     $sentence_data['PrisonerSentence']['sentence_length'] = $sentenceLengthText;
                                                     $sentence_data['PrisonerSentence']['remission'] = $remissionText;
                                                     $sentence_data['PrisonerSentence']['lpd'] = $lpd;
                                                     $sentence_data['PrisonerSentence']['epd'] = $epd;
-                                                    $sentence_data['PrisonerSentence']['is_long_term_prisoner'] = $is_long_term_prisoner;
+                                                    //$sentence_data['PrisonerSentence']['is_long_term_prisoner'] = $is_long_term_prisoner;
                                                     //save prisoner sentence
-                                                    $this->saveSentence($sentence_data);
-                                                } 
-                                            }
-                                            if($epd2 > $epd1)
-                                            {
-                                                //concurrent overlapping 
-                                                //debug($prevSentences[0]['PrisonerSentence']['date_of_conviction']); exit;
-                                                $date2=date_create($prevSentences[0]['PrisonerSentence']['date_of_conviction']);
-
-
-                                                $date1=date_create($current_lpd);
-                                                $diff=date_diff($date1,$date2);
-                                                $tpi = array();
-                                                $tpilength = array();
-                                                if(isset($diff) && !empty($diff))
-                                                {
-                                                    $tpi = array(
-                                                        '0' => array(
-                                                            'sentence_type'=> 1,
-                                                            'years'=> $diff->y,
-                                                            'months'=> $diff->m,
-                                                            'days'=> $diff->d
-                                                        )
-                                                    );
-                                                    $tpilength = array(
-                                                        'sentence_type'=> 1,
-                                                        'years'=> $diff->y,
-                                                        'months'=> $diff->m,
-                                                        'days'=> $diff->d
-                                                    );
+                                                    //debug($sentence_data); exit;
+                                                    $this->saveSentence($sentence_data); 
                                                 }
-                                                //calculate TPI
-                                                $sentenceLength = $this->getPrisonerSentenceLength($tpi);
-                                                $total_sentence = array();
-                                                $remission_sentence = array();
-                                                if(isset($sentenceLength))
+                                                else 
                                                 {
-                                                    $sentenceLength = json_decode($sentenceLength);
-                                                    
-                                                    if(count($sentenceLength->total_sentence) > 0)
+                                                    $lpd2 = $current_lpd;
+                                                    $epd2 = $current_epd;
+                                                    //debug($epd2); debug($epd1);
+
+                                                    //debug($epd2); debug($epd1); exit;
+                                                    if($lpd2 <= $lpd1)
                                                     {
-                                                        $is_long_term_prisoner = $this->gePrisonerTermType($sentenceLength->total_sentence);
-                                                        $sentenceLengthText = json_encode($sentenceLength->total_sentence);
-                                                        $total_sentence = array(
-                                                            'years'=>$sentenceLength->total_sentence->years,
-                                                            'months'=>$sentenceLength->total_sentence->months,
-                                                            'days'=>$sentenceLength->total_sentence->days
-                                                        ); 
+                                                        $date_of_conviction = $doc1;
+                                                        $total_sentence_length = $scount_on_diff_day;
+                                                        $total_sentence_length += array(
+                                                            count($total_sentence_length) => array(
+                                                                'years'=>$current_sentenceLength->years,
+                                                                'months'=>$current_sentenceLength->months,
+                                                                'days'=>$current_sentenceLength->days,
+                                                                'sentence_type'=> '2'
+                                                            )
+                                                        );
+                                                        //get prisoner sentence length 
+                                                        $sentenceLength = $this->getPrisonerSentenceLength($total_sentence_length);
+                                                        $total_sentence = array();
+                                                        $remission_sentence = array();
+                                                        if(isset($sentenceLength))
+                                                        {
+                                                            $sentenceLength = json_decode($sentenceLength);
+                                                            if(count($sentenceLength->total_sentence) > 0)
+                                                            {
+                                                                $is_long_term_prisoner = $this->gePrisonerTermType($sentenceLength->total_sentence);
+                                                                $sentenceLengthText = json_encode($sentenceLength->total_sentence);
+                                                                $total_sentence = array(
+                                                                    'years'=>$sentenceLength->total_sentence->years,
+                                                                    'months'=>$sentenceLength->total_sentence->months,
+                                                                    'days'=>$sentenceLength->total_sentence->days
+                                                                ); 
+                                                            }
+                                                            if(count($sentenceLength->remission_sentence) > 0)
+                                                            {
+                                                                $remission_sentence = array(
+                                                                    'years'=>$sentenceLength->remission_sentence->years,
+                                                                    'months'=>$sentenceLength->remission_sentence->months,
+                                                                    'days'=>$sentenceLength->remission_sentence->days
+                                                                ); 
+                                                                $remission = $this->calculateRemission($remission_sentence);
+                                                                
+                                                                if(count($remission) > 0)
+                                                                {
+                                                                    $remissionText = json_encode($remission);
+                                                                }
+                                                            }
+                                                            //calculate lpd
+                                                            $lpd = $this->calculateLPD($date_of_conviction, $total_sentence);
+                                                            $epd = $this->calculateEPD($lpd, $remission);
+                                                            $sentence_data['PrisonerSentence']['sentence_length'] = $sentenceLengthText;
+                                                            $sentence_data['PrisonerSentence']['remission'] = $remissionText;
+                                                            $sentence_data['PrisonerSentence']['lpd'] = $lpd;
+                                                            $sentence_data['PrisonerSentence']['epd'] = $epd;
+                                                            $sentence_data['PrisonerSentence']['is_long_term_prisoner'] = $is_long_term_prisoner;
+                                                            //save prisoner sentence
+                                                            $this->saveSentence($sentence_data);
+                                                        } 
                                                     }
-                                                    if(count($sentenceLength->remission_sentence) > 0)
+                                                    if($epd2 > $epd1)
                                                     {
-                                                        $remission_sentence = array(
-                                                            'years'=>$sentenceLength->remission_sentence->years,
-                                                            'months'=>$sentenceLength->remission_sentence->months,
-                                                            'days'=>$sentenceLength->remission_sentence->days
-                                                        ); 
-                                                        $remission = $this->calculateRemission($remission_sentence);
+                                                        //concurrent overlapping 
+                                                        //debug($prevSentences[0]['PrisonerSentence']['date_of_conviction']); exit;
+                                                        $date2=date_create($prevSentences[0]['PrisonerSentence']['date_of_conviction']);
+
+
+                                                        $date1=date_create($current_lpd);
+                                                        $diff=date_diff($date1,$date2);
+                                                        $tpi = array();
+                                                        $tpilength = array();
+                                                        if(isset($diff) && !empty($diff))
+                                                        {
+                                                            $tpi = array(
+                                                                '0' => array(
+                                                                    'sentence_type'=> 1,
+                                                                    'years'=> $diff->y,
+                                                                    'months'=> $diff->m,
+                                                                    'days'=> $diff->d
+                                                                )
+                                                            );
+                                                            $tpilength = array(
+                                                                'sentence_type'=> 1,
+                                                                'years'=> $diff->y,
+                                                                'months'=> $diff->m,
+                                                                'days'=> $diff->d
+                                                            );
+                                                        }
+                                                        //calculate TPI
+                                                        $sentenceLength = $this->getPrisonerSentenceLength($tpi);
+                                                        $total_sentence = array();
+                                                        $remission_sentence = array();
+                                                        if(isset($sentenceLength))
+                                                        {
+                                                            $sentenceLength = json_decode($sentenceLength);
+                                                            
+                                                            if(count($sentenceLength->total_sentence) > 0)
+                                                            {
+                                                                $is_long_term_prisoner = $this->gePrisonerTermType($sentenceLength->total_sentence);
+                                                                $sentenceLengthText = json_encode($sentenceLength->total_sentence);
+                                                                $total_sentence = array(
+                                                                    'years'=>$sentenceLength->total_sentence->years,
+                                                                    'months'=>$sentenceLength->total_sentence->months,
+                                                                    'days'=>$sentenceLength->total_sentence->days
+                                                                ); 
+                                                            }
+                                                            if(count($sentenceLength->remission_sentence) > 0)
+                                                            {
+                                                                $remission_sentence = array(
+                                                                    'years'=>$sentenceLength->remission_sentence->years,
+                                                                    'months'=>$sentenceLength->remission_sentence->months,
+                                                                    'days'=>$sentenceLength->remission_sentence->days
+                                                                ); 
+                                                                $remission = $this->calculateRemission($remission_sentence);
+                                                                
+                                                                if(count($remission) > 0)
+                                                                {
+                                                                    $remissionText = json_encode($remission);
+                                                                }
+                                                            }
+                                                            //calculate lpd
+                                                            $epd = $this->calculateEPD($current_lpd, $remission);
+                                                            $sentence_data['PrisonerSentence']['sentence_length'] = $sentenceLengthText;
+                                                            $sentence_data['PrisonerSentence']['remission'] = $remissionText;
+                                                            $sentence_data['PrisonerSentence']['lpd'] = $current_lpd;
+                                                            $sentence_data['PrisonerSentence']['epd'] = $epd;
+                                                            $sentence_data['PrisonerSentence']['is_long_term_prisoner'] = $is_long_term_prisoner;
+                                                            if(count($tpilength) > 0)
+                                                            {
+                                                                $sentence_data['PrisonerSentence']['tpi'] = json_encode($tpilength);
+                                                            }
+                                                            //save prisoner sentence
+                                                            $this->saveSentence($sentence_data);
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                                //save cuncurrent sentence -- END --
+                                            case 3: //PD
+                                                $date_of_conviction = date('Y-m-d', strtotime($date_of_conviction));
+                                                $pfr = '';
+                                                if($date_of_conviction <= $lpd1)
+                                                {
+                                                    //debug($lpd); debug($lpd1); exit;
+                                                    if($lpd < $lpd1 || $lpd > $lpd1)
+                                                    {
+                                                        $date1=date_create($date_of_conviction);
+                                                        $date2=date_create($doc1);
+                                                        $diff=date_diff($date1,$date2);
                                                         
+                                                        $remission_period = array();
+                                                        if(isset($diff) && !empty($diff))
+                                                        {
+                                                            $remission_period = array(
+                                                                'years'=> $diff->y,
+                                                                'months'=> $diff->m,
+                                                                'days'=> $diff->d
+                                                            );
+                                                            $pfr = json_encode($remission_period);
+                                                        }
+                                                        $remission = $this->calculateRemission($remission_period);
+                                                            
                                                         if(count($remission) > 0)
                                                         {
                                                             $remissionText = json_encode($remission);
                                                         }
+
+                                                        //get sentence length -- STRT --
+                                                        $remission_period['sentence_type'] = 3;
+                                                        $total_sentence_length = array(
+                                                            '0' => $remission_period 
+                                                        );
+                                                        $total_sentence_length += array(
+                                                            '1' => array(
+                                                                'years' => $sentence_data['PrisonerSentence']['years'],
+                                                                'months' => $sentence_data['PrisonerSentence']['months'],
+                                                                'days' => $sentence_data['PrisonerSentence']['days'],
+                                                                'sentence_type' => 3
+                                                            )
+                                                        );
+                                                        $sentenceLength = $this->getPrisonerSentenceLength($total_sentence_length);
+                                                        if(isset($sentenceLength))
+                                                        {
+                                                            $sentenceLength = json_decode($sentenceLength);
+                                                            if(count($sentenceLength->total_sentence) > 0)
+                                                            {
+                                                                $is_long_term_prisoner = $this->gePrisonerTermType($sentenceLength->total_sentence);
+                                                                $sentenceLengthText = json_encode($sentenceLength->total_sentence);
+                                                            }
+                                                        }
+                                                        //get sentence length -- END --
+                                                        $epd = $this->calculateEPD($lpd, $remission);
                                                     }
-                                                    //calculate lpd
-                                                    $epd = $this->calculateEPD($current_lpd, $remission);
+                                                    else 
+                                                    {
+                                                        $date_of_conviction = $doc1;
+
+                                                        $total_sentence_length = $scount_on_diff_day;
+                                                        $total_sentence_length += array(
+                                                            count($total_sentence_length) => array(
+                                                                'years'=>$current_sentenceLength->years,
+                                                                'months'=>$current_sentenceLength->months,
+                                                                'days'=>$current_sentenceLength->days,
+                                                                'sentence_type'=> '3'
+                                                            )
+                                                        );
+                                                        //get prisoner sentence length 
+                                                        $sentenceLength = $this->getPrisonerSentenceLength($total_sentence_length);
+                                                        $total_sentence = array();
+                                                        $remission_sentence = array();
+                                                        if(isset($sentenceLength))
+                                                        {
+                                                            $sentenceLength = json_decode($sentenceLength);
+                                                            if(count($sentenceLength->total_sentence) > 0)
+                                                            {
+                                                                $is_long_term_prisoner = $this->gePrisonerTermType($sentenceLength->total_sentence);
+                                                                $sentenceLengthText = json_encode($sentenceLength->total_sentence);
+                                                                $total_sentence = array(
+                                                                    'years'=>$sentenceLength->total_sentence->years,
+                                                                    'months'=>$sentenceLength->total_sentence->months,
+                                                                    'days'=>$sentenceLength->total_sentence->days
+                                                                ); 
+                                                            }
+                                                            if(count($sentenceLength->remission_sentence) > 0)
+                                                            {
+                                                                $remission_sentence = array(
+                                                                    'years'=>$sentenceLength->remission_sentence->years,
+                                                                    'months'=>$sentenceLength->remission_sentence->months,
+                                                                    'days'=>$sentenceLength->remission_sentence->days
+                                                                ); 
+                                                                $remission = $this->calculateRemission($remission_sentence);
+                                                                
+                                                                if(count($remission) > 0)
+                                                                {
+                                                                    $remissionText = json_encode($remission);
+                                                                }
+                                                            }
+                                                            //calculate lpd
+                                                            $lpd = $this->calculateLPD($date_of_conviction, $total_sentence);
+                                                            $epd = $this->calculateEPD($lpd, $remission);
+                                                        }
+                                                    }
                                                     $sentence_data['PrisonerSentence']['sentence_length'] = $sentenceLengthText;
                                                     $sentence_data['PrisonerSentence']['remission'] = $remissionText;
                                                     $sentence_data['PrisonerSentence']['lpd'] = $current_lpd;
                                                     $sentence_data['PrisonerSentence']['epd'] = $epd;
                                                     $sentence_data['PrisonerSentence']['is_long_term_prisoner'] = $is_long_term_prisoner;
-                                                    if(count($tpilength) > 0)
-                                                    {
-                                                        $sentence_data['PrisonerSentence']['tpi'] = json_encode($tpilength);
-                                                    }
+                                                    $sentence_data['PrisonerSentence']['pfr'] = $pfr;
                                                     //save prisoner sentence
-                                                    $this->saveSentence($sentence_data);
+                                                    $is_pd = 1;
+                                                    //debug($sentence_data); exit;
+                                                    $this->saveSentence($sentence_data, $is_pd);
                                                 }
-                                            }
-                                    	}
-                                        break;
-                                        //save cuncurrent sentence -- END --
-                                    case 3: //PD
-                                    	$date_of_conviction = date('Y-m-d', strtotime($date_of_conviction));
-                                    	$pfr = '';
-                                        if($date_of_conviction <= $lpd1)
-                                        {
-                                        	//debug($lpd); debug($lpd1); exit;
-                                            if($lpd < $lpd1 || $lpd > $lpd1)
-                                            {
-                                                $date1=date_create($date_of_conviction);
-                                                $date2=date_create($doc1);
-                                                $diff=date_diff($date1,$date2);
-                                                
-                                                $remission_period = array();
-                                                if(isset($diff) && !empty($diff))
-                                                {
-                                                    $remission_period = array(
-                                                        'years'=> $diff->y,
-                                                        'months'=> $diff->m,
-                                                        'days'=> $diff->d
-                                                    );
-                                                    $pfr = json_encode($remission_period);
-                                                }
-                                                $remission = $this->calculateRemission($remission_period);
-                                                    
-                                                if(count($remission) > 0)
-                                                {
-                                                    $remissionText = json_encode($remission);
-                                                }
-
-                                                //get sentence length -- STRT --
-                                                $remission_period['sentence_type'] = 3;
-                                                $total_sentence_length = array(
-                                                	'0' => $remission_period 
-                                                );
-                                                $total_sentence_length += array(
-                                                	'1' => array(
-                                                		'years' => $sentence_data['PrisonerSentence']['years'],
-                                                		'months' => $sentence_data['PrisonerSentence']['months'],
-                                                		'days' => $sentence_data['PrisonerSentence']['days'],
-                                                		'sentence_type' => 3
-                                                	)
-                                                );
-                                                $sentenceLength = $this->getPrisonerSentenceLength($total_sentence_length);
-                                                if(isset($sentenceLength))
-                                                {
-                                                    $sentenceLength = json_decode($sentenceLength);
-                                                    if(count($sentenceLength->total_sentence) > 0)
-                                                    {
-                                                        $is_long_term_prisoner = $this->gePrisonerTermType($sentenceLength->total_sentence);
-                                                        $sentenceLengthText = json_encode($sentenceLength->total_sentence);
-                                                    }
-                                                }
-                                                //get sentence length -- END --
-                                                $epd = $this->calculateEPD($lpd, $remission);
-                                            }
-                                            else 
-                                            {
-                                                $date_of_conviction = $doc1;
-
-                                                $total_sentence_length = $scount_on_diff_day;
-                                                $total_sentence_length += array(
-                                                    count($total_sentence_length) => array(
-                                                        'years'=>$current_sentenceLength->years,
-                                                        'months'=>$current_sentenceLength->months,
-                                                        'days'=>$current_sentenceLength->days,
-                                                        'sentence_type'=> '3'
-                                                    )
-                                                );
-                                                //get prisoner sentence length 
-                                                $sentenceLength = $this->getPrisonerSentenceLength($total_sentence_length);
-                                                $total_sentence = array();
-                                                $remission_sentence = array();
-                                                if(isset($sentenceLength))
-                                                {
-                                                    $sentenceLength = json_decode($sentenceLength);
-                                                    if(count($sentenceLength->total_sentence) > 0)
-                                                    {
-                                                        $is_long_term_prisoner = $this->gePrisonerTermType($sentenceLength->total_sentence);
-                                                        $sentenceLengthText = json_encode($sentenceLength->total_sentence);
-                                                        $total_sentence = array(
-                                                            'years'=>$sentenceLength->total_sentence->years,
-                                                            'months'=>$sentenceLength->total_sentence->months,
-                                                            'days'=>$sentenceLength->total_sentence->days
-                                                        ); 
-                                                    }
-                                                    if(count($sentenceLength->remission_sentence) > 0)
-                                                    {
-                                                        $remission_sentence = array(
-                                                            'years'=>$sentenceLength->remission_sentence->years,
-                                                            'months'=>$sentenceLength->remission_sentence->months,
-                                                            'days'=>$sentenceLength->remission_sentence->days
-                                                        ); 
-                                                        $remission = $this->calculateRemission($remission_sentence);
-                                                        
-                                                        if(count($remission) > 0)
-                                                        {
-                                                            $remissionText = json_encode($remission);
-                                                        }
-                                                    }
-                                                    //calculate lpd
-                                                    $lpd = $this->calculateLPD($date_of_conviction, $total_sentence);
-                                                    $epd = $this->calculateEPD($lpd, $remission);
-                                                }
-                                            }
-                                            $sentence_data['PrisonerSentence']['sentence_length'] = $sentenceLengthText;
-                                            $sentence_data['PrisonerSentence']['remission'] = $remissionText;
-                                            $sentence_data['PrisonerSentence']['lpd'] = $current_lpd;
-                                            $sentence_data['PrisonerSentence']['epd'] = $epd;
-                                            $sentence_data['PrisonerSentence']['is_long_term_prisoner'] = $is_long_term_prisoner;
-                                            $sentence_data['PrisonerSentence']['pfr'] = $pfr;
-                                            //save prisoner sentence
-                                            $is_pd = 1;
-                                            //debug($sentence_data); exit;
-                                            $this->saveSentence($sentence_data, $is_pd);
-                                        }
-                                        break;
-                                } 
+                                                break;
+                                        } 
+                                    }
+                                }
+                                else 
+                                {
+                                    $sentence_data['PrisonerSentence']['sentence_length'] = $current_sentence_data['sentenceLengthText'];
+                                    $sentence_data['PrisonerSentence']['remission'] = $current_sentence_data['remissionText'];
+                                    $sentence_data['PrisonerSentence']['lpd'] = $current_lpd;
+                                    $sentence_data['PrisonerSentence']['epd'] = $current_epd;
+                                    $sentence_data['PrisonerSentence']['is_long_term_prisoner'] = $current_sentence_data['is_long_term_prisoner'];
+                                    //save prisoner sentence
+                                    $this->saveSentence($sentence_data);
+                                }
                             }
-                        }
-                        else 
-                        {
-                            $sentence_data['PrisonerSentence']['sentence_length'] = $current_sentence_data['sentenceLengthText'];
-                            $sentence_data['PrisonerSentence']['remission'] = $current_sentence_data['remissionText'];
-                            $sentence_data['PrisonerSentence']['lpd'] = $current_lpd;
-                            $sentence_data['PrisonerSentence']['epd'] = $current_epd;
-                            $sentence_data['PrisonerSentence']['is_long_term_prisoner'] = $current_sentence_data['is_long_term_prisoner'];
-                            //save prisoner sentence
+                        break;
+                        case 2:
+                            // imprisonment + fine
+                            $this->calculatePartPayment($sentence_data);
+                        break;
+                        default:
                             $this->saveSentence($sentence_data);
-                        }
+                        break;
                     }
-                break;
-                case 2:
-                    // imprisonment + fine
-                    $this->calculatePartPayment($sentence_data);
-                break;
-                default:
-                    $this->saveSentence($sentence_data);
-                break;
+                    //if imprisonment -- END -- 
+                }
+            break;
+        }
+    }
+    //save awaiting sentence 
+    function saveAwaitingSentence($sentenceData)
+    {
+        $sentenceData = (array)$sentenceData; //debug($sentenceData); exit;
+        //update sentence info
+        if(!empty($sentenceData))
+        {
+            //status reviewed if OIC insert sentence
+            if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+            {
+                $sentenceData['PrisonerSentence']['status'] = 'Reviewed';
+            } 
+
+            if(isset($sentenceData['PrisonerSentence']['date_of_conviction']) && !empty($sentenceData['PrisonerSentence']['date_of_conviction']))
+                $sentenceData['PrisonerSentence']['date_of_conviction']=date('Y-m-d',strtotime($sentenceData['PrisonerSentence']['date_of_conviction']));
+            //save prisoner sentence
+            $db = ConnectionManager::getDataSource('default');
+            if($this->PrisonerSentence->save($sentenceData))
+            {
+                $db->commit();
             }
-            //if imprisonment -- END -- 
         }
     }
     //save multple prisoner sentence 
@@ -12719,7 +12755,7 @@ class PrisonersController extends AppController{
                             {}
                             else 
                             {
-                                $insertCaseData['PrisonerCaseFile']['file_no'] = 'File-'.($fileCnt+1);
+                                $insertCaseData['PrisonerCaseFile']['file_no'] = 'File-'.$fileCnt;
                                 $fileCnt = $fileCnt+1;
                             }
                             $insertCaseData['PrisonerCaseFile']['judicial_officer'] = implode(',',$insertCaseData['PrisonerCaseFile']['judicial_officer']);
@@ -13269,7 +13305,7 @@ class PrisonersController extends AppController{
                             // $appealData['PrisonerPetition'] = $this->request->data['PrisonerPetition'];
                             
 
-                            //debug($this->request->data['PrisonerPetition']);exit;
+                            // debug($this->request->data['PrisonerPetition']);exit;
                             $this->loadModel('PrisonerPetition');
                                 if($this->PrisonerPetition->saveAll($this->request->data))
                                 {   //echo '1';exit;
@@ -13289,7 +13325,7 @@ class PrisonersController extends AppController{
                             
     }
 
-    function petitionAjax(){
+    function petitionAjax(){ 
         $this->layout   = 'ajax';
         $prisoner_id      = '';
         $editPrisoner = 0;
@@ -13298,18 +13334,18 @@ class PrisonersController extends AppController{
             'PrisonerPetition.is_trash'         => 0,
         );
         // Display result as per status and user type --START--
-        // if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
-        // {
-        //     $condition      += array('PrisonerSentence.status !='=>'Draft');
-        // }
-        // else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
-        // { 
-        //     $condition      += array('PrisonerSentence.status not in ("Draft","Saved","Review-Rejected")');
-        // }
-        // else if($this->Session->read('Auth.User.usertype_id') != Configure::read('RECEPTIONIST_USERTYPE'))
-        // {
-        //     $condition      += array('PrisonerSentence.status'=>'Approved');
-        // }
+        if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
+        {
+            $condition      += array('PrisonerSentence.status !='=>'Draft');
+        }
+        else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+        { 
+            $condition      += array('PrisonerSentence.status not in ("Draft","Saved","Review-Rejected")');
+        }
+        else if($this->Session->read('Auth.User.usertype_id') != Configure::read('RECEPTIONIST_USERTYPE'))
+        {
+            $condition      += array('PrisonerSentence.status'=>'Approved');
+        }
         // Display result as per status and user type --END--
         $editPrisoner = 0;
         

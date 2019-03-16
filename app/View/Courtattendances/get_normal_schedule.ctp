@@ -1,4 +1,5 @@
 <?php
+$judicialOfficerLevel = 'Presiding judge';
 if(is_array($datas) && count($datas)>0){
     if(!isset($is_excel)){
 ?>
@@ -145,9 +146,13 @@ foreach($datas as $data){
                                 <td><b>Count</b></td>
                                 <td><?php echo $data['Courtattendance']['offence_count'];?></td>
                             </tr>
-							 
+							 <?php 
+								if(isset($data['Courtattendance']['court_level']) && $data['Courtattendance']['court_level'] != '') {
+									$judicialOfficerLevel = $funcall->getJudicialOfficerLevel($data['Courtattendance']['court_level']);
+								}
+							?>
 							 <tr>
-                                <td><b>Presiding Judge</b></td>
+                                <td><b><?php echo $judicialOfficerLevel; ?></b></td>
                                 <td><?php echo $data['Courtattendance']['presiding_judge'];?></td>
                             </tr>
 							 <tr>

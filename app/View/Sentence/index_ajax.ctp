@@ -77,7 +77,12 @@ foreach($datas as $data){
         }
         ?>
       </td>
-      <td><?php echo $funcall->getName($data['PrisonerSentence']['sentence_of'],'SentenceOf', 'name'); ?></td>
+      <td><?php 
+      if($data['PrisonerSentence']['is_convicted'] == 1)
+        echo 'Awaiting';
+      else 
+        echo $funcall->getName($data['PrisonerSentence']['sentence_of'],'SentenceOf', 'name'); 
+      ?></td>
       <td>
         <?php $sentence_count = '';
         if($data['PrisonerSentence']['years'] > 0)
@@ -92,12 +97,22 @@ foreach($datas as $data){
         {
           $sentence_count .= $data['PrisonerSentence']['days'].' days ';
         }
-        echo $sentence_count .= $funcall->getName($data['PrisonerSentence']['sentence_type'],'SentenceType', 'name')." "
+        $sentence_count .= $funcall->getName($data['PrisonerSentence']['sentence_type'],'SentenceType', 'name')." ";
+        if($data['PrisonerSentence']['is_convicted'] == 1)
+          echo Configure::read('NA');
+        else 
+          echo $sentence_count;
         ?>
       </td>
       <?php if(!isset($is_excel))
       {
+        if (isset($data['PrisonerSentence']['lpd']) && !empty($data['PrisonerSentence']['lpd']) && ($data['PrisonerSentence']['lpd'] != '01-01-1970')) {
+          
         $viewDetail = '<b>LPD: </b>'.date('d-m-Y', strtotime($data['PrisonerSentence']['lpd'])).'<hr>';
+      }else{
+        $lpd_view = 'N/A';
+        $viewDetail = '<b>LPD: </b>'." ".$lpd_view.'<hr>';
+      }
         $remission_val = (isset($data['PrisonerSentence']['remission']) && $data['Prisoner']['remission']!='') ? json_decode($data['PrisonerSentence']['remission']) : '';
         $remission_view = 'N/A';    
         $remission = array(); 
@@ -117,8 +132,13 @@ foreach($datas as $data){
             $remission_view = implode(", ", $remission); 
         } 
         $viewDetail .= '<b>Remission: </b>'.$remission_view.'<hr>';
+        if (isset($data['PrisonerSentence']['epd']) && !empty($data['PrisonerSentence']['epd']) && ($data['PrisonerSentence']['epd'] != '01-01-1970')) {
         $viewDetail .= '<b>EPD: </b>'.date('d-m-Y', strtotime($data['PrisonerSentence']['epd'])).'<hr>';
-        ?>
+          }else{
+        $epd_view = 'N/A';
+        $viewDetail .= '<b>EPD: </b>'." ".$epd_view.'<hr>';
+      }
+      ?>
         <td>
           <a href="javaScript:void(0);" class="pop btn btn-success" pageTitle="Senetence Details" pageBody="<?php echo $viewDetail;?>">
               <i class="icon-eye-open"></i>

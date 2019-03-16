@@ -36,6 +36,10 @@ if(isset($this->data['Prisoner']['date_of_birth']) && $this->data['Prisoner']['d
                                 //     ));
                                 if(isset($this->request->data['Prisoner']['id']))
                                 {
+                                    echo $this->Form->input('is_existing',array(
+                                        'type'=>'hidden',
+                                        'value'=>1
+                                    ));
                                     $prisoner_unique_no = $this->request->data['Prisoner']['prisoner_unique_no'];
                                     echo $this->Form->input('prisoner_unique_no',array(
                                         'type'=>'hidden',

@@ -40,6 +40,7 @@
                             </div>
                             <div class="form-actions" align="center">
                             <button id="btnsearchcash" class="btn btn-success" type="button" formnovalidate="formnovalidate">Search</button>
+                            <?php echo $this->Form->input('Reset', array('type'=>'reset', 'div'=>false,'label'=>false, 'class'=>'btn btn-danger', 'onclick'=>"resetData()"))?>
                                 
                             </div>
                             <?php echo $this->Form->end();?>
@@ -56,6 +57,14 @@
 $ajaxUrl           = $this->Html->url(array('controller'=>'Discharges','action'=>'childDetailListAjax'));
 $commonHeaderUrl   = $this->Html->url(array('controller'=>'Prisoners','action'=>'getCommonHeder'));
 echo $this->Html->scriptBlock("
+    function resetData()
+    {
+        // alert(1);
+        $('#prisoner_id').val('');
+        $('#status').val('');
+       
+        showData();
+    }
     
     function showData(){
         var url   = '".$ajaxUrl."';

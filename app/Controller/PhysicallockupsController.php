@@ -1033,6 +1033,9 @@ class PhysicallockupsController   extends AppController {
     }
 
     public function updateRecord() {
+        debug($this->getSystemPrisonerCount(1,2, 2, "Expected"));
+
+        exit;
         $this->layout = 'ajax';
 
         $lockupTime = array(

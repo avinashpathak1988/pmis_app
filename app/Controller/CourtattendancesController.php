@@ -1,7 +1,7 @@
 <?php
 App::uses('AppController', 'Controller');
 class CourtattendancesController  extends AppController {
-	public $layout='table';
+    public $layout='table';
     public $uses=array('Prisoner', 'Courtattendance', 'Court', 'Magisterial','Offence','Courtlevel','PrisonerSentence','ApprovalProcess','Gatepass','PresidingJudge','CauseList','EscortTeam','ReturnFromCourt','PrisonerOffence');
     public function courtscheduleList()
     {
@@ -13,7 +13,7 @@ class CourtattendancesController  extends AppController {
                         $this->Session->write('message','Not Authorized!');
                         $this->redirect(array('action'=>'../sites/dashboard')); 
                 }
-    	$this->set('funcall',$this);
+        $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
         if($this->request->is(array('post','put')))
@@ -111,7 +111,7 @@ class CourtattendancesController  extends AppController {
                 }
             }
         }
-    	$prisonerListData = $this->Courtattendance->find('list', array(
+        $prisonerListData = $this->Courtattendance->find('list', array(
                 "joins" => array(
                     array(
                         "table" => "prisoners",
@@ -122,14 +122,14 @@ class CourtattendancesController  extends AppController {
                         ),
                     ),
                 ),
-				'fields'		=> array(
-					'Prisoner.id',
-					'Prisoner.prisoner_no',
-				),
-				'conditions'	=> array(
-					'Prisoner.prison_id'        => $this->Auth->user('prison_id')
-				),
-			));
+                'fields'        => array(
+                    'Prisoner.id',
+                    'Prisoner.prisoner_no',
+                ),
+                'conditions'    => array(
+                    'Prisoner.prison_id'        => $this->Auth->user('prison_id')
+                ),
+            ));
         // if($this->Session->read('Auth.User.usertype_id')==Configure::read('RECEPTIONIST_USERTYPE'))
         //     {
         //         $sttusListData =array("Draft"=>"Draft","Saved"=>"Final Save");
@@ -172,21 +172,21 @@ class CourtattendancesController  extends AppController {
         //    $statusList += array('Reviewed'=>'Reviewed'); 
         //     $default_status = 'Reviewed';
         // }
-    	$this->set(array(
-					'prisonerListData'					=> $prisonerListData,
+        $this->set(array(
+                    'prisonerListData'                  => $prisonerListData,
                     'sttusListData'=>$statusList,
                     'default_status'    => $default_status
-				));
+                ));
     }
     
     public function courtsscheduleListAjax(){
-    	$this->layout 			= 'ajax';
-    	$prisoner_id 	= '';
+        $this->layout           = 'ajax';
+        $prisoner_id    = '';
         $status = '';
-    	$condition 				= array(
+        $condition              = array(
             'Courtattendance.is_trash'      => 0,
-    		'Courtattendance.prison_id'		=> $this->Session->read('Auth.User.prison_id'),            
-    	);
+            'Courtattendance.prison_id'     => $this->Session->read('Auth.User.prison_id'),            
+        );
         if(isset($this->params['named']['status']) && $this->params['named']['status'] != ''){
             $status = $this->params['named']['status'];
             $condition += array(
@@ -211,14 +211,14 @@ class CourtattendancesController  extends AppController {
                 $condition      += array('Courtattendance.status'=>'Reviewed');
             }   
         }
-    	if(isset($this->params['named']['prisoner_id']) && $this->params['named']['prisoner_id'] != ''){
-    		$prisoner_id = $this->params['named']['prisoner_id'];
-    		$condition += array(
-    			'Courtattendance.prisoner_id'	=> $prisoner_id,
-    		);
-    	}
-		    	
-		if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
+        if(isset($this->params['named']['prisoner_id']) && $this->params['named']['prisoner_id'] != ''){
+            $prisoner_id = $this->params['named']['prisoner_id'];
+            $condition += array(
+                'Courtattendance.prisoner_id'   => $prisoner_id,
+            );
+        }
+                
+        if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='XLS'){
                 $this->layout='export_xls';
                 $this->set('file_type','xls');
@@ -239,21 +239,21 @@ class CourtattendancesController  extends AppController {
         }else{
             $limit = array('limit'  => 20);
         } 
-		
-		$condition += array('Courtattendance.is_production_warrant !='   => 1);
-		
-    	$this->paginate = array(
-    		'conditions'	=> $condition,
-    		'order'			=> array(
-    			'Courtattendance.modified'	=> 'DESC',
-    		),
-    	)+$limit;
-    	$datas = $this->paginate('Courtattendance');
-    	$this->set(array(
-    		'datas'						=> $datas,
-    		'prisoner_id'					=> $prisoner_id,
+        
+        $condition += array('Courtattendance.is_production_warrant !='   => 1);
+        
+        $this->paginate = array(
+            'conditions'    => $condition,
+            'order'         => array(
+                'Courtattendance.modified'  => 'DESC',
+            ),
+        )+$limit;
+        $datas = $this->paginate('Courtattendance');
+        $this->set(array(
+            'datas'                     => $datas,
+            'prisoner_id'                   => $prisoner_id,
             'status'=>$status
-    	));
+        ));
     }
 
     public function getOffenceName($offence_id){
@@ -343,91 +343,91 @@ class CourtattendancesController  extends AppController {
             'prisoner_id'                   => $prisoner_id,
         ));
     }
-	
-	public function getAppealCuaseList()
-	{
-		$this->autoRender = false;
-		$case_id = $this->request->data['case_file_id'];
-		$caseFileno=$this->PrisonerCaseFile->find('list',array(
-				  "recursive" => -1,
+    
+    public function getAppealCuaseList()
+    {
+        $this->autoRender = false;
+        $case_id = $this->request->data['case_file_id'];
+        $caseFileno=$this->PrisonerCaseFile->find('list',array(
+                  "recursive" => -1,
                   'conditions'=>array(
                    'PrisonerCaseFile.is_trash'=>0,
-				   'PrisonerCaseFile.id'=>$case_id,
+                   'PrisonerCaseFile.id'=>$case_id,
                   ),
-				  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
+                  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
                   'order'=>array(
                     'PrisonerCaseFile.case_file_no'
                   )
             ));
-		
-		$options = '';		
-		if(isset($caseFileno) && $caseFileno != '')
-		{
-			foreach($caseFileno as $cfkey => $csval)
-			{
-				
-				$options .= '<option value='.$cfkey.'>'.$csval.'</option>';
-			}
-		}
-		echo $options;	
-	}
-	
-	public function getAppealCauseListOffence()
-	{
-		$this->autoRender = false;
-		$case_id = $this->request->data['offence_id'];
-		 $offenceList = $this->PrisonerOffence->find('all', array(
+        
+        $options = '';      
+        if(isset($caseFileno) && $caseFileno != '')
+        {
+            foreach($caseFileno as $cfkey => $csval)
+            {
+                
+                $options .= '<option value='.$cfkey.'>'.$csval.'</option>';
+            }
+        }
+        echo $options;  
+    }
+    
+    public function getAppealCauseListOffence()
+    {
+        $this->autoRender = false;
+        $case_id = $this->request->data['offence_id'];
+         $offenceList = $this->PrisonerOffence->find('all', array(
                 'recursive'     => -1,
                 'conditions'=> array("PrisonerOffence.id IN (". $case_id ." ) "),
                 'fields'        => array(
                     'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
                 ),
             ));
-			
-			$offence_name = '';
-			if(isset($offenceList) && !empty($offenceList))
-			{
-				
-				foreach($offenceList as $offkey => $offval)
-				{
-					$offence_name .= '<option value="'.$offval['PrisonerOffence']['id'].'">'. $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")".'</option>';
-					
-				}
-			}
-			else
-			{
-				$offence_name = '';
-				
-			}
-		echo $offence_name;
-	}
-	
-	public function index($uuid,$appeal_id='') {
-		$this->set('funcall',$this);
-		
-		/* for cause list records from prisoner sentence appeal*/
-		if(isset($appeal_id) && $appeal_id != '')
-		{
-			$this->loadModel('PrisonerSentenceAppeal');
-			//$this->PrisonerSentenceAppeal->recursive = -1;
-			$appeal_cause_list = $this->PrisonerSentenceAppeal->find('first',array(
-					'conditions'=>array('PrisonerSentenceAppeal.id' => $appeal_id,'PrisonerSentenceAppeal.appeal_status' => 'Cause List'),
-					'fields'=>array('PrisonerSentenceAppeal.case_file_id','PrisonerSentenceAppeal.offence_id','PrisonerSentenceAppeal.courtlevel_id','PrisonerSentenceAppeal.court_id','PrisonerSentenceAppeal.appeal_no','PrisonerSentenceAppeal.prisoner_no','PrisonerSentenceAppeal.created'),	
-			));
-			//debug($appeal_cause_list); exit;
-		}
-		/* end */
+            
+            $offence_name = '';
+            if(isset($offenceList) && !empty($offenceList))
+            {
+                
+                foreach($offenceList as $offkey => $offval)
+                {
+                    $offence_name .= '<option value="'.$offval['PrisonerOffence']['id'].'">'. $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")".'</option>';
+                    
+                }
+            }
+            else
+            {
+                $offence_name = '';
+                
+            }
+        echo $offence_name;
+    }
+    
+    public function index($uuid,$appeal_id='') {
+        $this->set('funcall',$this);
+        
+        /* for cause list records from prisoner sentence appeal*/
+        if(isset($appeal_id) && $appeal_id != '')
+        {
+            $this->loadModel('PrisonerSentenceAppeal');
+            //$this->PrisonerSentenceAppeal->recursive = -1;
+            $appeal_cause_list = $this->PrisonerSentenceAppeal->find('first',array(
+                    'conditions'=>array('PrisonerSentenceAppeal.id' => $appeal_id,'PrisonerSentenceAppeal.appeal_status' => 'Cause List'),
+                    'fields'=>array('PrisonerSentenceAppeal.case_file_id','PrisonerSentenceAppeal.offence_id','PrisonerSentenceAppeal.courtlevel_id','PrisonerSentenceAppeal.court_id','PrisonerSentenceAppeal.appeal_no','PrisonerSentenceAppeal.prisoner_no','PrisonerSentenceAppeal.created'),   
+            ));
+            //debug($appeal_cause_list); exit;
+        }
+        /* end */
 
-		if($uuid){
-			/*
-			 *Query for validate uuid of priosners
-			 */
-			$prisonerData = $this->Prisoner->find('first', array(
-				'recursive'		=> -1,
-				'conditions'	=> array(
-					'Prisoner.uuid'		=> $uuid,
-				),
-			));
+        if($uuid){
+            /*
+             *Query for validate uuid of priosners
+             */
+            $prisonerData = $this->Prisoner->find('first', array(
+                'recursive'     => -1,
+                'conditions'    => array(
+                    'Prisoner.uuid'     => $uuid,
+                ),
+            ));
               $courtLevelList  = $this->Courtlevel->find('list', array(
                     'recursive'     => -1,
                     'fields'        => array(
@@ -442,55 +442,69 @@ class CourtattendancesController  extends AppController {
                         'Courtlevel.name'
                     ),
                 ));
-            // debug($prisonerData); exit;
-			
-						
+            // debug($courtLevelList); exit;
+            
+                        
             $this->loadModel('Magisterial');
-			$this->loadModel('PrisonerCaseFile');
+            $this->loadModel('PrisonerCaseFile');
             $caseFileno=$this->PrisonerCaseFile->find('list',array(
-				  "recursive" => -1,
+                  "recursive" => -1,
                   'conditions'=>array(
                    'PrisonerCaseFile.is_trash'=>0,
-				   'PrisonerCaseFile.prisoner_id'=>$prisonerData['Prisoner']['id'],
+                   'PrisonerCaseFile.prisoner_id'=>$prisonerData['Prisoner']['id'],
                   ),
-				  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
+                  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
                   'order'=>array(
                     'PrisonerCaseFile.case_file_no'
                   )
             ));
-			
-			$casefilesToCourt = $this->getTocourtFileNo($prisonerData['Prisoner']['id'],$prisonerData['Prisoner']['prisoner_type_id']);
-			
-			
-			/* for return form court case file no */
-			$this->loadModel('Courtattendance');
-			$returncaseFileno=$this->Courtattendance->find('all',array(
-				  "recursive" => -1,
-                  'conditions'=>array(
+            
+            $casefilesToCourt = $this->getTocourtFileNo($prisonerData['Prisoner']['id'],$prisonerData['Prisoner']['prisoner_type_id']);
+            
+            
+            /* for return form court case file no */
+            $this->loadModel('Courtattendance');
+            $returncaseFileno=$this->Courtattendance->find('all',array(
+            "recursive" => -1,
+            'conditions'=>array(
                    'Courtattendance.is_trash'=>0,
-				   'Courtattendance.status'=>'Approved',
-				   'Courtattendance.prisoner_id'=>$prisonerData['Prisoner']['id'],
-				   'Courtattendance.uuid'=>$uuid
+                   'Courtattendance.status'=>'Approved',
+                   'Courtattendance.prisoner_id'=>$prisonerData['Prisoner']['id'],
+                   'Courtattendance.uuid'=>$uuid
                   ),
-				  'fields'=>array('Courtattendance.case_no'),
-				  'order'=>array('Courtattendance.id'=>'DESC'),
-				  'limit'=>1,
+                  'fields'=>array('Courtattendance.case_no'),
+                  'order'=>array('Courtattendance.id'=>'DESC'),
+                  'limit'=>1,
                   
             ));
-			$fromcourtfile = array();
-			if(isset($returncaseFileno[0]['Courtattendance']['case_no']) && $returncaseFileno[0]['Courtattendance']['case_no'] != '')
-			{
-				$fromcourtcasefile = explode(',',$returncaseFileno[0]['Courtattendance']['case_no']);
-				
-				foreach($fromcourtcasefile as $rk => $rv)
-				{
-					if($rv != '')
-					{
-						$fromcourtfile[$rv] = @$caseFileno[$rv];				
-					}				
-				}
-			}			
-			/* end */
+            $fromcourtfile = array();
+            if(isset($returncaseFileno[0]['Courtattendance']['case_no']) && $returncaseFileno[0]['Courtattendance']['case_no'] != '')
+            {
+                $fromcourtcasefile = explode(',',$returncaseFileno[0]['Courtattendance']['case_no']);
+                
+                
+                
+                foreach($fromcourtcasefile as $rk => $rv)
+                {
+
+                    if($rv != '')
+                    {
+                        $this->loadModel('ReturnFromCourt');
+                        $checkFileNO = $this->ReturnFromCourt->find('count',array('conditions'=>array(
+                                    'ReturnFromCourt.case_file_number'=>$rv,
+                                     'ReturnFromCourt.prisoner_id'=>$prisonerData['Prisoner']['id'],
+                                    'ReturnFromCourt.uuid'=>$uuid
+                        )
+                        
+                        ));
+                        if($checkFileNO == 0)
+                        {
+                            $fromcourtfile[$rv] = @$caseFileno[$rv];
+                        }                       
+                    }               
+                }
+            }           
+            /* end */
             
             $magisterialList=$this->Courtlevel->find('list',array(
                   'conditions'=>array(
@@ -523,17 +537,17 @@ class CourtattendancesController  extends AppController {
                 ),
             ));
             
-			$remand_prisoner = '';
-			
+            $remand_prisoner = '';
+            
             if(Configure::read('REMAND')==$prisonerData['Prisoner']['prisoner_type_id'])
-			{
-				$remand_prisoner = 'yes';
-			}				
+            {
+                $remand_prisoner = 'yes';
+            }               
            
-			$this->loadModel('ApplicationToCourt');	  
-			if(isset($prisonerData['Prisoner']['id']) && (int)$prisonerData['Prisoner']['id'] != 0){
-				$courtList 		= array();
-				$prisoner_id 	= $prisonerData['Prisoner']['id'];
+            $this->loadModel('ApplicationToCourt');   
+            if(isset($prisonerData['Prisoner']['id']) && (int)$prisonerData['Prisoner']['id'] != 0){
+                $courtList      = array();
+                $prisoner_id    = $prisonerData['Prisoner']['id'];
                 /*
                  *Code for add the Application to court list records
                 */                  
@@ -544,30 +558,30 @@ class CourtattendancesController  extends AppController {
                         $this->request->data['ApplicationToCourt']['submission_date'] = date('Y-m-d', strtotime($this->request->data['ApplicationToCourt']['submission_date']));
                     }
                     
-					$this->request->data['ApplicationToCourt']['prisoner_id'] = $prisoner_id;	
-					$application_no = rand(100000,9999999);
-					$this->request->data['ApplicationToCourt']['application_no'] = $application_no;	
-					$this->request->data['ApplicationToCourt']['prison_id'] = $this->Session->read('Auth.User.prison_id');
-					
-					/* check for feedback status granted against case file no */
-					$is_count = $this->ApplicationToCourt->find('count',array(
-																	'conditions'=>array(
-																	'ApplicationToCourt.case_file_no'=>$this->request->data['ApplicationToCourt']['case_file_no'],
-																	'ApplicationToCourt.court_feedback'=>'Granted',
-																	)
-																
-																));
-					if($is_count > 0)
-					{
-						$this->Session->write('message_type','error');
+                    $this->request->data['ApplicationToCourt']['prisoner_id'] = $prisoner_id;   
+                    $application_no = rand(100000,9999999);
+                    $this->request->data['ApplicationToCourt']['application_no'] = $application_no; 
+                    $this->request->data['ApplicationToCourt']['prison_id'] = $this->Session->read('Auth.User.prison_id');
+                    
+                    /* check for feedback status granted against case file no */
+                    $is_count = $this->ApplicationToCourt->find('count',array(
+                                                                    'conditions'=>array(
+                                                                    'ApplicationToCourt.case_file_no'=>$this->request->data['ApplicationToCourt']['case_file_no'],
+                                                                    'ApplicationToCourt.court_feedback'=>'Granted',
+                                                                    )
+                                                                
+                                                                ));
+                    if($is_count > 0)
+                    {
+                        $this->Session->write('message_type','error');
                         $this->Session->write('message','Feedback status already Granted to this case file no. !');
-						$this->redirect('/courtattendances/index/'.$uuid.'#causeList');
-						exit;
-					}						
-					/* end */
-					
-					//debug($this->request->data); exit;
-					
+                        $this->redirect('/courtattendances/index/'.$uuid.'#causeList');
+                        exit;
+                    }                       
+                    /* end */
+                    
+                    //debug($this->request->data); exit;
+                    
                     if($this->ApplicationToCourt->save($this->request->data)){
                         $this->Session->write('message_type','success');
                         if($this->request->data['ApplicationToCourt']['id']==""){
@@ -588,7 +602,7 @@ class CourtattendancesController  extends AppController {
                 if(isset($this->data['ApplicationToCourtEdit']['id']) && (int)$this->data['ApplicationToCourtEdit']['id'] != 0){
                     if($this->ApplicationToCourt->exists($this->data['ApplicationToCourtEdit']['id'])){
                         $this->data = $this->ApplicationToCourt->findById($this->data['ApplicationToCourtEdit']['id']);
-					}					
+                    }                   
                 }
                 /*
                  *Code for delete the Application to court list records
@@ -607,15 +621,15 @@ class CourtattendancesController  extends AppController {
                     }
                 }
 
-				/*
-				 *Code for add the court attendance records
-				*/	
-				
-				if(isset($this->data['Courtattendance']) && is_array($this->data['Courtattendance']) && count($this->data['Courtattendance']) >0){
-						
-					$offence_id='';
-					$offence_count = '';
-					$case_no = '';
+                /*
+                 *Code for add the court attendance records
+                */  
+                
+                if(isset($this->data['Courtattendance']) && is_array($this->data['Courtattendance']) && count($this->data['Courtattendance']) >0){
+                        
+                    $offence_id='';
+                    $offence_count = '';
+                    $case_no = '';
                     // code by partha
                     if(isset($this->request->data['Courtattendance']['offence_id']) && $this->request->data['Courtattendance']['offence_id']!= '')
                     {
@@ -623,43 +637,43 @@ class CourtattendancesController  extends AppController {
                         $offence_id .= $value.',';
                         }
                     }
-					
-					$offence_id=rtrim($offence_id,",");
-					$this->request->data['Courtattendance']['offence_id']=$offence_id;
-					
-					
+                    
+                    $offence_id=rtrim($offence_id,",");
+                    $this->request->data['Courtattendance']['offence_id']=$offence_id;
+                    
+                    
                     if(isset($this->request->data['Courtattendance']['offence_count']) && $this->request->data['Courtattendance']['offence_count']!= '')
                     {
-						
+                        
                         foreach ($this->request->data['Courtattendance']['offence_count'] as $value1) {
-														
-								$offence_count .= $value1.',';
-							
+                                                        
+                                $offence_count .= $value1.',';
+                            
                         }
                     }
-					
-					if(isset($this->request->data['Courtattendance']['case_no']) && $this->request->data['Courtattendance']['case_no']!= '')
+                    
+                    if(isset($this->request->data['Courtattendance']['case_no']) && $this->request->data['Courtattendance']['case_no']!= '')
                     {
                         foreach ($this->request->data['Courtattendance']['case_no'] as $value2) {
                         $case_no .= $value2.',';
-						
-						
+                        
+                        
                         }
                     }
-					
-					$offence_count=rtrim($offence_count,",");
-					$this->request->data['Courtattendance']['offence_count']=$offence_id;
-					
-					$case_no=rtrim($case_no,",");
-					$this->request->data['Courtattendance']['case_no']=$case_no;
+                    
+                    $offence_count=rtrim($offence_count,",");
+                    $this->request->data['Courtattendance']['offence_count']=$offence_id;
+                    
+                    $case_no=rtrim($case_no,",");
+                    $this->request->data['Courtattendance']['case_no']=$case_no;
                     //attendance_date
-					if(isset($this->request->data['Courtattendance']['attendance_date']) && $this->request->data['Courtattendance']['attendance_date'] != ''){
+                    if(isset($this->request->data['Courtattendance']['attendance_date']) && $this->request->data['Courtattendance']['attendance_date'] != ''){
                         // $date = $this->request->data['Courtattendance']['attendance_date'];
                         // $res = explode("-", $date);
                         // $changedDate = $res[2]."-".$res[0]."-".$res[1];
                         // echo $changedDate; // prints 2014-10-24
-						$this->request->data['Courtattendance']['attendance_date'] = date('Y-m-d', strtotime($this->request->data['Courtattendance']['attendance_date']));
-					}
+                        $this->request->data['Courtattendance']['attendance_date'] = date('Y-m-d', strtotime($this->request->data['Courtattendance']['attendance_date']));
+                    }
                     if(isset($this->request->data['Courtattendance']['production_warrent_date']) && $this->request->data['Courtattendance']['production_warrent_date'] != ''){
                         // $date = $this->request->data['Courtattendance']['attendance_date'];
                         // $res = explode("-", $date);
@@ -675,199 +689,199 @@ class CourtattendancesController  extends AppController {
                        
                         $this->request->data['Courtattendance']['cause_date'] = date('Y-m-d', strtotime($this->request->data['Courtattendance']['cause_date']));
                     }
-					 if(isset($this->request->data['Courtattendance']['commence_date']) && $this->request->data['Courtattendance']['commence_date'] != ''){
+                     if(isset($this->request->data['Courtattendance']['commence_date']) && $this->request->data['Courtattendance']['commence_date'] != ''){
                        
                         $this->request->data['Courtattendance']['court_date'] = date('Y-m-d', strtotime($this->request->data['Courtattendance']['commence_date']));
                         $this->request->data['Courtattendance']['commence_date'] = date('Y-m-d', strtotime($this->request->data['Courtattendance']['commence_date']));
                     }
-					if(isset($this->request->data['Courtattendance']['production_warrent_date']) && $this->request->data['Courtattendance']['production_warrent_date'] != ''){
+                    if(isset($this->request->data['Courtattendance']['production_warrent_date']) && $this->request->data['Courtattendance']['production_warrent_date'] != ''){
                        
                         $this->request->data['Courtattendance']['production_warrent_date'] = date('Y-m-d', strtotime($this->request->data['Courtattendance']['production_warrent_date']));
                     }
-					if(isset($this->data['Courtattendance']['uuid']) && $this->data['Courtattendance']['uuid'] == ''){
-						$uuidArr = $this->Courtattendance->query("select uuid() as code");
-						$this->request->data['Courtattendance']['uuid']	= $uuidArr[0][0]['code'];
-					}
+                    if(isset($this->data['Courtattendance']['uuid']) && $this->data['Courtattendance']['uuid'] == ''){
+                        $uuidArr = $this->Courtattendance->query("select uuid() as code");
+                        $this->request->data['Courtattendance']['uuid'] = $uuidArr[0][0]['code'];
+                    }
                     $this->request->data['Courtattendance']['prisoner_id']  = $prisoner_id;  
-					$this->request->data['Courtattendance']['prison_id'] 	= $this->Auth->user('prison_id');
-                   // debug($this->data);	exit;
+                    $this->request->data['Courtattendance']['prison_id']    = $this->Auth->user('prison_id');
+                   // debug($this->data);   exit;
                     //debug($this->validationErrors); exit; 
                    // debug($this->Session->read()); exit;
-				   // $check_count = '';
-					if(isset($this->request->data['Courtattendance']['id']) && $this->request->data['Courtattendance']['id'] == '')
-					{
-						$check_count = $this->Courtattendance->find('count',array(
-										'conditions'=>array(
-												'Courtattendance.prisoner_id'=>$prisoner_id,
-												'Courtattendance.prison_id'=>$this->Auth->user('prison_id'),
-												'Courtattendance.court_date'=>$this->request->data['Courtattendance']['court_date'],
-												),
-						));
-					}
-					
-					if(@$check_count == 0)
-					{
-						$this->Courtattendance->recursive=-1;
-						if($this->request->data['Courtattendance']['from_cause_list']!=1)
-						{
-							//debug($this->data); exit;
-						}
-						
-						$this->request->data['Courtattendance']['appeal_id'] = $appeal_id;
-						if($this->Courtattendance->save($this->data)){
-							$this->Session->write('message_type','success');
-							if($this->request->data['Courtattendance']['id']==""){
-								$this->Session->write('message','Saved Successfully !');    
-							}
-							else{
-								$this->Session->write('message','Updated Successfully !');
-							}
-							$this->redirect('/courtattendances/index/'.$uuid.'#produceToCourt');
-						}else{
-							$this->Session->write('message_type','error');
-							$this->Session->write('message','Saving Failed !');
-							$this->redirect('/courtattendances/index/'.$uuid.'#produceToCourt');
-						}
-					}else{
-							$this->Session->write('message_type','error');
-							$this->Session->write('message','Already cause list date prepared !');
-							$this->redirect('/courtattendances/index/'.$uuid.'#produceToCourt');
-						}
-				}
-				/*
-				 *Code for edit the court attendance records
-				*/			
-            	
-		        if(isset($this->data['normalScheduleEdit']['id']) && (int)$this->data['normalScheduleEdit']['id'] != 0){
+                   // $check_count = '';
+                    if(isset($this->request->data['Courtattendance']['id']) && $this->request->data['Courtattendance']['id'] == '')
+                    {
+                        $check_count = $this->Courtattendance->find('count',array(
+                                        'conditions'=>array(
+                                                'Courtattendance.prisoner_id'=>$prisoner_id,
+                                                'Courtattendance.prison_id'=>$this->Auth->user('prison_id'),
+                                                'Courtattendance.court_date'=>$this->request->data['Courtattendance']['court_date'],
+                                                ),
+                        ));
+                    }
+                    
+                    if(@$check_count == 0)
+                    {
+                        $this->Courtattendance->recursive=-1;
+                        if($this->request->data['Courtattendance']['from_cause_list']!=1)
+                        {
+                            //debug($this->data); exit;
+                        }
+                        
+                        $this->request->data['Courtattendance']['appeal_id'] = $appeal_id;
+                        if($this->Courtattendance->save($this->data)){
+                            $this->Session->write('message_type','success');
+                            if($this->request->data['Courtattendance']['id']==""){
+                                $this->Session->write('message','Saved Successfully !');    
+                            }
+                            else{
+                                $this->Session->write('message','Updated Successfully !');
+                            }
+                            $this->redirect('/courtattendances/index/'.$uuid.'#produceToCourt');
+                        }else{
+                            $this->Session->write('message_type','error');
+                            $this->Session->write('message','Saving Failed !');
+                            $this->redirect('/courtattendances/index/'.$uuid.'#produceToCourt');
+                        }
+                    }else{
+                            $this->Session->write('message_type','error');
+                            $this->Session->write('message','Already cause list date prepared !');
+                            $this->redirect('/courtattendances/index/'.$uuid.'#produceToCourt');
+                        }
+                }
+                /*
+                 *Code for edit the court attendance records
+                */          
+                
+                if(isset($this->data['normalScheduleEdit']['id']) && (int)$this->data['normalScheduleEdit']['id'] != 0){
 
-		            if($this->Courtattendance->exists($this->data['normalScheduleEdit']['id'])){
-		                $this->data = $this->Courtattendance->findById($this->data['normalScheduleEdit']['id']);
-						$case_file = $this->request->data['Courtattendance']['case_no'];
-						$offence = $this->request->data['Courtattendance']['offence_id'];
-						$count = $this->request->data['Courtattendance']['offence_count'];
-						//debug($this->request->data['Courtattendance']);
-						$prisoner_case_file_id = rtrim($case_file,',');
-						$file_id = explode(',',$prisoner_case_file_id);
-						if(isset($file_id) && $file_id!='')
-						{
-							foreach($file_id as $value)
-							{
-								$case_file_id .= "'".$value."'".',';
-							}
-						}
-						
-						$case_file_id = rtrim($case_file_id,',');
-						$this->loadModel('PrisonerOffence');
-						$offence_for_edit = array();
-						$offenceList = $this->PrisonerOffence->find('all', array(
-							'recursive'     => -1,
-							'conditions'=> array("PrisonerOffence.prisoner_case_file_id IN (". $case_file_id ." ) "),
-							'fields'        => array(
-								'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
-							),
-						));
-						foreach($offenceList as $offval)
-						{
-							$offence_for_edit[$offval['PrisonerOffence']['id']] = $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")";
-						}
-						
-						
-		            }
-		        }
-				
-				if(isset($this->data['causelistEdit']['id']) && (int)$this->data['causelistEdit']['id'] != 0){
+                    if($this->Courtattendance->exists($this->data['normalScheduleEdit']['id'])){
+                        $this->data = $this->Courtattendance->findById($this->data['normalScheduleEdit']['id']);
+                        $case_file = $this->request->data['Courtattendance']['case_no'];
+                        $offence = $this->request->data['Courtattendance']['offence_id'];
+                        $count = $this->request->data['Courtattendance']['offence_count'];
+                        //debug($this->request->data['Courtattendance']);
+                        $prisoner_case_file_id = rtrim($case_file,',');
+                        $file_id = explode(',',$prisoner_case_file_id);
+                        if(isset($file_id) && $file_id!='')
+                        {
+                            foreach($file_id as $value)
+                            {
+                                $case_file_id .= "'".$value."'".',';
+                            }
+                        }
+                        
+                        $case_file_id = rtrim($case_file_id,',');
+                        $this->loadModel('PrisonerOffence');
+                        $offence_for_edit = array();
+                        $offenceList = $this->PrisonerOffence->find('all', array(
+                            'recursive'     => -1,
+                            'conditions'=> array("PrisonerOffence.prisoner_case_file_id IN (". $case_file_id ." ) "),
+                            'fields'        => array(
+                                'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
+                            ),
+                        ));
+                        foreach($offenceList as $offval)
+                        {
+                            $offence_for_edit[$offval['PrisonerOffence']['id']] = $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")";
+                        }
+                        
+                        
+                    }
+                }
+                
+                if(isset($this->data['causelistEdit']['id']) && (int)$this->data['causelistEdit']['id'] != 0){
 
-		            if($this->Courtattendance->exists($this->data['causelistEdit']['id'])){
-		                $this->data = $this->Courtattendance->findById($this->data['causelistEdit']['id']);
-						$case_file = $this->request->data['Courtattendance']['case_no'];
-						//debug($this->request->data['Courtattendance']);
-						$prisoner_case_file_id = rtrim($case_file,',');
-						$file_id = explode(',',$prisoner_case_file_id);
-						if(isset($file_id) && $file_id!='')
-						{
-							foreach($file_id as $value)
-							{
-								$case_file_id .= "'".$value."'".',';
-							}
-						}
-						
-						$case_file_id = rtrim($case_file_id,',');
-						$this->loadModel('PrisonerOffence');
-						$offence_for_edit = array();
-						$offenceList = $this->PrisonerOffence->find('all', array(
-							'recursive'     => -1,
-							'conditions'=> array("PrisonerOffence.prisoner_case_file_id IN (". $case_file_id ." ) "),
-							'fields'        => array(
-								'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
-							),
-						));
-						foreach($offenceList as $offval)
-						{
-							$offence_for_edit[$offval['PrisonerOffence']['id']] = $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")";
-						}
-		            }
-		        }
-				if(isset($this->data['productionwarrantEdit']['id']) && (int)$this->data['productionwarrantEdit']['id'] != 0){
+                    if($this->Courtattendance->exists($this->data['causelistEdit']['id'])){
+                        $this->data = $this->Courtattendance->findById($this->data['causelistEdit']['id']);
+                        $case_file = $this->request->data['Courtattendance']['case_no'];
+                        //debug($this->request->data['Courtattendance']);
+                        $prisoner_case_file_id = rtrim($case_file,',');
+                        $file_id = explode(',',$prisoner_case_file_id);
+                        if(isset($file_id) && $file_id!='')
+                        {
+                            foreach($file_id as $value)
+                            {
+                                $case_file_id .= "'".$value."'".',';
+                            }
+                        }
+                        
+                        $case_file_id = rtrim($case_file_id,',');
+                        $this->loadModel('PrisonerOffence');
+                        $offence_for_edit = array();
+                        $offenceList = $this->PrisonerOffence->find('all', array(
+                            'recursive'     => -1,
+                            'conditions'=> array("PrisonerOffence.prisoner_case_file_id IN (". $case_file_id ." ) "),
+                            'fields'        => array(
+                                'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
+                            ),
+                        ));
+                        foreach($offenceList as $offval)
+                        {
+                            $offence_for_edit[$offval['PrisonerOffence']['id']] = $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")";
+                        }
+                    }
+                }
+                if(isset($this->data['productionwarrantEdit']['id']) && (int)$this->data['productionwarrantEdit']['id'] != 0){
 
-		            if($this->Courtattendance->exists($this->data['productionwarrantEdit']['id'])){
-		                $this->data = $this->Courtattendance->findById($this->data['productionwarrantEdit']['id']);
-						$case_file = $this->request->data['Courtattendance']['case_no'];
-						//debug($this->data);
-						$prisoner_case_file_id = rtrim($case_file,',');
-						$file_id = explode(',',$prisoner_case_file_id);
-						if(isset($file_id) && $file_id!='')
-						{
-							foreach($file_id as $value)
-							{
-								$case_file_id .= "'".$value."'".',';
-							}
-						}
-						
-						$case_file_id = rtrim($case_file_id,',');
-						$this->loadModel('PrisonerOffence');
-						$offence_for_edit = array();
-						$offenceList = $this->PrisonerOffence->find('all', array(
-							'recursive'     => -1,
-							'conditions'=> array("PrisonerOffence.prisoner_case_file_id IN (". $case_file_id ." ) "),
-							'fields'        => array(
-								'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
-							),
-						));
-						foreach($offenceList as $offval)
-						{
-							$offence_for_edit[$offval['PrisonerOffence']['id']] = $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")";
-						}
-		            }
-		        }
-		        /*
-		         *Code for delete the court attendance records
-		         */	
-		        if(isset($this->data['CourtattendanceDelete']['id']) && (int)$this->data['CourtattendanceDelete']['id'] != 0){
-		            if($this->Courtattendance->exists($this->data['CourtattendanceDelete']['id'])){
-	                    $this->Courtattendance->id = $this->data['CourtattendanceDelete']['id'];
-	                    if($this->Courtattendance->saveField('is_trash',1)){
-							$this->Session->write('message_type','success');
-		                    $this->Session->write('message','Deleted Successfully !');
-	                    }else{
-							$this->Session->write('message_type','error');
-		                    $this->Session->write('message','Delete Failed !');
-	                    }
-	                    $this->redirect('/courtattendances/index/'.$uuid."#produceToCourt");		                
-		            }
-		        }	
+                    if($this->Courtattendance->exists($this->data['productionwarrantEdit']['id'])){
+                        $this->data = $this->Courtattendance->findById($this->data['productionwarrantEdit']['id']);
+                        $case_file = $this->request->data['Courtattendance']['case_no'];
+                        //debug($this->data);
+                        $prisoner_case_file_id = rtrim($case_file,',');
+                        $file_id = explode(',',$prisoner_case_file_id);
+                        if(isset($file_id) && $file_id!='')
+                        {
+                            foreach($file_id as $value)
+                            {
+                                $case_file_id .= "'".$value."'".',';
+                            }
+                        }
+                        
+                        $case_file_id = rtrim($case_file_id,',');
+                        $this->loadModel('PrisonerOffence');
+                        $offence_for_edit = array();
+                        $offenceList = $this->PrisonerOffence->find('all', array(
+                            'recursive'     => -1,
+                            'conditions'=> array("PrisonerOffence.prisoner_case_file_id IN (". $case_file_id ." ) "),
+                            'fields'        => array(
+                                'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
+                            ),
+                        ));
+                        foreach($offenceList as $offval)
+                        {
+                            $offence_for_edit[$offval['PrisonerOffence']['id']] = $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")";
+                        }
+                    }
+                }
+                /*
+                 *Code for delete the court attendance records
+                 */ 
+                if(isset($this->data['CourtattendanceDelete']['id']) && (int)$this->data['CourtattendanceDelete']['id'] != 0){
+                    if($this->Courtattendance->exists($this->data['CourtattendanceDelete']['id'])){
+                        $this->Courtattendance->id = $this->data['CourtattendanceDelete']['id'];
+                        if($this->Courtattendance->saveField('is_trash',1)){
+                            $this->Session->write('message_type','success');
+                            $this->Session->write('message','Deleted Successfully !');
+                        }else{
+                            $this->Session->write('message_type','error');
+                            $this->Session->write('message','Delete Failed !');
+                        }
+                        $this->redirect('/courtattendances/index/'.$uuid."#produceToCourt");                        
+                    }
+                }   
 
-				/*
-				 *Query for get the Magistrail area list
-				 */
-				
-				$prissentence=$this->PrisonerSentence->find('first', array(
-					'recursive'		=> -1,
+                /*
+                 *Query for get the Magistrail area list
+                 */
+                
+                $prissentence=$this->PrisonerSentence->find('first', array(
+                    'recursive'     => -1,
                     'conditions'    => array(
                         'PrisonerSentence.prisoner_id'  => $prisonerData['Prisoner']['id'],
                         // 'Offence.is_enable'      => 1,
                         // 'Offence.is_trash'       => 0,
                     ),
-				));
+                ));
                 // debug($prissentence);
                 ///isset($prissentence["PrisonerSentence"]["offence"]) && $prissentence["PrisonerSentence"]["offence"]!=''
                 $this->loadModel('PrisonerOffence');
@@ -890,8 +904,8 @@ class CourtattendancesController  extends AppController {
                         'fields'        => array(
                             'PrisonerOffence.id',
                             'PrisonerOffence.offence',
-							 'PrisonerOffence.offence_no',
-							  'PrisonerOffence.offence_category_id',
+                             'PrisonerOffence.offence_no',
+                              'PrisonerOffence.offence_category_id',
                         ),
                         'conditions'    => array(
                           "PrisonerOffence.prisoner_id"=> $prisonerData['Prisoner']['id'],
@@ -900,25 +914,25 @@ class CourtattendancesController  extends AppController {
                             'PrisonerOffence.id',
                         ),
                     ));
-					$offenceListarr = array();
-					$offenceCategory = array();
-					if(isset($offenceList) && !empty($offenceList))
-					{
-						
-						foreach($offenceList as $offkey => $offval)
-						{
-							$offenceListarr[$offval['PrisonerOffence']['offence']] = $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")";
-							@$offenceCategory[$offval['PrisonerOffence']['offence_category_id']] = $this->getName($offval['OffenceCategory']['offence_category_id'],'OffenceCategory','name');
-						}
-					}
-					
-					$authority_type = array(1,2,3);
-					$offenceListfromtab=$this->Courtattendance->find('all', array(
+                    $offenceListarr = array();
+                    $offenceCategory = array();
+                    if(isset($offenceList) && !empty($offenceList))
+                    {
+                        
+                        foreach($offenceList as $offkey => $offval)
+                        {
+                            $offenceListarr[$offval['PrisonerOffence']['offence']] = $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")";
+                            @$offenceCategory[$offval['PrisonerOffence']['offence_category_id']] = $this->getName($offval['OffenceCategory']['offence_category_id'],'OffenceCategory','name');
+                        }
+                    }
+                    
+                    $authority_type = array(1,2,3);
+                    $offenceListfromtab=$this->Courtattendance->find('all', array(
                         'recursive'     => -1,
                         'fields'        => array(
                             'Courtattendance.id',
                             'Courtattendance.offence_id',
-							
+                            
                         ),
                         'conditions'    => array(
                           "Courtattendance.authority_type"=> $authority_type ,
@@ -927,21 +941,21 @@ class CourtattendancesController  extends AppController {
                             'Courtattendance.id',
                         ),
                     ));
-					
-					$offenceListarrFromtab = array();
-					if(isset($offenceListfromtab) && !empty($offenceListfromtab))
-					{
-						
-						foreach($offenceListfromtab as $offkey => $offval)
-						{
-							 $offenceListarrFromtab[$offval['Courtattendance']['id']] = $this->getName($offval['Courtattendance']['offence_id'],'Offence','name');
-							
-						}
-					}
-					
-				$offencecountList = $this->PrisonerOffence->find('list', array(
+                    
+                    $offenceListarrFromtab = array();
+                    if(isset($offenceListfromtab) && !empty($offenceListfromtab))
+                    {
+                        
+                        foreach($offenceListfromtab as $offkey => $offval)
+                        {
+                             $offenceListarrFromtab[$offval['Courtattendance']['id']] = $this->getName($offval['Courtattendance']['offence_id'],'Offence','name');
+                            
+                        }
+                    }
+                    
+                $offencecountList = $this->PrisonerOffence->find('list', array(
                 //'recursive'     => -1,
-				 /*"conditions"    => array(
+                 /*"conditions"    => array(
                         "PrisonerOffence.prisoner_id"=> $prisonerData['Prisoner']['id'],
                         
                     ),*/
@@ -949,40 +963,26 @@ class CourtattendancesController  extends AppController {
                     'PrisonerOffence.offence_no','PrisonerOffence.offence_no'
                 ),
             ));
-				
-				$magestrilareaList = $this->Magisterial->find('list', array(
-					'recursive'		=> -1,
-					'fields'		=> array(
-						'Magisterial.id',
-						'Magisterial.name',
-					),
-					'conditions'	=> array(
-						'Magisterial.is_enable'		=> 1,
-						'Magisterial.is_trash'		=> 0,
-					),
-					'order'			=> array(
-						'Magisterial.name',
-					),
-				));
-				/*
-				 *Query for get the court List
-				 */
-				
-					$courtList = $this->Court->find('list', array(
-						'recursive'		=> -1,
-						'fields'		=> array(
-							'Court.id',
-							'Court.name',
-						),
-						'conditions'	=> array(
-							'Court.is_enable'		=> 1,
-							'Court.is_trash'		=> 0,
-							
-						),
-						'order'			=> array(
-							'Court.name'
-						),
-					));
+                
+                $magestrilareaList = $this->Magisterial->find('list', array(
+                    'recursive'     => -1,
+                    'fields'        => array(
+                        'Magisterial.id',
+                        'Magisterial.name',
+                    ),
+                    'conditions'    => array(
+                        'Magisterial.is_enable'     => 1,
+                        'Magisterial.is_trash'      => 0,
+                    ),
+                    'order'         => array(
+                        'Magisterial.name',
+                    ),
+                ));
+                /*
+                 *Query for get the court List
+                 */
+                
+                    
                       $courtList  = $this->Court->find('list', array(
                     'recursive'     => -1,
                     'fields'        => array(
@@ -997,9 +997,10 @@ class CourtattendancesController  extends AppController {
                         'Court.name'
                     ),
                 ));
-				
-				
-				
+                      // debug($courtList); exit;
+                
+                
+                
 
                 /* return from court*/
             
@@ -1008,7 +1009,7 @@ class CourtattendancesController  extends AppController {
                     if(isset($this->request->data['ReturnFromCourt']['session_date']) && $this->request->data['ReturnFromCourt']['session_date'] != ''){
                         $this->request->data['ReturnFromCourt']['session_date'] = date('Y-m-d', strtotime($this->request->data['ReturnFromCourt']['session_date']));
                     }
-					if(isset($this->request->data['ReturnFromCourt']['decission_date']) && $this->request->data['ReturnFromCourt']['decission_date'] != ''){
+                    if(isset($this->request->data['ReturnFromCourt']['decission_date']) && $this->request->data['ReturnFromCourt']['decission_date'] != ''){
                         $this->request->data['ReturnFromCourt']['decission_date'] = date('Y-m-d', strtotime($this->request->data['ReturnFromCourt']['decission_date']));
                     }
                     if(isset($this->request->data['ReturnFromCourt']['commitment_date']) && $this->request->data['ReturnFromCourt']['commitment_date'] != ''){
@@ -1020,48 +1021,48 @@ class CourtattendancesController  extends AppController {
                     if(isset($this->request->data['ReturnFromCourt']['aquited_date']) && $this->request->data['ReturnFromCourt']['aquited_date'] != ''){
                         $this->request->data['ReturnFromCourt']['aquited_date'] = date('Y-m-d', strtotime($this->request->data['ReturnFromCourt']['aquited_date']));
                     }
-					if(isset($this->request->data['ReturnFromCourt']['sentence_date']) && $this->request->data['ReturnFromCourt']['sentence_date'] != ''){
+                    if(isset($this->request->data['ReturnFromCourt']['sentence_date']) && $this->request->data['ReturnFromCourt']['sentence_date'] != ''){
                         $this->request->data['ReturnFromCourt']['sentence_date'] = date('Y-m-d', strtotime($this->request->data['ReturnFromCourt']['sentence_date']));
                     }
-					
-					$cashbail = '';
-					if(isset($this->request->data['ReturnFromCourt']['cash_bail']) && $this->request->data['ReturnFromCourt']['cash_bail']!= '')
+                    
+                    $cashbail = '';
+                    if(isset($this->request->data['ReturnFromCourt']['cash_bail']) && $this->request->data['ReturnFromCourt']['cash_bail']!= '')
                     {
                         foreach ($this->request->data['ReturnFromCourt']['cash_bail'] as $value3) {
-							
-						if(	$value3 != '0' )
-						{
-							
-							$cashbail .= $value3.',';
-						}
-						
+                            
+                        if( $value3 != '0' )
+                        {
+                            
+                            $cashbail .= $value3.',';
                         }
-						 $cashbail =  rtrim($cashbail,',');
-						
+                        
+                        }
+                         $cashbail =  rtrim($cashbail,',');
+                        
                     }
-					 $this->request->data['ReturnFromCourt']['cash_bail'] = $cashbail;
+                     $this->request->data['ReturnFromCourt']['cash_bail'] = $cashbail;
                     //$this->data['ReturnFromCourt']['uuid']=$uuid; 
                     $this->request->data['ReturnFromCourt']['prison_id'] = $this->Session->read('Auth.User.prison_id');
-					//debug($this->request->data['ReturnFromCourt']); exit;
-									 
+                    //debug($this->request->data['ReturnFromCourt']); exit;
+                                     
                     if($this->ReturnFromCourt->saveAll($this->request->data)){
-						$return_id = $this->ReturnFromCourt->id;
+                        $return_id = $this->ReturnFromCourt->id;
                         $this->Session->write('message_type','success');
                         if($this->request->data['ReturnFromCourt']['id']==""){
                             $this->Session->write('message','Saved Successfully !');
-							//$this->Session->write('appeal_status',$this->request->data['ReturnFromCourt']['appeal_status']);					
+                            //$this->Session->write('appeal_status',$this->request->data['ReturnFromCourt']['appeal_status']);                  
                         }
                         else{
                             $this->Session->write('message','Updated Successfully !');
                         }
-						//$this->set('appeal_status',$this->request->data['ReturnFromCourt']['appeal_status']);
-						if($this->request->data['ReturnFromCourt']['appeal_status']=='Completed')
-						{
-							$this->redirect('/prisoners/edit/'.$uuid.'/'.$return_id);
-						}
-						else{
-							$this->redirect('/courtattendances/index/'.$uuid.'#returnFromCourt');
-						}						
+                        //$this->set('appeal_status',$this->request->data['ReturnFromCourt']['appeal_status']);
+                        if($this->request->data['ReturnFromCourt']['appeal_status']=='Completed')
+                        {
+                            $this->redirect('/prisoners/edit/'.$uuid.'/'.$return_id);
+                        }
+                        else{
+                            $this->redirect('/courtattendances/index/'.$uuid.'#returnFromCourt');
+                        }                       
                         
                     }else{
                         $this->Session->write('message_type','error');
@@ -1090,120 +1091,120 @@ class CourtattendancesController  extends AppController {
                 }
                 $mentalcaseList=array("Yes"=>"Convicted","No"=>"Un-Convicted");
             /*return from court ends*/
-			
-			/* cause list date listing */
-			
-					
-			$cause_list_date = $this->Courtattendance->find('list',array(
-													'conditions'=>array(
-														'Courtattendance.authority_type'=>2,
-														'Courtattendance.uuid'=>$uuid,
-														'Courtattendance.prisoner_id' => $prisonerData['Prisoner']['id'],
-														'Courtattendance.prison_id'=> $this->Auth->user('prison_id'),
-														'Courtattendance.is_production_warrant'=>1,
-														),
-														'fields'=>array('Courtattendance.id','Courtattendance.cause_date'),
-														'order' =>array('Courtattendance.cause_date'=>'ASC')														
-														));
-			/* cause list date listing end */
-			
-			$caseTypeList =array(
+            
+            /* cause list date listing */
+            
+                    
+            $cause_list_date = $this->Courtattendance->find('list',array(
+                                                    'conditions'=>array(
+                                                        'Courtattendance.authority_type'=>2,
+                                                        'Courtattendance.uuid'=>$uuid,
+                                                        'Courtattendance.prisoner_id' => $prisonerData['Prisoner']['id'],
+                                                        'Courtattendance.prison_id'=> $this->Auth->user('prison_id'),
+                                                        'Courtattendance.is_production_warrant'=>1,
+                                                        ),
+                                                        'fields'=>array('Courtattendance.id','Courtattendance.cause_date'),
+                                                        'order' =>array('Courtattendance.cause_date'=>'ASC')                                                        
+                                                        ));
+            /* cause list date listing end */
+            
+            $caseTypeList =array(
                 '1'=>'Capital Case',
                 '2'=>'Petty Case'
             );
-			
-				 $caseStatusList =array(
-					'Mention'=>'Mention',
-					'Commitment'=>'Commitment',
-					'Hearing'=>'Hearing',
-					'Ruling'=>'Ruling',
-					'Defence'=>'Defence',
-					'Judgement'=>'Judgement',
-					'Sentencing'=>'Sentencing',
-					//'Case Ammended'=>'Case Ammended'
-				);
-			
-			/* for  commitment_date */
-			$this->loadModel('ReturnFromCourt');
-			$commit_date = $this->ReturnFromCourt->find('all', array(
-						'recursive'		=> -1,
-						'fields'		=> array(
-							'ReturnFromCourt.session_date',
-							'ReturnFromCourt.commitment_date',
-							'ReturnFromCourt.conviction_date',
-							'ReturnFromCourt.aquited_date',
-							'ReturnFromCourt.remark',
-						),
-						'conditions'	=> array(
-							'ReturnFromCourt.uuid'		=> $uuid,
-							'ReturnFromCourt.prison_id'		=> $this->Auth->user('prison_id'),
-							
-						),
-						'order'			=> array(
-							'ReturnFromCourt.id'=>'DESC'
-						),
-					));
-						
-			//debug($commit_date); exit;		
-			/* -- end ---*/
-			foreach($commit_date as $key => $vall)
-			{
-				if($vall['ReturnFromCourt']['commitment_date'] != '0000-00-00 00:00:00')
-				{
-					$commitdate = date('d-m-Y',strtotime($vall['ReturnFromCourt']['commitment_date'])); 
-				}
-				if($vall['ReturnFromCourt']['conviction_date'] != '0000-00-00 00:00:00')
-				{
-					$conviction_date = date('d-m-Y',strtotime($vall['ReturnFromCourt']['conviction_date'])); 
-				}
-				if($vall['ReturnFromCourt']['aquited_date'] != '0000-00-00 00:00:00')
-				{
-					$aquited_date = date('d-m-Y',strtotime($vall['ReturnFromCourt']['aquited_date'])); 
-				}
-				if($vall['ReturnFromCourt']['session_date'] != '0000-00-00 00:00:00')
-				{
-					$session_date = date('d-m-Y',strtotime($vall['ReturnFromCourt']['session_date'])); 
-				}
-				if($vall['ReturnFromCourt']['remark'] == '7')
-				{
-					$remark = $vall['ReturnFromCourt']['remark']; 
-				}
-				
-			}
-			
-			
-			$remarks = array(
-				'1'=>'Further remanded',
-				'2'=>'Released on Bond',
-				'3'=>'Granted Bail',
-				'4'=>'Adjourned to next session',
-				'5'=>'Case amended',
-				'6'=>'Noelle Presque',
-				'7'=>'Pending Minister Order',
-				'8'=>'Commitment',
-				'9'=>'Defence',
-				'10'=>'Acquitted',
-				'11'=>'Convicted',
-				'12'=>'Judgement differed',
-				'13'=>'Case Adjourned',
-				
-			);
-			
-					
-			
-				$this->set(array(
-					'uuid'					=> $uuid,
-					'courtList'				=> $courtList,
-					'magestrilareaList'		=> $magestrilareaList,
-					'offenceList'           => $offenceList,
-					'prisoner_id'           => $prisonerData['Prisoner']['id'],
-					'prison_id'          	=> $this->Auth->user('prison_id'),
-					'prisoner_no'           => $prisonerData['Prisoner']['prisoner_no'],
+            
+                 $caseStatusList =array(
+                    'Mention'=>'Mention',
+                    'Commitment'=>'Commitment',
+                    'Hearing'=>'Hearing',
+                    'Ruling'=>'Ruling',
+                    'Defence'=>'Defence',
+                    'Judgement'=>'Judgement',
+                    'Sentencing'=>'Sentencing',
+                    //'Case Ammended'=>'Case Ammended'
+                );
+            
+            /* for  commitment_date */
+            $this->loadModel('ReturnFromCourt');
+            $commit_date = $this->ReturnFromCourt->find('all', array(
+                        'recursive'     => -1,
+                        'fields'        => array(
+                            'ReturnFromCourt.session_date',
+                            'ReturnFromCourt.commitment_date',
+                            'ReturnFromCourt.conviction_date',
+                            'ReturnFromCourt.aquited_date',
+                            'ReturnFromCourt.remark',
+                        ),
+                        'conditions'    => array(
+                            'ReturnFromCourt.uuid'      => $uuid,
+                            'ReturnFromCourt.prison_id'     => $this->Auth->user('prison_id'),
+                            
+                        ),
+                        'order'         => array(
+                            'ReturnFromCourt.id'=>'DESC'
+                        ),
+                    ));
+                        
+            //debug($commit_date); exit;        
+            /* -- end ---*/
+            foreach($commit_date as $key => $vall)
+            {
+                if($vall['ReturnFromCourt']['commitment_date'] != '0000-00-00 00:00:00')
+                {
+                    $commitdate = date('d-m-Y',strtotime($vall['ReturnFromCourt']['commitment_date'])); 
+                }
+                if($vall['ReturnFromCourt']['conviction_date'] != '0000-00-00 00:00:00')
+                {
+                    $conviction_date = date('d-m-Y',strtotime($vall['ReturnFromCourt']['conviction_date'])); 
+                }
+                if($vall['ReturnFromCourt']['aquited_date'] != '0000-00-00 00:00:00')
+                {
+                    $aquited_date = date('d-m-Y',strtotime($vall['ReturnFromCourt']['aquited_date'])); 
+                }
+                if($vall['ReturnFromCourt']['session_date'] != '0000-00-00 00:00:00')
+                {
+                    $session_date = date('d-m-Y',strtotime($vall['ReturnFromCourt']['session_date'])); 
+                }
+                if($vall['ReturnFromCourt']['remark'] == '7')
+                {
+                    $remark = $vall['ReturnFromCourt']['remark']; 
+                }
+                
+            }
+            
+            
+            $remarks = array(
+                '1'=>'Further remanded',
+                '2'=>'Released on Bond',
+                '3'=>'Granted Bail',
+                '4'=>'Adjourned to next session',
+                '5'=>'Case amended',
+                '6'=>'Noelle Presque',
+                '7'=>'Pending Minister Order',
+                '8'=>'Commitment',
+                '9'=>'Defence',
+                '10'=>'Acquitted',
+                '11'=>'Convicted',
+                '12'=>'Judgement differed',
+                '13'=>'Case Adjourned',
+                
+            );
+            
+                    
+            
+                $this->set(array(
+                    'uuid'                  => $uuid,
+                    //'courtList'               => $courtList,
+                    'magestrilareaList'     => $magestrilareaList,
+                    'offenceList'           => $offenceList,
+                    'prisoner_id'           => $prisonerData['Prisoner']['id'],
+                    'prison_id'             => $this->Auth->user('prison_id'),
+                    'prisoner_no'           => $prisonerData['Prisoner']['prisoner_no'],
                     'magisterialList'       => $magisterialList,
 
                     'prisonerData'          =>$prisonerData,
 
-					'offencecountList'		=> $offencecountList,
+                    'offencecountList'      => $offencecountList,
                     //'causeList'             => $causeList,
                     'caseTypeList'          => $caseTypeList,
                     'caseStatusList'        => $caseStatusList,
@@ -1211,51 +1212,52 @@ class CourtattendancesController  extends AppController {
                     //'offenceIdList'      => $offenceIdList,
                    // 'remarksList'           => $remarksList,
                     'mentalcaseList'       => $mentalcaseList,
-					'offenceListarr' 		   => $offenceListarr,
-					'caseFileno'			=> $caseFileno,
-					'cause_list_date'		=> $cause_list_date,
-					'offenceListarrFromtab' => $offenceListarrFromtab,
-					'remarks'				=> $remarks,
-					'offenceCategory'		=> $offenceCategory,
-					'prisoner_type_id'		=> $prisonerData['Prisoner']['prisoner_type_id'],
-					'session_date'			=> @$session_date,
-					'conviction_date'		=> @$conviction_date,
-					'aquited_date'			=> @$aquited_date,
-					'commit_date'			=> @$commitdate,
-					'remark'			=> @$remark,
-					'offencess'=>@$offence_for_edit,
-					'remand_prisoner' => $remand_prisoner,
-					'fromcourtfile' => $fromcourtfile,
-					'casefilesToCourt'=>$casefilesToCourt,
+                    'offenceListarr'           => $offenceListarr,
+                    'caseFileno'            => $caseFileno,
+                    'cause_list_date'       => $cause_list_date,
+                    'offenceListarrFromtab' => $offenceListarrFromtab,
+                    'remarks'               => $remarks,
+                    'offenceCategory'       => $offenceCategory,
+                    'prisoner_type_id'      => $prisonerData['Prisoner']['prisoner_type_id'],
+                    'session_date'          => @$session_date,
+                    'conviction_date'       => @$conviction_date,
+                    'aquited_date'          => @$aquited_date,
+                    'commit_date'           => @$commitdate,
+                    'remark'            => @$remark,
+                    'offencess'=>@$offence_for_edit,
+
+                    'remand_prisoner' => $remand_prisoner,
+                    'fromcourtfile' => $fromcourtfile,
+                    'casefilesToCourt'=>$casefilesToCourt,
                     'courtLevelList'  =>$courtLevelList,
                     'courtList'       =>$courtList,
-					'appeal_cause_list'=>@$appeal_cause_list
-					
-					
-				));
-			}else{
-				return $this->redirect(array('controller'=>'prisoners', 'action' => 'index'));	
-			}
-		}else{
-			return $this->redirect(array('controller'=>'prisoners', 'action' => 'index'));	
-		}
+                    'appeal_cause_list'=>@$appeal_cause_list
+                    
+                    
+                ));
+            }else{
+                return $this->redirect(array('controller'=>'prisoners', 'action' => 'index'));  
+            }
+        }else{
+            return $this->redirect(array('controller'=>'prisoners', 'action' => 'index'));  
+        }
     }
-	
-	function showCourtName($id='')
-	{
-		 $this->autoRender = false;
-		   if(isset($id) && (int)$id != 0){
-				
-				 $this->loadModel('Court');
-				 $courtList = $this->Court->find('all', array(
+    
+    function showCourtName($id='')
+    {
+         $this->autoRender = false;
+           if(isset($id) && (int)$id != 0){
+                
+                 $this->loadModel('Court');
+                 $courtList = $this->Court->find('all', array(
                 'recursive'     => -1,
                 'conditions'=> array('Court.courtlevel_id' => $id),
                 'fields'        => array(
                     'Court.id,Court.name',
                 ),
             ));
-			
-			if(is_array($courtList) && count($courtList)>0){
+            
+            if(is_array($courtList) && count($courtList)>0){
                 echo '<option value="">-- Select court --</option>';
                 foreach($courtList as $courtKey=>$courtVal){
                     echo '<option value="'.$courtVal['Court']['id'].'">'.$courtVal['Court']['name'].'</option>';
@@ -1264,13 +1266,13 @@ class CourtattendancesController  extends AppController {
                 //echo "hwsafgcsh";
                 echo '<option value="">-- Select court --</option>';
             }
-			
-		   }
-		   else{
-				echo '<option value="">-- Select court --</option>';
-			}
-	}
-	
+            
+           }
+           else{
+                echo '<option value="">-- Select court --</option>';
+            }
+    }
+    
      public function showCount($id=''){
         $this->autoRender = false;
         if(isset($id) && (int)$id != 0){
@@ -1310,9 +1312,9 @@ class CourtattendancesController  extends AppController {
         }
     }
 
-	public function showCaseTypeReturn($id='',$prisoner_id=''){
+    public function showCaseTypeReturn($id='',$prisoner_id=''){
         $this->autoRender = false;
-		$casetype = '';
+        $casetype = '';
         if(isset($id) && (int)$id != 0){
            $condition = array();
             $this->loadModel('PrisonerOffence');
@@ -1325,8 +1327,8 @@ class CourtattendancesController  extends AppController {
                     'PrisonerOffence.offence_category_id',
                 ),
             ));
-			$this->loadModel('OffenceCategory');
-			$case_type = $this->OffenceCategory->find('list',array('conditions'=>array('OffenceCategory.is_enable'=>1)));
+            $this->loadModel('OffenceCategory');
+            $case_type = $this->OffenceCategory->find('list',array('conditions'=>array('OffenceCategory.is_enable'=>1)));
             
             if(is_array($offenceList) && count($offenceList)>0){
                 //echo '<option value="">--Select--</option>';
@@ -1337,20 +1339,20 @@ class CourtattendancesController  extends AppController {
                 //echo "hwsafgcsh";
                 $casetype .=  '<option value="">-- Select --</option>';
             }
-			
-			$this->loadModel('PrisonerSentenceAppeal');
-			$appealCount = $this->PrisonerSentenceAppeal->find('count',array(
-									'conditions'=>array('PrisonerSentenceAppeal.offence_id'=>$id),
-									
-								));
-			
+            
+            $this->loadModel('PrisonerSentenceAppeal');
+            $appealCount = $this->PrisonerSentenceAppeal->find('count',array(
+                                    'conditions'=>array('PrisonerSentenceAppeal.offence_id'=>$id),
+                                    
+                                ));
+            
         }else{
             $casetype .= '<option value="">-- Select --</option>';
         }
-		echo $casetype.'##'.$appealCount;
-		
-		
-    } 	
+        echo $casetype.'##'.$appealCount;
+        
+        
+    }   
     function getReturnFromCourt()
     {
         $this->autoRender = false;
@@ -1588,29 +1590,29 @@ class CourtattendancesController  extends AppController {
     }
   
    public function indexAjax(){
-		$this->loadModel('ApplicationToCourt');
-    	$this->layout 			= 'ajax';
-    	$condition 				= array(
-    		'ApplicationToCourt.is_trash'		=> 0,
+        $this->loadModel('ApplicationToCourt');
+        $this->layout           = 'ajax';
+        $condition              = array(
+            'ApplicationToCourt.is_trash'       => 0,
             'ApplicationToCourt.prison_id'     => $this->Session->read('Auth.User.prison_id'),
-			
-    	);
-		if(isset($this->params['named']['uuid']) && $this->params['named']['uuid'] != ''){
-    		$uuid = $this->params['named']['uuid'];
-			 $condition += array('ApplicationToCourt.uuid'	=> $uuid);
-			
-			
+            
+        );
+        if(isset($this->params['named']['uuid']) && $this->params['named']['uuid'] != ''){
+            $uuid = $this->params['named']['uuid'];
+             $condition += array('ApplicationToCourt.uuid'  => $uuid);
+            
+            
             $prisonerData = $this->Prisoner->find('first', array(
                 'recursive'     => -1,
                 'conditions'    => array(
                     'Prisoner.uuid'     => $uuid,
-					),
+                    ),
             ));
             $prisoner_id    = $prisonerData['Prisoner']['id'];
             $condition += array(
                 'ApplicationToCourt.prisoner_id'  => $prisoner_id,
             ); 
-    	}   	
+        }       
                        
         if(isset($this->data['ApplicationToCourt']) && is_array($this->data['ApplicationToCourt']) && count($this->data['ApplicationToCourt']) >0){
             
@@ -1645,13 +1647,13 @@ class CourtattendancesController  extends AppController {
             }
         }
 
-		 if(isset($this->data['ApplicationToCourtEdit']['id']) && (int)$this->data['ApplicationToCourtEdit']['id'] != 0){
+         if(isset($this->data['ApplicationToCourtEdit']['id']) && (int)$this->data['ApplicationToCourtEdit']['id'] != 0){
                     if($this->ApplicationToCourt->exists($this->data['ApplicationToCourtEdit']['id'])){
                         $this->data = $this->ApplicationToCourt->findById($this->data['ApplicationToCourtEdit']['id']);
-					}
+                    }
                 }
 
-		if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
+        if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='XLS'){
                 $this->layout='export_xls';
                 $this->set('file_type','xls');
@@ -1666,21 +1668,21 @@ class CourtattendancesController  extends AppController {
         }else{
             $limit = array('limit'  => 20);
         }   
-		
-		
-    	$this->paginate = array(
-    		'conditions'	=> $condition,
-    		'order'			=> array(
-    			'ApplicationToCourt.id'	=> 'DESC',
-    		),
-    	)+$limit;
-    	$datas = $this->paginate('ApplicationToCourt');
-    	$this->set(array(
-    		'uuid'						=> $uuid,
-    		'datas'						=> $datas,
-    		
-    		
-    	));     	      	    	    	    	
+        
+        
+        $this->paginate = array(
+            'conditions'    => $condition,
+            'order'         => array(
+                'ApplicationToCourt.id' => 'DESC',
+            ),
+        )+$limit;
+        $datas = $this->paginate('ApplicationToCourt');
+        $this->set(array(
+            'uuid'                      => $uuid,
+            'datas'                     => $datas,
+            
+            
+        ));                                         
     }
 
 
@@ -1727,7 +1729,7 @@ class CourtattendancesController  extends AppController {
             ),
         )+$limit;
         $datas = $this->paginate('ReturnFromCourt');
-		
+        
         $this->set(array(
             'uuid'                      => $uuid,
             'datas'                     => $datas,
@@ -1735,35 +1737,35 @@ class CourtattendancesController  extends AppController {
     }
     
     public function getCourtByMagisterial(){
-    	$this->autoRender = false;
-    	if(isset($this->data['magisterial_id']) && (int)$this->data['magisterial_id'] != 0){
-    		$courtList = $this->Court->find('list', array(
-    			'recursive'		=> -1,
-    			'fields'		=> array(
-    				'Court.id',
-    				'Court.name',
-    			),
-    			'conditions'	=> array(
-    				'Court.courtlevel_id'	=> $this->data['magisterial_id']
-    			),
-    			'order'			=> array(
-    				'Court.name',
-    			),
-    		));
-			
-			 
-			
-    		if(is_array($courtList) && count($courtList)>0){
-    			echo '<option value="">--Select Court--</option>';
-    			foreach($courtList as $key=>$val){
-    				echo '<option value="'.$key.'">'.$val.'</option>';
-    			}
-    		}else{
-    			echo '<option value="">--Select Court--</option>';
-    		}
-    	}else{
-    		echo '<option value="">--Select Court--</option>';
-    	}
+        $this->autoRender = false;
+        if(isset($this->data['magisterial_id']) && (int)$this->data['magisterial_id'] != 0){
+            $courtList = $this->Court->find('list', array(
+                'recursive'     => -1,
+                'fields'        => array(
+                    'Court.id',
+                    'Court.name',
+                ),
+                'conditions'    => array(
+                    'Court.courtlevel_id'   => $this->data['magisterial_id']
+                ),
+                'order'         => array(
+                    'Court.name',
+                ),
+            ));
+            
+             
+            
+            if(is_array($courtList) && count($courtList)>0){
+                echo '<option value="">--Select Court--</option>';
+                foreach($courtList as $key=>$val){
+                    echo '<option value="'.$key.'">'.$val.'</option>';
+                }
+            }else{
+                echo '<option value="">--Select Court--</option>';
+            }
+        }else{
+            echo '<option value="">--Select Court--</option>';
+        }
     }
     
     public function getCourtByCourtLevel(){
@@ -1855,36 +1857,36 @@ class CourtattendancesController  extends AppController {
         }
     }
     public function getCourtlvl(){
-    	$this->autoRender = false;
-    	if(isset($this->data['court_id']) && (int)$this->data['court_id'] != 0){
-    		$courtList = $this->Court->find('first', array(
-    			'recursive'		=> -1,
-    			'conditions'	=> array(
-    				'Court.id'	=> $this->data['court_id']
-    			),
-    		));
-    		$courtLevlList = $this->Courtlevel->find('first', array(
-    			'recursive'		=> -1,
-    			'conditions'	=> array(
-    				'Courtlevel.id'	=> $courtList["Court"]["courtlevel_id"]
-    			),
-    			
-    		));
-    		if(is_array($courtLevlList) && count($courtLevlList)>0){
-    			
-    				echo $courtLevlList["Courtlevel"]["name"];
-    			
-    		}else{
-    			echo '';
-    		}
-    	}else{
-    		echo '';
-    	}
+        $this->autoRender = false;
+        if(isset($this->data['court_id']) && (int)$this->data['court_id'] != 0){
+            $courtList = $this->Court->find('first', array(
+                'recursive'     => -1,
+                'conditions'    => array(
+                    'Court.id'  => $this->data['court_id']
+                ),
+            ));
+            $courtLevlList = $this->Courtlevel->find('first', array(
+                'recursive'     => -1,
+                'conditions'    => array(
+                    'Courtlevel.id' => $courtList["Court"]["courtlevel_id"]
+                ),
+                
+            ));
+            if(is_array($courtLevlList) && count($courtLevlList)>0){
+                
+                    echo $courtLevlList["Courtlevel"]["name"];
+                
+            }else{
+                echo '';
+            }
+        }else{
+            echo '';
+        }
     }
 
     public function courtscheduleGatepassList()
     {
-    	 $menuId = $this->getMenuId("/courtattendances/courtscheduleGatepassList");
+         $menuId = $this->getMenuId("/courtattendances/courtscheduleGatepassList");
                 $moduleId = $this->getModuleId("court_attendance");
                 $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
                 if($isAccess != 1){
@@ -2154,7 +2156,7 @@ class CourtattendancesController  extends AppController {
 
     public function courtsTrackList()
     {
-    	$menuId = $this->getMenuId("/courtattendances/courtsTrackList");
+        $menuId = $this->getMenuId("/courtattendances/courtsTrackList");
                 $moduleId = $this->getModuleId("court_attendance");
                 $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
                 if($isAccess != 1){
@@ -2190,7 +2192,7 @@ class CourtattendancesController  extends AppController {
                         'Magisterial.name',
                     ),
                 ));*/
-		$magestrilareaList=$this->Courtlevel->find('list',array(
+        $magestrilareaList=$this->Courtlevel->find('list',array(
                   'conditions'=>array(
                     'Courtlevel.is_enable'=>1,
                     'Courtlevel.is_trash'=>0,
@@ -2198,7 +2200,7 @@ class CourtattendancesController  extends AppController {
                   'order'=>array(
                     'Courtlevel.name'
                   )
-            ));		
+            ));     
 
         $this->loadModel('Prison');
         $prisonCondi = array();
@@ -2253,7 +2255,7 @@ class CourtattendancesController  extends AppController {
                 $condition += array('Prisoner.prison_id' => $prison_id );
             }
         }
-		
+        
          //debug($this->params['named']);
         if(isset($this->params['named']['magisterial_id']) && $this->params['named']['magisterial_id'] != ''){
             $magisterial_id = $this->params['named']['magisterial_id'];
@@ -2312,38 +2314,38 @@ class CourtattendancesController  extends AppController {
             $limit = array('limit'  => 20);
         }
 
-		
+        
         $this->paginate = array(
-		    'recursive' => -1,
+            'recursive' => -1,
             'conditions'    => $condition,
-			'joins'=>array(
-						   array(
-								'table'         => 'courtattendances',
-								'alias'         => 'Courtattendance',
-								'type'          => 'left',
-								'conditions'    => array('Prisoner.id = Courtattendance.prisoner_id')
-						),
-						array(
-							'table'         => 'return_from_courts',
-							'alias'         => 'returnFromCourt',
-							'type'          => 'left',
-							'conditions'    => array('Courtattendance.prisoner_id = returnFromCourt.prisoner_id')
-						),	
-			),		
+            'joins'=>array(
+                           array(
+                                'table'         => 'courtattendances',
+                                'alias'         => 'Courtattendance',
+                                'type'          => 'left',
+                                'conditions'    => array('Prisoner.id = Courtattendance.prisoner_id')
+                        ),
+                        array(
+                            'table'         => 'return_from_courts',
+                            'alias'         => 'returnFromCourt',
+                            'type'          => 'left',
+                            'conditions'    => array('Courtattendance.prisoner_id = returnFromCourt.prisoner_id')
+                        ),  
+            ),      
            'fields' => array(
                  'Prisoner.*',
                  'Courtattendance.*',                 
                  'ReturnFromCourt.case_status',
-				 'ReturnFromCourt.remark',
+                 'ReturnFromCourt.remark',
             ),   
             'order'         => array(
                 'Prisoner.prisoner_no'  => 'ASC',
             ),
         )+$limit;
-		
+        
         $datas = $this->paginate('Prisoner');
-		
-		//debug($datas);
+        
+        //debug($datas);
         $this->set(array(
             'datas'             => $datas,
             'prisoner_id'       => $prisoner_id,
@@ -2371,7 +2373,7 @@ class CourtattendancesController  extends AppController {
 
     public function courtsLoadReport()
     {
-    	$menuId = $this->getMenuId("/courtattendances/courtsLoadReport");
+        $menuId = $this->getMenuId("/courtattendances/courtsLoadReport");
                 $moduleId = $this->getModuleId("court_attendance");
                 $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
                 if($isAccess != 1){
@@ -2392,8 +2394,8 @@ class CourtattendancesController  extends AppController {
                     'Prisoner.prison_id'        => $this->Auth->user('prison_id')
                 ),
             ));
-			
-		$magestrilareaList=$this->Courtlevel->find('list',array(
+            
+        $magestrilareaList=$this->Courtlevel->find('list',array(
                   'conditions'=>array(
                     'Courtlevel.is_enable'=>1,
                     'Courtlevel.is_trash'=>0,
@@ -2401,7 +2403,7 @@ class CourtattendancesController  extends AppController {
                   'order'=>array(
                     'Courtlevel.name'
                   )
-            ));	
+            )); 
         /*$magestrilareaList = $this->Magisterial->find('list', array(
                     'recursive'     => -1,
                     'fields'        => array(
@@ -2451,9 +2453,9 @@ class CourtattendancesController  extends AppController {
         $court_id    = '';
         $attendance_date    = '';
         $status = '';
-		
-		$this->loadModel('Courtattendance');
-			
+        
+        $this->loadModel('Courtattendance');
+            
         $condition = array();
         $prison_id      = '';
         if($this->Session->read('Auth.User.prison_id')!=''){
@@ -2485,9 +2487,9 @@ class CourtattendancesController  extends AppController {
         //         'date(Courtattendance.attendance_date)'   => date("Y-m-d", strtotime($attendance_date)),
         //     );
         // }
-			
-			$condition += array('ReturnFromCourt.remark NOT IN (15,16,10,11,14,6)');
-		  
+            
+            $condition += array('ReturnFromCourt.remark NOT IN (15,16,10,11,14,6)');
+          
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='XLS'){
                 $this->layout='export_xls';
@@ -2510,33 +2512,33 @@ class CourtattendancesController  extends AppController {
             $limit = array('limit' => 2000,'maxLimit'   => 2000);
         } 
 
-		$this->Courtattendance->recursive = -1;	
-		 $this->paginate = array( 
-		        'joins' => array( 
-		        array( 
-	             'table' => 'return_from_courts', 
-	            'alias' => 'ReturnFromCourt', 
-	           'type' => 'left', 
-	            'conditions'=> array('ReturnFromCourt.prisoner_id = Courtattendance.prisoner_id')
+        $this->Courtattendance->recursive = -1; 
+         $this->paginate = array( 
+                'joins' => array( 
+                array( 
+                 'table' => 'return_from_courts', 
+                'alias' => 'ReturnFromCourt', 
+               'type' => 'left', 
+                'conditions'=> array('ReturnFromCourt.prisoner_id = Courtattendance.prisoner_id')
                )
             ),   
-			'fields'=>array('Courtattendance.id','Courtattendance.case_no','Courtattendance.court_level','Courtattendance.court_id'),
-			'conditions'=> $condition, 
-	        )+$limit;
-				 
-		
+            'fields'=>array('Courtattendance.id','Courtattendance.case_no','Courtattendance.court_level','Courtattendance.court_id'),
+            'conditions'=> $condition, 
+            )+$limit;
+                 
+        
        
         $datas = $this->paginate('Courtattendance');
-		
+        
         $finalData = array();
-		
+        
         if(isset($datas) && count($datas)>0){
             foreach ($datas as $key => $value) {
                 $finalData[$value['Courtattendance']['court_level']][$value['Courtattendance']['court_id']][] = $value['Courtattendance']['case_no'];
             }
         }
-		
-		
+        
+        
         $this->set(array(
             'datas'             => $finalData,
             'prisoner_id'       => $prisoner_id,
@@ -2550,7 +2552,7 @@ class CourtattendancesController  extends AppController {
 
     public function courtsTrackingReport()
     {
-    	 $menuId = $this->getMenuId("/courtattendances/courtsTrackingReport");
+         $menuId = $this->getMenuId("/courtattendances/courtsTrackingReport");
                 $moduleId = $this->getModuleId("court_attendance");
                 $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
                 if($isAccess != 1){
@@ -2593,7 +2595,7 @@ class CourtattendancesController  extends AppController {
     }
     public function stayListReport()
     {
-    	 $menuId = $this->getMenuId("/courtattendances/stayListReport");
+         $menuId = $this->getMenuId("/courtattendances/stayListReport");
                 $moduleId = $this->getModuleId("court_attendance");
                 $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
                 if($isAccess != 1){
@@ -2677,40 +2679,40 @@ class CourtattendancesController  extends AppController {
             $limit = array('limit'  => 20);
         }       
        
-		/*   $this->paginate = array(
+        /*   $this->paginate = array(
             'recursive'     => -1,
             'conditions'    => $condition,
             'order'         => array(
                 'Prisoner.modified'  => 'DESC',
             ),
         )+$limit;*/
-		
-		$this->paginate = array( 
-			'recursive'     => -1,
-			'joins' => array( 
-			array( 
-					'table' => 'prisoner_case_files', 
-					'alias' => 'PrisonerCaseFile', 
-					'type' => 'left', 
-					'conditions'=> array('PrisonerCaseFile.prisoner_id = Prisoner.id')
-		   ),
-		   array(
+        
+        $this->paginate = array( 
+            'recursive'     => -1,
+            'joins' => array( 
+            array( 
+                    'table' => 'prisoner_case_files', 
+                    'alias' => 'PrisonerCaseFile', 
+                    'type' => 'left', 
+                    'conditions'=> array('PrisonerCaseFile.prisoner_id = Prisoner.id')
+           ),
+           array(
                    'table' => 'prisoner_offences',
                    'alias' => 'PrisonerOffence',
                    'type' => 'LEFT',
                    'conditions' => array('PrisonerCaseFile.id = PrisonerOffence.prisoner_case_file_id')
-			),
-		   
-		),   
-		'conditions'=> $condition, 
-		'fields'=>array('Prisoner.*','PrisonerOffence.offence_category_id'),
-		)+$limit;
-				 
-		
-		
+            ),
+           
+        ),   
+        'conditions'=> $condition, 
+        'fields'=>array('Prisoner.*','PrisonerOffence.offence_category_id'),
+        )+$limit;
+                 
+        
+        
         $datas = $this->paginate('Prisoner');
-		//debug($datas); exit;
-				
+        //debug($datas); exit;
+                
         $this->set(array(
             'datas'             => $datas,
             'prisoner_id'       => $prisoner_id,
@@ -2763,7 +2765,7 @@ class CourtattendancesController  extends AppController {
             $limit = array('limit'  => 20);
         } 
 
-		
+        
         /*$this->paginate = array(
             'recursive'     => -1,
             'conditions'    => $condition,
@@ -2771,28 +2773,28 @@ class CourtattendancesController  extends AppController {
                 'Prisoner.modified'  => 'DESC',
             ),
         )+$limit;*/
-		
-		$this->paginate = array( 
-			'recursive'     => -1,
-			'joins' => array( 
-			array( 
-					'table' => 'prisoner_case_files', 
-					'alias' => 'PrisonerCaseFile', 
-					'type' => 'left', 
-					'conditions'=> array('PrisonerCaseFile.prisoner_id = Prisoner.id')
-		   ),
-		   array(
+        
+        $this->paginate = array( 
+            'recursive'     => -1,
+            'joins' => array( 
+            array( 
+                    'table' => 'prisoner_case_files', 
+                    'alias' => 'PrisonerCaseFile', 
+                    'type' => 'left', 
+                    'conditions'=> array('PrisonerCaseFile.prisoner_id = Prisoner.id')
+           ),
+           array(
                    'table' => 'prisoner_offences',
                    'alias' => 'PrisonerOffence',
                    'type' => 'LEFT',
                    'conditions' => array('PrisonerCaseFile.id = PrisonerOffence.prisoner_case_file_id')
-			),
-		   
-		),   
-		'conditions'=> $condition, 
-		'fields'=>array('Prisoner.*','PrisonerOffence.offence_category_id'),
-		)+$limit;
-		
+            ),
+           
+        ),   
+        'conditions'=> $condition, 
+        'fields'=>array('Prisoner.*','PrisonerOffence.offence_category_id'),
+        )+$limit;
+        
         $datas = $this->paginate('Prisoner');
         $this->set(array(
             'datas'             => $datas,
@@ -2805,7 +2807,7 @@ class CourtattendancesController  extends AppController {
     }
     public function courtsTrackingReportNew()
     {
-    	$menuId = $this->getMenuId("/courtattendances/courtsTrackingReportNew");
+        $menuId = $this->getMenuId("/courtattendances/courtsTrackingReportNew");
                 $moduleId = $this->getModuleId("court_attendance");
                 $isAccess = $this->isAccess($moduleId,$menuId,'is_view');
                 if($isAccess != 1){
@@ -2917,13 +2919,13 @@ class CourtattendancesController  extends AppController {
             'status'            => $status
         ));
     }
-	
-	public function saveFeedbackdetail()
-	{
-		$this->autoRender = false;
-		if(isset($this->params['named']) && !empty($this->params['named']))
-		{
-			$fields  = array(
+    
+    public function saveFeedbackdetail()
+    {
+        $this->autoRender = false;
+        if(isset($this->params['named']) && !empty($this->params['named']))
+        {
+            $fields  = array(
                 'ApplicationToCourt.court_feedback' => "'".$this->params['named']['feedback_status']."'",
                 'ApplicationToCourt.feedback_date'  => "'".date('Y-m-d',strtotime($this->params['named']['feedback_date']))."'",
             );
@@ -2931,191 +2933,204 @@ class CourtattendancesController  extends AppController {
             $conds   = array(
                 'ApplicationToCourt.id' => $this->params['named']['id'],
             );
-			
+            
             $this->loadModel('ApplicationToCourt'); 
             if($this->ApplicationToCourt->updateAll($fields, $conds))
-			{
-				echo '1';
-			}
-			else
-			{
-				echo '0';
-			}
-		}
-	}
-	
-	public function getCountOffence(){
-		
-		
+            {
+                echo '1';
+            }
+            else
+            {
+                echo '0';
+            }
+        }
+    }
+    
+    public function getCountOffence(){
+        
+        
 
-		$this->loadModel('PrisonerSentenceAppeal');
-		$this->loadModel('PrisonerSentence');
-		$this->autoRender = false;
-		$prisoner_case_file_id = $this->params['named']['prisoner_case_file_id'];
-		$offence_name = '';
-		$offence_count = '';
-		$case_file_id = '';
-		$offences = array();
-		$case_file_id_arr1 = '';
-		
-		$case_file_array = array();
-		$case_file_array1 = array();
-		$case_file_array2 = array();
-		$new_array = array();
-		$case_file_id_arr = array();
-		
+        $this->loadModel('PrisonerSentenceAppeal');
+        $this->loadModel('PrisonerSentence');
+        $this->autoRender = false;
+        $prisoner_case_file_id = $this->params['named']['prisoner_case_file_id'];
+        $offence_name = '';
+        $offence_count = '';
+        $case_file_id = '';
+        $offences = array();
+        $case_file_id_arr1 = '';
+        
+        $case_file_array = array();
+        $case_file_array1 = array();
+        $case_file_array2 = array();
+        $new_array = array();
+        $case_file_id_arr = array();
+        
         if(isset($prisoner_case_file_id) && (int)$prisoner_case_file_id != ''){
            $condition = array();
             $this->loadModel('PrisonerOffence');
             $prisoner_case_file_id = rtrim($prisoner_case_file_id,',');
-			$file_id = explode(',',$prisoner_case_file_id);
-			if(isset($file_id) && $file_id!='')
-			{
-				foreach($file_id as $value)
-				{
-					$case_file_id .= "'".$value."'".',';
-				}
-			}
-			
+            $file_id = explode(',',$prisoner_case_file_id);
+            if(isset($file_id) && $file_id!='')
+            {
+                foreach($file_id as $value)
+                {
+                    $case_file_id .= "'".$value."'".',';
+                }
+            }
+            
             $case_file_id = rtrim($case_file_id,',');
-			
-			
-			$sentenceAppeal = $this->PrisonerOffence->find('all',array(
-							'recursive' => -1,
-										'conditions'=>array(
-										'PrisonerOffence.prisoner_case_file_id IN ('. $case_file_id.')',
-										
-								),
-								'fields'=>array( 'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',)
-					));
-			
-			if(isset($sentenceAppeal) && count($sentenceAppeal) > 0)
-			{
-				foreach($sentenceAppeal as $keys => $vals)
-				{
-					array_push($offences,$vals['PrisonerOffence']['id']);
-				}
-				
-				
-				
-				$senerence_count = $this->PrisonerSentence->find('all',array(
-									'recursive' => -1,
-									'conditions' => array('PrisonerSentence.offence_id'=>$offences),
-									'fields' => array('PrisonerSentence.offence_id','PrisonerSentence.is_convicted','PrisonerSentence.wish_to_appeal','PrisonerSentence.waiting_for_confirmation'),
-				));
-				
-				
-				if(isset($senerence_count) && count($senerence_count) > 0)
-						{
-							foreach($senerence_count as $case_file_val)
-							{
-								if($case_file_val['PrisonerSentence']['is_convicted']==0)
-								{
-									array_push($new_array,  $case_file_val['PrisonerSentence']['offence_id']);
-									
-								}
-								if($case_file_val['PrisonerSentence']['is_convicted']==1)
-								{
-									if($case_file_val['PrisonerSentence']['waiting_for_confirmation']==1)
-									{
-										array_push($new_array,  $case_file_val['PrisonerSentence']['offence_id']);
-									}
-									if($case_file_val['PrisonerSentence']['wish_to_appeal']==1)
-									{
-										array_push($case_file_array1,  $case_file_val['PrisonerSentence']['offence_id']);
-									}
-									
-								}
-							}
-							
-							if($case_file_array1 != '')
-							{
-								
-								$sentenceAppeal = $this->PrisonerSentenceAppeal->find('all',array(
-											'recursive' => -1,
-														'conditions'=>array(
-														'PrisonerSentenceAppeal.appeal_status'=>'Cause List',
-														'PrisonerSentenceAppeal.offence_id'=> $case_file_array1,
-														//'PrisonerSentenceAppeal.prisoner_id' => $prisoner_id,
-												),
-												'fields'=>array('PrisonerSentenceAppeal.offence_id')
-									));
-									
-									foreach($sentenceAppeal as $sentval)
-									{
-										array_push($new_array,$sentval['PrisonerSentenceAppeal']['offence_id']);
-									}
-							}
-							
-							$new_array = array_values(array_merge($offences,$case_file_array,$case_file_array2,$case_file_id_arr));		
-									
-						}
-				
-				$offenceList = $this->PrisonerOffence->find('all', array(
-                'recursive'     => -1,
-                'conditions'=> array("PrisonerOffence.id" => $new_array),
-                'fields'        => array(
-                    'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
-                ),
-				));
-			
-			
-				if(isset($offenceList) && !empty($offenceList))
-				{
-					
-					foreach($offenceList as $offkey => $offval)
-					{
-						//$offence_name .= '<option value=""></value>';
-						 $offence_name .= '<option value="'.$offval['PrisonerOffence']['id'].'">'. $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")".'</option>';
-						
-					}
-				}
-				else
-				{
-					$offence_name = '';
-					
-				}
-			
-						
-			$appealCount = $this->PrisonerSentenceAppeal->find('count',array(
-									'conditions'=>array('PrisonerSentenceAppeal.case_file_id'=>$prisoner_case_file_id),
-									
-									
-								));
-			}
+            
+            
+            $sentenceAppeal = $this->PrisonerOffence->find('all',array(
+                            'recursive' => -1,
+                                        'conditions'=>array(
+                                        'PrisonerOffence.prisoner_case_file_id IN ('. $case_file_id.')',
+                                        
+                                ),
+                                'fields'=>array( 'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',)
+                    ));
+            
+            if(isset($sentenceAppeal) && count($sentenceAppeal) > 0)
+            {
+                foreach($sentenceAppeal as $keys => $vals)
+                {
+                    array_push($offences,$vals['PrisonerOffence']['id']);
+                }
+                
+                //debug($offences); exit;   
+                
+                $senerence_count = $this->PrisonerSentence->find('all',array(
+                                    'recursive' => -1,
+                                    'conditions' => array('PrisonerSentence.offence_id'=>$offences),
+                                    'fields' => array('PrisonerSentence.offence_id','PrisonerSentence.is_convicted','PrisonerSentence.wish_to_appeal','PrisonerSentence.waiting_for_confirmation'),
+                ));
+                
+                
+                if(isset($senerence_count) && count($senerence_count) > 0)
+                        {
+                            foreach($senerence_count as $case_file_val)
+                            {
+                                if($case_file_val['PrisonerSentence']['is_convicted']==0)
+                                {
+                                    array_push($new_array,  $case_file_val['PrisonerSentence']['offence_id']);
+                                    
+                                }
+                                if($case_file_val['PrisonerSentence']['is_convicted']==1)
+                                {
+                                    if($case_file_val['PrisonerSentence']['waiting_for_confirmation']==1)
+                                    {
+                                        array_push($new_array,  $case_file_val['PrisonerSentence']['offence_id']);
+                                    }
+                                    if($case_file_val['PrisonerSentence']['wish_to_appeal']==1)
+                                    {
+                                        array_push($case_file_array1,  $case_file_val['PrisonerSentence']['offence_id']);
+                                    }
+                                    
+                                }
+                            }
+                            
+                            if($case_file_array1 != '')
+                            {
+                                
+                                $sentenceAppeal = $this->PrisonerSentenceAppeal->find('all',array(
+                                            'recursive' => -1,
+                                                        'conditions'=>array(
+                                                        'PrisonerSentenceAppeal.appeal_status'=>'Cause List',
+                                                        'PrisonerSentenceAppeal.offence_id'=> $case_file_array1,
+                                                        //'PrisonerSentenceAppeal.prisoner_id' => $prisoner_id,
+                                                ),
+                                                'fields'=>array('PrisonerSentenceAppeal.offence_id')
+                                    ));
+                                    
+                                    foreach($sentenceAppeal as $sentval)
+                                    {
+                                        array_push($new_array,$sentval['PrisonerSentenceAppeal']['offence_id']);
+                                    }
+                            }
+                            
+                            $new_array = array_values(array_merge($offences,$case_file_array,$case_file_array2,$case_file_id_arr));     
+                                    
+                        }
+                        else{
+                            $new_array = $offences;
+                        }
+                        
+                    
+                if(count($new_array) > 0)
+                {
+                    $offenceList = $this->PrisonerOffence->find('all', array(
+                    'recursive'     => -1,
+                    'conditions'=> array("PrisonerOffence.id" => $new_array),
+                    'fields'        => array(
+                        'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
+                    ),
+                    ));
+                }
+                
+                
+            
+            
+                if(isset($offenceList) && !empty($offenceList))
+                {
+                    
+                    foreach($offenceList as $offkey => $offval)
+                    {
+                        //$offence_name .= '<option value=""></value>';
+                         $offence_name .= '<option value="'.$offval['PrisonerOffence']['id'].'">'. $this->getName($offval['PrisonerOffence']['offence'],'Offence','name')."(".$offval['PrisonerOffence']['offence_no'].")".'</option>';
+                        
+                    }
+                }
+                else
+                {
+                    $offence_name = '';
+                    
+                }
+            
+                        
+            $appealCount = $this->PrisonerSentenceAppeal->find('count',array(
+                                    'conditions'=>array('PrisonerSentenceAppeal.case_file_id'=>$prisoner_case_file_id),
+                                    
+                                    
+                                ));
+            }
+            else
+            {
+                
+            }
 
         }
-		else
-		{
+        else
+        {
            $offence_name = '';
         }
-		
-		echo rtrim($offence_name,',').'##'.'0'.'##'.@$appealCount;
-	}
-	
-	public function getFromCourtOffence(){
-		
-		$this->autoRender = false;
-		$prisoner_case_file_id = $this->params['named']['prisoner_case_file_id'];
-		$prisoner_id = $this->params['named']['prisoner_id'];
-		$uuid = $this->params['named']['uuid'];
-		
-		$offence_name = '';
-		$offence_count = '';
-		$case_file_id = '';
+        
+        echo rtrim($offence_name,',').'##'.'0'.'##'.@$appealCount;
+    }
+    
+    public function getFromCourtOffence(){
+        
+        $this->autoRender = false;
+        $prisoner_case_file_id = $this->params['named']['prisoner_case_file_id'];
+        $prisoner_id = $this->params['named']['prisoner_id'];
+        $uuid = $this->params['named']['uuid'];
+        
+        $offence_name = '';
+        $offence_count = '';
+        $case_file_id = '';
         if(isset($prisoner_case_file_id) && (int)$prisoner_case_file_id != ''){
            $condition = array();
             $this->loadModel('PrisonerOffence');
             $prisoner_case_file_id = rtrim($prisoner_case_file_id,',');
-			$file_id = explode(',',$prisoner_case_file_id);
-			if(isset($file_id) && count($file_id) > 0)
-			{
-				foreach($file_id as $value)
-				{
-					$case_file_id .= "'".$value."'".',';
-				}
-			}
-			
+            $file_id = explode(',',$prisoner_case_file_id);
+            if(isset($file_id) && count($file_id) > 0)
+            {
+                foreach($file_id as $value)
+                {
+                    $case_file_id .= "'".$value."'".',';
+                }
+            }
+            
             $case_file_id = rtrim($case_file_id,',');
             /*$offenceList = $this->PrisonerOffence->find('all', array(
                 'recursive'     => -1,
@@ -3124,88 +3139,89 @@ class CourtattendancesController  extends AppController {
                     'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
                 ),
             ));
-			
-			$newarr = array();
-			foreach($offenceList as $nkey => $nval)
-			{
-				$newarr[$nval['PrisonerOffence']['offence']][$nval['PrisonerOffence']['offence_no']] = $nval['PrisonerOffence']['id'];
-			}
-			*/
-			
-			
-			$offencecountList = $this->Courtattendance->find('all', array(
+            
+            $newarr = array();
+            foreach($offenceList as $nkey => $nval)
+            {
+                $newarr[$nval['PrisonerOffence']['offence']][$nval['PrisonerOffence']['offence_no']] = $nval['PrisonerOffence']['id'];
+            }
+            */
+            
+            
+            $offencecountList = $this->Courtattendance->find('all', array(
                 'recursive'     => -1,
-				'conditions'=> array("Courtattendance.case_no IN (". $case_file_id ." ) AND Courtattendance.prisoner_id = ".$prisoner_id." AND Courtattendance.uuid = '".$uuid."' AND Courtattendance.status = 'Approved' AND Courtattendance.court_date = '".date('Y-m-d')."' "),
+                'conditions'=> array("Courtattendance.case_no IN (". $case_file_id ." ) AND Courtattendance.prisoner_id = ".$prisoner_id." AND Courtattendance.uuid = '".$uuid."' AND Courtattendance.status = 'Approved'"),
                 'fields'        => array('Courtattendance.id','Courtattendance.offence_id'),
             ));
-			
-			$offence_count = '';
-			$to_court_id = '';
-			
-			if(count($offencecountList) > 0)
-			{
-					$offenceList = $this->PrisonerOffence->find('all', array(
-					'recursive'     => -1,
-					'conditions'=> array("PrisonerOffence.id IN (". $offencecountList[0]['Courtattendance']['offence_id'] ." ) "),
-					'fields'        => array(
-						'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
-					),
-				));
-				
-				if(count($offenceList) > 0)
-				{
-						foreach($offenceList as $offkey => $offval)
-						{	
-							$offence_count .= '<option value="'.$offval['PrisonerOffence']['id'].'">'.$this->getName($offval['PrisonerOffence']['offence'],'Offence','name').'-'.$offval['PrisonerOffence']['offence_no'].'</option>';									
-						}
-				}
-				else
-				{
-					$offence_count = '';
-					
-				}
-				
-			}
-			
-		
-			$this->loadModel('PrisonerSentenceAppeal');
-			$appealCount = $this->PrisonerSentenceAppeal->find('count',array(
-									'conditions'=>array('PrisonerSentenceAppeal.case_file_id'=>$prisoner_case_file_id),
-									
-								));
+            
+            $offence_count = '';
+            $to_court_id = '';
+            
+            if(count($offencecountList) > 0)
+            {
+                    $offenceList = $this->PrisonerOffence->find('all', array(
+                    'recursive'     => -1,
+                    'conditions'=> array("PrisonerOffence.id IN (". $offencecountList[0]['Courtattendance']['offence_id'] ." ) "),
+                    'fields'        => array(
+                        'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
+                    ),
+                ));
+                
+                $offence_count .= '<option value=""></option>';
+                if(count($offenceList) > 0)
+                {
+                        foreach($offenceList as $offkey => $offval)
+                        {   
+                            $offence_count .= '<option value="'.$offval['PrisonerOffence']['id'].'">'.$this->getName($offval['PrisonerOffence']['offence'],'Offence','name').'-'.$offval['PrisonerOffence']['offence_no'].'</option>';                                  
+                        }
+                }
+                else
+                {
+                    $offence_count = '';
+                    
+                }
+                
+            }
+            
+        
+            $this->loadModel('PrisonerSentenceAppeal');
+            $appealCount = $this->PrisonerSentenceAppeal->find('count',array(
+                                    'conditions'=>array('PrisonerSentenceAppeal.case_file_id'=>$prisoner_case_file_id),
+                                    
+                                ));
             
         }
-		else
-		{
+        else
+        {
            
         }
-		
-		echo rtrim($offence_count,',').'##'.@$appealCount.'##'.$to_court_id;
-	}
-	
-	public function getNormalSchedule(){
+        
+        echo rtrim($offence_count,',').'##'.@$appealCount.'##'.$to_court_id;
+    }
+    
+    public function getNormalSchedule(){
         $this->layout           = 'ajax';
         $uuid                   = '';
-		$auth_type 				= '';
-		$this->loadModel('Courtattendance');
-		
+        $auth_type              = '';
+        $this->loadModel('Courtattendance');
+        
         $condition              = array(
                 'Courtattendance.prison_id'     => $this->Session->read('Auth.User.prison_id')
         );
         
         if(isset($this->params['named']['uuid']) && $this->params['named']['uuid'] != ''){
             $uuid = $this->params['named']['uuid'];
-			$condition += array('Courtattendance.uuid'=>$uuid);
-		}
-		
-		if(isset($this->params['named']['authority_type']) && $this->params['named']['authority_type'] != '' && $this->params['named']['authority_type'] != 'undefined'){
-            $authority_type = $this->params['named']['authority_type'];			
-			$condition += array('Courtattendance.authority_type'=>1);
-		}
-		else{
-			$authority_type = $this->params['named']['authority_type'];			
-			$condition += array('Courtattendance.authority_type'=>array(1,2,3));
-		}	
+            $condition += array('Courtattendance.uuid'=>$uuid);
+        }
+        
+        if(isset($this->params['named']['authority_type']) && $this->params['named']['authority_type'] != '' && $this->params['named']['authority_type'] != 'undefined'){
+            $authority_type = $this->params['named']['authority_type'];         
+            $condition += array('Courtattendance.authority_type'=>1);
+        }
+        else{
+            $authority_type = $this->params['named']['authority_type'];         
+            $condition += array('Courtattendance.authority_type'=>array(1,2,3));
+        }   
        
        // debug($condition);     
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
@@ -3230,28 +3246,28 @@ class CourtattendancesController  extends AppController {
             ),
         )+$limit;
         $datas = $this->paginate('Courtattendance');
-		//debug($datas); exit;
+        //debug($datas); exit;
         $this->set(array(
             'uuid'                      => $uuid,
             'datas'                     => $datas,
         ));                                         
     }
-	
-	public function getTocourtListData(){
+    
+    public function getTocourtListData(){
         $this->layout           = 'ajax';
         $uuid                   = '';
-		$auth_type 				= '';
-		$this->loadModel('Courtattendance');
-		
+        $auth_type              = '';
+        $this->loadModel('Courtattendance');
+        
         $condition              = array(
                 'Courtattendance.prison_id'     => $this->Session->read('Auth.User.prison_id')
         );
         
         if(isset($this->params['named']['uuid']) && $this->params['named']['uuid'] != ''){
             $uuid = $this->params['named']['uuid'];
-			$condition += array('Courtattendance.uuid'=>$uuid);
-		}
-		
+            $condition += array('Courtattendance.uuid'=>$uuid);
+        }
+        
        
        // debug($condition);     
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
@@ -3276,14 +3292,14 @@ class CourtattendancesController  extends AppController {
             ),
         )+$limit;
         $datas = $this->paginate('Courtattendance');
-		//debug($datas); exit;
+        //debug($datas); exit;
         $this->set(array(
             'uuid'                      => $uuid,
             'datas'                     => $datas,
         ));                                         
     }
-	
-	 public function indexCauseAjax(){
+    
+     public function indexCauseAjax(){
         $this->layout           = 'ajax';
        // $production_warrent_no  = '';
         //$attendance_date        = '';
@@ -3292,24 +3308,24 @@ class CourtattendancesController  extends AppController {
        // $court_id               = '';
        // $case_no                = '';
         $uuid                   = '';
-		$auth_type 				= '';
-		
-		$this->loadModel('Courtattendance');
-		
+        $auth_type              = '';
+        
+        $this->loadModel('Courtattendance');
+        
         $condition              = array(
                 'Courtattendance.prison_id'     => $this->Session->read('Auth.User.prison_id')
         );
         
         if(isset($this->params['named']['uuid']) && $this->params['named']['uuid'] != ''){
             $uuid = $this->params['named']['uuid'];
-			$condition += array('Courtattendance.uuid'=>$uuid);
-		}
-		
-		if(isset($this->params['named']['authority_type']) && $this->params['named']['authority_type'] != ''){
+            $condition += array('Courtattendance.uuid'=>$uuid);
+        }
+        
+        if(isset($this->params['named']['authority_type']) && $this->params['named']['authority_type'] != ''){
             $authority_type = $this->params['named']['authority_type'];
-			$condition += array('Courtattendance.authority_type'=>$authority_type);
-		}
-		
+            $condition += array('Courtattendance.authority_type'=>$authority_type);
+        }
+        
        
              
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
@@ -3334,35 +3350,35 @@ class CourtattendancesController  extends AppController {
             ),
         )+$limit;
         $datas = $this->paginate('Courtattendance');
-		//debug($datas); exit;
+        //debug($datas); exit;
         $this->set(array(
             'uuid'                      => $uuid,
             'datas'                     => $datas,
         ));                                         
     }
-	
-	 public function getProductionWarrant(){
+    
+     public function getProductionWarrant(){
         $this->layout           = 'ajax';
       
         $uuid                   = '';
-		$auth_type 				= '';
-		
-		$this->loadModel('Courtattendance');
-		
+        $auth_type              = '';
+        
+        $this->loadModel('Courtattendance');
+        
         $condition              = array(
                 'Courtattendance.prison_id'     => $this->Session->read('Auth.User.prison_id')
         );
         
         if(isset($this->params['named']['uuid']) && $this->params['named']['uuid'] != ''){
             $uuid = $this->params['named']['uuid'];
-			$condition += array('Courtattendance.uuid'=>$uuid);
-		}
-		
-		if(isset($this->params['named']['authority_type']) && $this->params['named']['authority_type'] != ''){
+            $condition += array('Courtattendance.uuid'=>$uuid);
+        }
+        
+        if(isset($this->params['named']['authority_type']) && $this->params['named']['authority_type'] != ''){
             $authority_type = $this->params['named']['authority_type'];
-			$condition += array('Courtattendance.authority_type'=>$authority_type);
-		}
-		
+            $condition += array('Courtattendance.authority_type'=>$authority_type);
+        }
+        
        
              
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
@@ -3387,93 +3403,93 @@ class CourtattendancesController  extends AppController {
             ),
         )+$limit;
         $datas = $this->paginate('Courtattendance');
-		//debug($datas); exit;
+        //debug($datas); exit;
         $this->set(array(
             'uuid'                      => $uuid,
             'datas'                     => $datas,
         ));                                         
     }
-	public function getfromCauselistdata()
-	{
-		 $this->autoRender           = false;
+    public function getfromCauselistdata()
+    {
+         $this->autoRender           = false;
       
         
-		$this->loadModel('Courtattendance');
-		$condition = array();
+        $this->loadModel('Courtattendance');
+        $condition = array();
        
         if(isset($this->params['named']['uuid']) && $this->params['named']['uuid'] != ''){
             $uuid = $this->params['named']['uuid'];
-			$condition += array('Courtattendance.uuid'=>$uuid);
-		}
-		
-		if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != ''){
+            $condition += array('Courtattendance.uuid'=>$uuid);
+        }
+        
+        if(isset($this->params['named']['prison_id']) && $this->params['named']['prison_id'] != ''){
             $prison_id = $this->params['named']['prison_id'];
-			$condition += array('Courtattendance.prison_id'=>$prison_id);
-		}
-		
-		if(isset($this->params['named']['prisoner_id']) && $this->params['named']['prisoner_id'] != ''){
+            $condition += array('Courtattendance.prison_id'=>$prison_id);
+        }
+        
+        if(isset($this->params['named']['prisoner_id']) && $this->params['named']['prisoner_id'] != ''){
             $prisoner_id = $this->params['named']['prisoner_id'];
-			$condition += array('Courtattendance.prison_id'=>$prisoner_id);
-		}
+            $condition += array('Courtattendance.prison_id'=>$prisoner_id);
+        }
              
         $condition += array('Courtattendance.is_production_warrant'=>1);
-		$this->Courtattendance->recursive = -1;
+        $this->Courtattendance->recursive = -1;
         $datas = $this->Courtattendance->find('first',array(
             'conditions'    => $condition,
             
         ));
        if(isset($datas) && count($datas) > 0)
-	   {
-		   $file_no = $datas['Courtattendance']['case_no'];
-		   $offence = $datas['Courtattendance']['offence_id'];
-		   $court_id = $datas['Courtattendance']['court_id'];
-		   $court_level = $datas['Courtattendance']['court_level'];
-		   $court_file_no = $datas['Courtattendance']['court_file_no'];
-		   $high_court_file_no = $datas['Courtattendance']['high_court_file_no'];
-		  $jsonarr = array(
-			'file_no' => $file_no,
-			'offence' => $offence,
-			'court_id' => $court_id,
-			'court_level' => $court_level,
-			'court_file_no' => $court_file_no,
-			'high_court_file_no' => $high_court_file_no
-		  );
-		  
-		  echo json_encode($jsonarr);
-	   }
-			
-	   else
-	   {
-		    echo '';
-	   }
-		  
+       {
+           $file_no = $datas['Courtattendance']['case_no'];
+           $offence = $datas['Courtattendance']['offence_id'];
+           $court_id = $datas['Courtattendance']['court_id'];
+           $court_level = $datas['Courtattendance']['court_level'];
+           $court_file_no = $datas['Courtattendance']['court_file_no'];
+           $high_court_file_no = $datas['Courtattendance']['high_court_file_no'];
+          $jsonarr = array(
+            'file_no' => $file_no,
+            'offence' => $offence,
+            'court_id' => $court_id,
+            'court_level' => $court_level,
+            'court_file_no' => $court_file_no,
+            'high_court_file_no' => $high_court_file_no
+          );
+          
+          echo json_encode($jsonarr);
+       }
+            
+       else
+       {
+            echo '';
+       }
+          
                                               
-	}
-	
-	function getMultivalue($value,$model,$column = 'title')
-	{
-		$this->loadModel($model);
-		$values = explode(',',$value);
-		$data = $this->$model->find('all',array('conditions'=>array($model.'.id'=>$values)));
-		
-		$name = '';
+    }
+    
+    function getMultivalue($value,$model,$column = 'title')
+    {
+        $this->loadModel($model);
+        $values = explode(',',$value);
+        $data = $this->$model->find('all',array('conditions'=>array($model.'.id'=>$values)));
+        
+        $name = '';
         if(isset($data) && !empty($data)){
-			foreach($data as $val)
-			{
-				$name .= $val[$model][$column].',';
-			}
-			
+            foreach($data as $val)
+            {
+                $name .= $val[$model][$column].',';
+            }
+            
             return rtrim($name,',');
         }else{
             return "";
         }
-		
-	}
-	function getFileNo($value)
-	{
-		$this->loadModel('PrisonerCaseFile');
-		
-		
+        
+    }
+    function getFileNo($value)
+    {
+        $this->loadModel('PrisonerCaseFile');
+        
+        
            $offenceList = $this->PrisonerCaseFile->find('all', array(
                 'recursive'     => -1,
                 'conditions'=> array("PrisonerCaseFile.id IN (". $value ." ) "),
@@ -3481,64 +3497,64 @@ class CourtattendancesController  extends AppController {
                     'PrisonerCaseFile.file_no',
                 ),
             ));
-		
-		
-		
-		$name = '';
+        
+        
+        
+        $name = '';
         if(isset($offenceList) && !empty($offenceList)){
-			foreach($offenceList as $val)
-			{
-				$name .= $val['PrisonerCaseFile']['file_no'].',';
-			}
-			
+            foreach($offenceList as $val)
+            {
+                $name .= $val['PrisonerCaseFile']['file_no'].',';
+            }
+            
             return rtrim($name,',');
         }else{
             return "";
         }
-		
-	}
-	 function getOffenceNameListing($id){
+        
+    }
+     function getOffenceNameListing($id){
         $this->loadModel('PrisonerOffence');
        
             $offenceList = $this->PrisonerOffence->find('all', array(
                 'recursive'     => -1,
-				'joins'=>array(
-								array(
-									'table' => 'prisoner_case_files',
-									'alias' => 'PrisonerCaseFile',
-									'type' => 'left',
-									'foreignKey' => false,
-									'conditions'=> array(
-									'PrisonerCaseFile.case_file_no = PrisonerOffence.prisoner_case_file_id',
-									),
-							),
-				),
+                'joins'=>array(
+                                array(
+                                    'table' => 'prisoner_case_files',
+                                    'alias' => 'PrisonerCaseFile',
+                                    'type' => 'left',
+                                    'foreignKey' => false,
+                                    'conditions'=> array(
+                                    'PrisonerCaseFile.case_file_no = PrisonerOffence.prisoner_case_file_id',
+                                    ),
+                            ),
+                ),
                 'conditions'=> array("PrisonerOffence.prisoner_case_file_id IN (". $id ." ) "),
                 'fields'        => array(
                     'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
                 ),
             ));
-			
-			
-			$offence_name = '';
-			if(isset($offenceList) && !empty($offenceList))
-			{
-				
-				foreach($offenceList as $offkey => $offval)
-				{
-					$offence_name .= $this->getName($offval['PrisonerOffence']['offence'],'Offence','name').',';
-					
-				}
-				 return rtrim($offence_name,',');
-			}else{
+            
+            
+            $offence_name = '';
+            if(isset($offenceList) && !empty($offenceList))
+            {
+                
+                foreach($offenceList as $offkey => $offval)
+                {
+                    $offence_name .= $this->getName($offval['PrisonerOffence']['offence'],'Offence','name').',';
+                    
+                }
+                 return rtrim($offence_name,',');
+            }else{
             return "";
         }
     }
-	
-	 function getOffenceNameViewListing($id){
+    
+     function getOffenceNameViewListing($id){
         $this->loadModel('PrisonerOffence');
-       	   
-	   
+           
+       
            /* $offenceList = $this->PrisonerOffence->find('all', array(
                 'recursive'     => -1,
                 'conditions'=> array("PrisonerOffence.prisoner_case_file_id IN (". $id ." ) "),
@@ -3546,45 +3562,45 @@ class CourtattendancesController  extends AppController {
                     'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',
                 ),
             ));*/
-			
-		
-			
-		$offenceList = $this->PrisonerOffence->find('all', array(
-			'recursive'     => -1,
-			'joins' => array(
-								array(
-									'table' => 'offences',
-									'alias' => 'Offence',
-									'type' => 'left',
-									'foreignKey' => false,
-									'conditions'=> array(
-											'Offence.id = PrisonerOffence.offence',
-									),
-								
-						),
-						),
-		'fields'=>array( 'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',),
-			'conditions'=>array("PrisonerOffence.id IN (". $id ." ) "),
-		)); 
-			
-			$offence_name = '';
-			if(isset($offenceList) && !empty($offenceList))
-			{
-				
-				foreach($offenceList as $offkey => $offval)
-				{
-					$offence_name .= $this->getName($offval['PrisonerOffence']['offence'],'Offence','name').',';
-					
-				}
-				 return rtrim($offence_name,',');
-			}
-			else
-			{
-				return "";
-			}
+            
+        
+            
+        $offenceList = $this->PrisonerOffence->find('all', array(
+            'recursive'     => -1,
+            'joins' => array(
+                                array(
+                                    'table' => 'offences',
+                                    'alias' => 'Offence',
+                                    'type' => 'left',
+                                    'foreignKey' => false,
+                                    'conditions'=> array(
+                                            'Offence.id = PrisonerOffence.offence',
+                                    ),
+                                
+                        ),
+                        ),
+        'fields'=>array( 'PrisonerOffence.id','PrisonerOffence.offence','PrisonerOffence.offence_no',),
+            'conditions'=>array("PrisonerOffence.id IN (". $id ." ) "),
+        )); 
+            
+            $offence_name = '';
+            if(isset($offenceList) && !empty($offenceList))
+            {
+                
+                foreach($offenceList as $offkey => $offval)
+                {
+                    $offence_name .= $this->getName($offval['PrisonerOffence']['offence'],'Offence','name').',';
+                    
+                }
+                 return rtrim($offence_name,',');
+            }
+            else
+            {
+                return "";
+            }
     }
-	
-	public function approveAll() {
+    
+    public function approveAll() {
         $this->autoRender = false;
         $this->loadModel('ReturnFromCourt');
         if (isset($this->params['named']['id']) && $this->params['named']['id'] != '') {
@@ -3602,204 +3618,204 @@ class CourtattendancesController  extends AppController {
             }
         }
     }
-	
-	public function getTocourtFileNo($prisoner_id='',$sentene_type='')
-	{
-		$this->loadModel('PrisonerCaseFile');
-		$this->loadModel('PrisonerSentenceAppeal');
-		
-		$case_files = $this->PrisonerCaseFile->find('all', array(
-			'recursive'     => -1,
-			'joins' => array(
-								array(
-									'table' => 'prisoner_sentences',
-									'alias' => 'PrisonerSentence',
-									'type' => 'left',
-									'foreignKey' => false,
-									'conditions'=> array(
-											'PrisonerSentence.case_id = PrisonerCaseFile.case_file_no',
-									),
-									
-								),
-								/*array(
-									'table' => 'courtattendances',
-									'alias' => 'Courtattendance',
-									'type' => 'left',
-									'foreignKey' => false,
-									'conditions'=> array(
-											'Courtattendance.case_no = PrisonerSentence.case_id',
-									),
-								)*/		
-						),
-		'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no','PrisonerSentence.sentence_type','PrisonerSentence.is_convicted','PrisonerSentence.wish_to_appeal','PrisonerSentence.waiting_for_confirmation'),
-			'conditions'=>array('PrisonerCaseFile.prisoner_id'=>$prisoner_id),
-		)); 
-		
-		//$this->PrisonerCaseFile->recursive = -1;
-		/*$case_files = $this->PrisonerCaseFile->find('all', array(
-			'joins' => array(
-								array(
-									'table' => 'prisoner_sentences',
-									'alias' => 'PrisonerSentence',
-									'type' => 'left',
-									'foreignKey' => false,
-									'conditions'=> array(
-											'PrisonerSentence.case_id = PrisonerCaseFile.id',
-									),
-									
-								)			
-						),
-		'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no','PrisonerSentence.sentence_type'),
-			'conditions'=>array('PrisonerCaseFile.prisoner_id'=>$prisoner_id),
-		)); */
-		//debug($case_files);
-		$case_file_array = array();
-		$case_file_array1 = array();
-		$case_file_array2 = array();
-		$case_file_id_arr = array();
-		$new_array = array();
-		$case_file_id = '';
-		$case_file_id1 = '';
-		if(isset($case_files) && $case_files != '')
-		{
-			foreach($case_files as $case_file_val)
-			{
-				if($case_file_val['PrisonerSentence']['is_convicted']==0)
-				{
-					array_push($case_file_array,  $case_file_val['PrisonerCaseFile']['id']);
-					
-				}
-				if($case_file_val['PrisonerSentence']['is_convicted']==1)
-				{
-					if($case_file_val['PrisonerSentence']['waiting_for_confirmation']==1)
-					{
-						array_push($case_file_array2,  $case_file_val['PrisonerCaseFile']['id']);
-					}
-					if($case_file_val['PrisonerSentence']['wish_to_appeal']==1)
-					{
-						array_push($case_file_array1,  $case_file_val['PrisonerCaseFile']['id']);
-					}
-					
-				}
-			}
-			
-			if($case_file_array1 != '')
-			{
-				
-				$sentenceAppeal = $this->PrisonerSentenceAppeal->find('all',array(
-							'recursive' => -1,
-										'conditions'=>array(
-										'PrisonerSentenceAppeal.appeal_status'=>'Cause List',
-										'PrisonerSentenceAppeal.case_file_id'=> $case_file_array1,
-										//'PrisonerSentenceAppeal.prisoner_id' => $prisoner_id,
-								),
-								'fields'=>array('PrisonerSentenceAppeal.case_file_id')
-					));
-					
-					foreach($sentenceAppeal as $sentval)
-					{
-						array_push($case_file_id_arr,$sentval['PrisonerSentenceAppeal']['case_file_id']);
-					}
-			}
-			
-			$new_array = array_values(array_merge($case_file_array,$case_file_array2,$case_file_id_arr));		
-					
-		}
-		
-		//debug($case_file_array1); exit;
-		if(!empty($new_array))
-		{
-			
-			
-		 $caseFileno=$this->PrisonerCaseFile->find('list',array(
-				  "recursive" => -1,
+    
+    public function getTocourtFileNo($prisoner_id='',$sentene_type='')
+    {
+        $this->loadModel('PrisonerCaseFile');
+        $this->loadModel('PrisonerSentenceAppeal');
+        
+        $case_files = $this->PrisonerCaseFile->find('all', array(
+            'recursive'     => -1,
+            'joins' => array(
+                                array(
+                                    'table' => 'prisoner_sentences',
+                                    'alias' => 'PrisonerSentence',
+                                    'type' => 'left',
+                                    'foreignKey' => false,
+                                    'conditions'=> array(
+                                            'PrisonerSentence.case_id = PrisonerCaseFile.case_file_no',
+                                    ),
+                                    
+                                ),
+                                /*array(
+                                    'table' => 'courtattendances',
+                                    'alias' => 'Courtattendance',
+                                    'type' => 'left',
+                                    'foreignKey' => false,
+                                    'conditions'=> array(
+                                            'Courtattendance.case_no = PrisonerSentence.case_id',
+                                    ),
+                                )*/     
+                        ),
+        'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no','PrisonerSentence.sentence_type','PrisonerSentence.is_convicted','PrisonerSentence.wish_to_appeal','PrisonerSentence.waiting_for_confirmation'),
+            'conditions'=>array('PrisonerCaseFile.prisoner_id'=>$prisoner_id),
+        )); 
+        
+        //$this->PrisonerCaseFile->recursive = -1;
+        /*$case_files = $this->PrisonerCaseFile->find('all', array(
+            'joins' => array(
+                                array(
+                                    'table' => 'prisoner_sentences',
+                                    'alias' => 'PrisonerSentence',
+                                    'type' => 'left',
+                                    'foreignKey' => false,
+                                    'conditions'=> array(
+                                            'PrisonerSentence.case_id = PrisonerCaseFile.id',
+                                    ),
+                                    
+                                )           
+                        ),
+        'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no','PrisonerSentence.sentence_type'),
+            'conditions'=>array('PrisonerCaseFile.prisoner_id'=>$prisoner_id),
+        )); */
+        //debug($case_files);
+        $case_file_array = array();
+        $case_file_array1 = array();
+        $case_file_array2 = array();
+        $case_file_id_arr = array();
+        $new_array = array();
+        $case_file_id = '';
+        $case_file_id1 = '';
+        if(isset($case_files) && $case_files != '')
+        {
+            foreach($case_files as $case_file_val)
+            {
+                if($case_file_val['PrisonerSentence']['is_convicted']==0)
+                {
+                    array_push($case_file_array,  $case_file_val['PrisonerCaseFile']['id']);
+                    
+                }
+                if($case_file_val['PrisonerSentence']['is_convicted']==1)
+                {
+                    if($case_file_val['PrisonerSentence']['waiting_for_confirmation']==1)
+                    {
+                        array_push($case_file_array2,  $case_file_val['PrisonerCaseFile']['id']);
+                    }
+                    if($case_file_val['PrisonerSentence']['wish_to_appeal']==1)
+                    {
+                        array_push($case_file_array1,  $case_file_val['PrisonerCaseFile']['id']);
+                    }
+                    
+                }
+            }
+            
+            if($case_file_array1 != '')
+            {
+                
+                $sentenceAppeal = $this->PrisonerSentenceAppeal->find('all',array(
+                            'recursive' => -1,
+                                        'conditions'=>array(
+                                        'PrisonerSentenceAppeal.appeal_status'=>'Cause List',
+                                        'PrisonerSentenceAppeal.case_file_id'=> $case_file_array1,
+                                        //'PrisonerSentenceAppeal.prisoner_id' => $prisoner_id,
+                                ),
+                                'fields'=>array('PrisonerSentenceAppeal.case_file_id')
+                    ));
+                    
+                    foreach($sentenceAppeal as $sentval)
+                    {
+                        array_push($case_file_id_arr,$sentval['PrisonerSentenceAppeal']['case_file_id']);
+                    }
+            }
+            
+            $new_array = array_values(array_merge($case_file_array,$case_file_array2,$case_file_id_arr));       
+                    
+        }
+        
+        //debug($case_file_array1); exit;
+        if(!empty($new_array))
+        {
+            
+            
+         $caseFileno=$this->PrisonerCaseFile->find('list',array(
+                  "recursive" => -1,
                   'conditions'=>array(
                    'PrisonerCaseFile.is_trash'=>0,
-				   'PrisonerCaseFile.id'=>$new_array,
+                   'PrisonerCaseFile.id'=>$new_array,
                   ),
-				  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
+                  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
                   'order'=>array(
                     'PrisonerCaseFile.case_file_no'
                   )
             ));
-			
-			return $caseFileno;
-		}
-		/*else{
-			
-			$caseFileno=$this->PrisonerCaseFile->find('list',array(
-				  "recursive" => -1,
+            
+            return $caseFileno;
+        }
+        /*else{
+            
+            $caseFileno=$this->PrisonerCaseFile->find('list',array(
+                  "recursive" => -1,
                   'conditions'=>array(
                    'PrisonerCaseFile.is_trash'=>0,
-				   'PrisonerCaseFile.prisoner_id'=>$prisoner_id
+                   'PrisonerCaseFile.prisoner_id'=>$prisoner_id
                   ),
-				  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
+                  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
                   'order'=>array(
                     'PrisonerCaseFile.case_file_no'
                   )
             ));
-			
-			return $caseFileno;
-		}*/		
-		
-	}
-	
-	public function remandBeyondStatutoryReport()
+            
+            return $caseFileno;
+        }*/     
+        
+    }
+    
+    public function remandBeyondStatutoryReport()
     {
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
-		$usertype = array(1,2);
-		$district_condition = array();
-		$station_condition = array();
-		$region_condition = array();
-		if(!in_array($this->Auth->user('usertype_id'),$usertype))
-		{
-			$district_condition +=  array('District.id' => $this->Auth->user('district_id'));
-			$station_condition += array('Prison.district_id' => $this->Auth->user('district_id'));
-			$region_condition += array('State.id' => $this->Auth->user('state_id'));
-		}
+        $usertype = array(1,2);
+        $district_condition = array();
+        $station_condition = array();
+        $region_condition = array();
+        if(!in_array($this->Auth->user('usertype_id'),$usertype))
+        {
+            $district_condition +=  array('District.id' => $this->Auth->user('district_id'));
+            $station_condition += array('Prison.district_id' => $this->Auth->user('district_id'));
+            $region_condition += array('State.id' => $this->Auth->user('state_id'));
+        }
         
        
-		$this->loadModel('District');
-		$this->loadModel('State');
-		$this->loadModel('Country');
-		$this->loadModel('Prison');
-		
+        $this->loadModel('District');
+        $this->loadModel('State');
+        $this->loadModel('Country');
+        $this->loadModel('Prison');
+        
         $prisonListData = $this->Prison->find('list', array(
-				'joins'=>array(
-								array(
-									'table' => 'users',
-									'alias'=> 'User',
-									'type'=> 'inner',
-									'conditions'=>array('User.district_id=Prison.district_id'),
-								),
-				),
+                'joins'=>array(
+                                array(
+                                    'table' => 'users',
+                                    'alias'=> 'User',
+                                    'type'=> 'inner',
+                                    'conditions'=>array('User.district_id=Prison.district_id'),
+                                ),
+                ),
                 'fields'        => array(
                     'Prison.id',
                     'Prison.name',
                 ),
                 'conditions'    => $station_condition,
             ));
-			
-		 $districtListData = $this->District->find('list', array(
+            
+         $districtListData = $this->District->find('list', array(
                 'fields'        => array(
                     'District.id',
                     'District.name',
                 ),
                 'conditions'    => $district_condition,
                
-            ));	
-			
-			$regionListData = $this->State->find('list', array(
+            )); 
+            
+            $regionListData = $this->State->find('list', array(
                 'fields'        => array(
                     'State.id',
                     'State.name',
                 ),
                 'conditions'    => $region_condition,
                
-            ));	
-			
+            )); 
+            
         $countryList = $this->Country->find('list', array(
                     'fields'        => array(
                         'Country.id',
@@ -3817,56 +3833,56 @@ class CourtattendancesController  extends AppController {
         $this->set(array(
                     'prisonListData'  => $prisonListData,
                     'districtListData' => $districtListData,
-					'regionListData' => $regionListData,
-					'countryList' => $countryList,
+                    'regionListData' => $regionListData,
+                    'countryList' => $countryList,
                 ));
     }
-	
-	public function remandBeyondStatutoryReportAjax(){
+    
+    public function remandBeyondStatutoryReportAjax(){
         $this->layout   = 'ajax';
         $prisoner_id    = '';
-		$station_id = '';
-		$district_id = '';
-		$region_id = '';
-		$country_id = '';
-		$from_date = '';
-		$to_date = '';
-		$condition = array();
-		
-		if(isset($this->params['named']['station_id']) && $this->params['named']['station_id'] != '')
-		{
-			$condition += array("Prisoner.prison_id IN (".$this->params['named']['station_id'].")");
-			$station_id = $this->params['named']['station_id'];
-		}
-		
-		if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '')
-		{
-			$condition += array("Prisoner.district_id IN (".$this->params['named']['district_id'].")");
-			$district_id = $this->params['named']['district_id'];
-		}
-		
-		if(isset($this->params['named']['region_id']) && $this->params['named']['region_id'] != '')
-		{
-			$condition += array("Prisoner.state_id IN (".$this->params['named']['region_id'].")");
-			$region_id = $this->params['named']['region_id'];
-		}
-		if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '')
-		{
-			$condition += array('Prisoner.country_id'=>$this->params['named']['country_id']);
-			$country_id = $this->params['named']['country_id'];
-		}
-		
-		if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '')
-		{
-			$condition += array('Prisoner.doa >'=> date('Y-m-d',strtotime($this->params['named']['from_date'])));
-			$from_date = date('Y-m-d',strtotime($this->params['named']['from_date']));
-		}
-		if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '')
-		{
-			$condition += array('Prisoner.doa <'=> date('Y-m-d',strtotime($this->params['named']['to_date'])));
-			$to_date = date('Y-m-d',strtotime($this->params['named']['to_date']));
-		}
-		
+        $station_id = '';
+        $district_id = '';
+        $region_id = '';
+        $country_id = '';
+        $from_date = '';
+        $to_date = '';
+        $condition = array();
+        
+        if(isset($this->params['named']['station_id']) && $this->params['named']['station_id'] != '')
+        {
+            $condition += array("Prisoner.prison_id IN (".$this->params['named']['station_id'].")");
+            $station_id = $this->params['named']['station_id'];
+        }
+        
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '')
+        {
+            $condition += array("Prisoner.district_id IN (".$this->params['named']['district_id'].")");
+            $district_id = $this->params['named']['district_id'];
+        }
+        
+        if(isset($this->params['named']['region_id']) && $this->params['named']['region_id'] != '')
+        {
+            $condition += array("Prisoner.state_id IN (".$this->params['named']['region_id'].")");
+            $region_id = $this->params['named']['region_id'];
+        }
+        if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '')
+        {
+            $condition += array('Prisoner.country_id'=>$this->params['named']['country_id']);
+            $country_id = $this->params['named']['country_id'];
+        }
+        
+        if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '')
+        {
+            $condition += array('Prisoner.doa >'=> date('Y-m-d',strtotime($this->params['named']['from_date'])));
+            $from_date = date('Y-m-d',strtotime($this->params['named']['from_date']));
+        }
+        if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '')
+        {
+            $condition += array('Prisoner.doa <'=> date('Y-m-d',strtotime($this->params['named']['to_date'])));
+            $to_date = date('Y-m-d',strtotime($this->params['named']['to_date']));
+        }
+        
         $condition     += array('AND' => array( 
                 'Prisoner.is_trash'         => 0,
                 'Prisoner.present_status'   => 1,
@@ -3902,9 +3918,9 @@ class CourtattendancesController  extends AppController {
             $limit = array('limit'  => 20);
         } 
 
-		
-		
-		 $this->paginate = array(
+        
+        
+         $this->paginate = array(
            'conditions' => $condition,
            'recursive'=>  -1,
              'joins' => array(
@@ -3915,12 +3931,12 @@ class CourtattendancesController  extends AppController {
                     'type'          => 'inner',
                     'conditions'    => array('Prisoner.id = PrisonerCaseFile.prisoner_id ')
                 ),
-				array(
+                array(
                    'table' => 'prisoner_offences',
                    'alias' => 'PrisonerOffence',
                    'type' => 'LEFT',
                    'conditions' => array('PrisonerCaseFile.id = PrisonerOffence.prisoner_case_file_id')
-				),
+                ),
                 array(
                     'table'         => 'courtlevels',
                     'alias'         => 'Courtlevel',
@@ -3934,10 +3950,10 @@ class CourtattendancesController  extends AppController {
                     'conditions'    => array('PrisonerCaseFile.court_id = Court.id')
                 ),
                 array(
-					'table' => 'prisons',
-					'alias' => 'Prison',
-					'type' => 'inner',
-					array('Prisoner.prison_id = Prison.id')
+                    'table' => 'prisons',
+                    'alias' => 'Prison',
+                    'type' => 'inner',
+                    array('Prisoner.prison_id = Prison.id')
                 ),  
                
             ),  
@@ -3948,24 +3964,24 @@ class CourtattendancesController  extends AppController {
                /*  'Prisoner.age_on_admission',*/
                  'Prisoner.doa',              
                  'Prisoner.first_name',
-				 'Prisoner.middle_name',
-				 'Prisoner.last_name',
-				 'Court.name',
+                 'Prisoner.middle_name',
+                 'Prisoner.last_name',
+                 'Court.name',
                  'Prisoner.prisoner_no',
                  'Prison.name',
                  'Prison.district_id',
                  'Prison.state_id',
-				 'Prison.geographical_id',
+                 'Prison.geographical_id',
                  'PrisonerOffence.offence',
-				 'PrisonerOffence.offence_category_id'
+                 'PrisonerOffence.offence_category_id'
                )
         )+$limit;
-		
-		
+        
+        
         $datas = $this->paginate('Prisoner');
-		
-		//debug($datas); exit;
-		
+        
+        //debug($datas); exit;
+        
         $this->set(array(
             'datas'             => $datas,
             'prisoner_id'       => $prisoner_id,
@@ -3973,66 +3989,66 @@ class CourtattendancesController  extends AppController {
             'district_id'          => $district_id,
             'region_id'   => $region_id,
             'country_id'            => $country_id,
-			'from_date'            => $from_date,
-			'to_date'            => $to_date
+            'from_date'            => $from_date,
+            'to_date'            => $to_date
         ));
     }
-	
-	public function reachMandatoryPeriodReport()
+    
+    public function reachMandatoryPeriodReport()
     {
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
-		$usertype = array(1,2);
-		$district_condition = array();
-		$station_condition = array();
-		$region_condition = array();
-		if(!in_array($this->Auth->user('usertype_id'),$usertype))
-		{
-			$district_condition +=  array('District.id' => $this->Auth->user('district_id'));
-			$station_condition += array('Prison.district_id' => $this->Auth->user('district_id'));
-			$region_condition += array('State.id' => $this->Auth->user('state_id'));
-		}
-		
-		$this->loadModel('District');
-		$this->loadModel('State');
-		$this->loadModel('Country');
-		$this->loadModel('Prison');
-		
+        $usertype = array(1,2);
+        $district_condition = array();
+        $station_condition = array();
+        $region_condition = array();
+        if(!in_array($this->Auth->user('usertype_id'),$usertype))
+        {
+            $district_condition +=  array('District.id' => $this->Auth->user('district_id'));
+            $station_condition += array('Prison.district_id' => $this->Auth->user('district_id'));
+            $region_condition += array('State.id' => $this->Auth->user('state_id'));
+        }
+        
+        $this->loadModel('District');
+        $this->loadModel('State');
+        $this->loadModel('Country');
+        $this->loadModel('Prison');
+        
         $prisonListData = $this->Prison->find('list', array(
-				'joins'=>array(
-								array(
-									'table' => 'users',
-									'alias'=> 'User',
-									'type'=> 'inner',
-									'conditions'=>array('User.district_id=Prison.district_id'),
-								),
-				),
+                'joins'=>array(
+                                array(
+                                    'table' => 'users',
+                                    'alias'=> 'User',
+                                    'type'=> 'inner',
+                                    'conditions'=>array('User.district_id=Prison.district_id'),
+                                ),
+                ),
                 'fields'        => array(
                     'Prison.id',
                     'Prison.name',
                 ),
                 'conditions'    => $station_condition,
             ));
-			
-		 $districtListData = $this->District->find('list', array(
+            
+         $districtListData = $this->District->find('list', array(
                 'fields'        => array(
                     'District.id',
                     'District.name',
                 ),
                 'conditions'    => $district_condition,
                
-            ));	
-			
-			$regionListData = $this->State->find('list', array(
+            )); 
+            
+            $regionListData = $this->State->find('list', array(
                 'fields'        => array(
                     'State.id',
                     'State.name',
                 ),
                 'conditions'    => $region_condition,
                
-            ));	
-			
+            )); 
+            
         $countryList = $this->Country->find('list', array(
                     'fields'        => array(
                         'Country.id',
@@ -4050,54 +4066,54 @@ class CourtattendancesController  extends AppController {
         $this->set(array(
                     'prisonListData'  => $prisonListData,
                     'districtListData' => $districtListData,
-					'regionListData' => $regionListData,
-					'countryList' => $countryList,
+                    'regionListData' => $regionListData,
+                    'countryList' => $countryList,
                 ));
     }
-	
-	public function reachMandatoryPeriodReportAjax(){
+    
+    public function reachMandatoryPeriodReportAjax(){
         $this->layout   = 'ajax';
         $prisoner_id    = '';
         $magisterial_id    = '';
         $court_id    = '';
         $attendance_date    = '';
         $status = '';
-		$condition = array();
-		
-		if(isset($this->params['named']['station_id']) && $this->params['named']['station_id'] != '')
-		{
-			$condition += array("Prisoner.prison_id IN (".$this->params['named']['station_id'].")");
-			$station_id = $this->params['named']['station_id'];
-		}
-		
-		if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '')
-		{
-			$condition += array("Prisoner.district_id IN (".$this->params['named']['district_id'].")");
-			$district_id = $this->params['named']['district_id'];
-		}
-		
-		if(isset($this->params['named']['region_id']) && $this->params['named']['region_id'] != '')
-		{
-			$condition += array("Prisoner.state_id IN (".$this->params['named']['region_id'].")");
-			$region_id = $this->params['named']['region_id'];
-		}
-		if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '')
-		{
-			$condition += array('Prisoner.country_id'=>$this->params['named']['country_id']);
-			$country_id = $this->params['named']['country_id'];
-		}
-		
-		if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '')
-		{
-			$condition += array('Prisoner.doa >'=> date('Y-m-d',strtotime($this->params['named']['from_date'])));
-			$from_date = date('Y-m-d',strtotime($this->params['named']['from_date']));
-		}
-		if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '')
-		{
-			$condition += array('Prisoner.doa <'=> date('Y-m-d',strtotime($this->params['named']['to_date'])));
-			$to_date = date('Y-m-d',strtotime($this->params['named']['to_date']));
-		}
-		
+        $condition = array();
+        
+        if(isset($this->params['named']['station_id']) && $this->params['named']['station_id'] != '')
+        {
+            $condition += array("Prisoner.prison_id IN (".$this->params['named']['station_id'].")");
+            $station_id = $this->params['named']['station_id'];
+        }
+        
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '')
+        {
+            $condition += array("Prisoner.district_id IN (".$this->params['named']['district_id'].")");
+            $district_id = $this->params['named']['district_id'];
+        }
+        
+        if(isset($this->params['named']['region_id']) && $this->params['named']['region_id'] != '')
+        {
+            $condition += array("Prisoner.state_id IN (".$this->params['named']['region_id'].")");
+            $region_id = $this->params['named']['region_id'];
+        }
+        if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '')
+        {
+            $condition += array('Prisoner.country_id'=>$this->params['named']['country_id']);
+            $country_id = $this->params['named']['country_id'];
+        }
+        
+        if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '')
+        {
+            $condition += array('Prisoner.doa >'=> date('Y-m-d',strtotime($this->params['named']['from_date'])));
+            $from_date = date('Y-m-d',strtotime($this->params['named']['from_date']));
+        }
+        if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '')
+        {
+            $condition += array('Prisoner.doa <'=> date('Y-m-d',strtotime($this->params['named']['to_date'])));
+            $to_date = date('Y-m-d',strtotime($this->params['named']['to_date']));
+        }
+        
         $condition     += array('AND' => array( 
                 'Prisoner.is_trash'         => 0,
                 'Prisoner.present_status'         => 1,
@@ -4133,9 +4149,9 @@ class CourtattendancesController  extends AppController {
             $limit = array('limit'  => 20);
         } 
 
-		
-		
-		 $this->paginate = array(
+        
+        
+         $this->paginate = array(
            'conditions' => $condition,
            'recursive'=>  -1,
              'joins' => array(
@@ -4146,12 +4162,12 @@ class CourtattendancesController  extends AppController {
                     'type'          => 'inner',
                     'conditions'    => array('Prisoner.id = PrisonerCaseFile.prisoner_id ')
                 ),
-				array(
+                array(
                    'table' => 'prisoner_offences',
                    'alias' => 'PrisonerOffence',
                    'type' => 'LEFT',
                    'conditions' => array('PrisonerCaseFile.id = PrisonerOffence.prisoner_case_file_id')
-				),
+                ),
                 array(
                     'table'         => 'courtlevels',
                     'alias'         => 'Courtlevel',
@@ -4165,10 +4181,10 @@ class CourtattendancesController  extends AppController {
                     'conditions'    => array('PrisonerCaseFile.court_id = Court.id')
                 ),
                 array(
-					'table' => 'prisons',
-					'alias' => 'Prison',
-					'type' => 'inner',
-					array('Prisoner.prison_id = Prison.id')
+                    'table' => 'prisons',
+                    'alias' => 'Prison',
+                    'type' => 'inner',
+                    array('Prisoner.prison_id = Prison.id')
                 ),  
                
             ),  
@@ -4179,24 +4195,24 @@ class CourtattendancesController  extends AppController {
                /*  'Prisoner.age_on_admission',*/
                  'Prisoner.doa',              
                  'Prisoner.first_name',
-				 'Prisoner.middle_name',
-				 'Prisoner.last_name',
-				 'Court.name',
+                 'Prisoner.middle_name',
+                 'Prisoner.last_name',
+                 'Court.name',
                  'Prisoner.prisoner_no',
                  'Prison.name',
                  'Prison.district_id',
                  'Prison.state_id',
-				 'Prison.geographical_id',
+                 'Prison.geographical_id',
                  'PrisonerOffence.offence',
-				 'PrisonerOffence.offence_category_id'
+                 'PrisonerOffence.offence_category_id'
                )
         )+$limit;
-		
-		
+        
+        
         $datas = $this->paginate('Prisoner');
-		
-		//debug($datas); exit;
-		
+        
+        //debug($datas); exit;
+        
         $this->set(array(
             'datas'             => $datas,
             'prisoner_id'       => $prisoner_id,
@@ -4206,62 +4222,62 @@ class CourtattendancesController  extends AppController {
             'status'            => $status
         ));
     }
-	
-	public function lengthOfStayRemandReport()
+    
+    public function lengthOfStayRemandReport()
     {
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
-		$usertype = array(1,2);
-		$district_condition = array();
-		$station_condition = array();
-		$region_condition = array();
-		if(!in_array($this->Auth->user('usertype_id'),$usertype))
-		{
-			$district_condition +=  array('District.id' => $this->Auth->user('district_id'));
-			$station_condition += array('Prison.district_id' => $this->Auth->user('district_id'));
-			$region_condition += array('State.id' => $this->Auth->user('state_id'));
-		}
-		
-		$this->loadModel('District');
-		$this->loadModel('State');
-		$this->loadModel('Country');
-		$this->loadModel('Prison');
-		
+        $usertype = array(1,2);
+        $district_condition = array();
+        $station_condition = array();
+        $region_condition = array();
+        if(!in_array($this->Auth->user('usertype_id'),$usertype))
+        {
+            $district_condition +=  array('District.id' => $this->Auth->user('district_id'));
+            $station_condition += array('Prison.district_id' => $this->Auth->user('district_id'));
+            $region_condition += array('State.id' => $this->Auth->user('state_id'));
+        }
+        
+        $this->loadModel('District');
+        $this->loadModel('State');
+        $this->loadModel('Country');
+        $this->loadModel('Prison');
+        
         $prisonListData = $this->Prison->find('list', array(
-				'joins'=>array(
-								array(
-									'table' => 'users',
-									'alias'=> 'User',
-									'type'=> 'inner',
-									'conditions'=>array('User.district_id=Prison.district_id'),
-								),
-				),
+                'joins'=>array(
+                                array(
+                                    'table' => 'users',
+                                    'alias'=> 'User',
+                                    'type'=> 'inner',
+                                    'conditions'=>array('User.district_id=Prison.district_id'),
+                                ),
+                ),
                 'fields'        => array(
                     'Prison.id',
                     'Prison.name',
                 ),
                 'conditions'    => $station_condition,
             ));
-			
-		 $districtListData = $this->District->find('list', array(
+            
+         $districtListData = $this->District->find('list', array(
                 'fields'        => array(
                     'District.id',
                     'District.name',
                 ),
                 'conditions'    => $district_condition,
                
-            ));	
-			
-			$regionListData = $this->State->find('list', array(
+            )); 
+            
+            $regionListData = $this->State->find('list', array(
                 'fields'        => array(
                     'State.id',
                     'State.name',
                 ),
                 'conditions'    => $region_condition,
                
-            ));	
-			
+            )); 
+            
         $countryList = $this->Country->find('list', array(
                     'fields'        => array(
                         'Country.id',
@@ -4279,54 +4295,54 @@ class CourtattendancesController  extends AppController {
         $this->set(array(
                     'prisonListData'  => $prisonListData,
                     'districtListData' => $districtListData,
-					'regionListData' => $regionListData,
-					'countryList' => $countryList,
+                    'regionListData' => $regionListData,
+                    'countryList' => $countryList,
                 ));
     }
-	
-	public function lengthOfStayRemandReportAjax(){
+    
+    public function lengthOfStayRemandReportAjax(){
         $this->layout   = 'ajax';
         $prisoner_id    = '';
         $magisterial_id    = '';
         $court_id    = '';
         $attendance_date    = '';
         $status = '';
-		$condition = array();
-		
-		if(isset($this->params['named']['station_id']) && $this->params['named']['station_id'] != '')
-		{
-			$condition += array("Prisoner.prison_id IN (".$this->params['named']['station_id'].")");
-			$station_id = $this->params['named']['station_id'];
-		}
-		
-		if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '')
-		{
-			$condition += array("Prisoner.district_id IN (".$this->params['named']['district_id'].")");
-			$district_id = $this->params['named']['district_id'];
-		}
-		
-		if(isset($this->params['named']['region_id']) && $this->params['named']['region_id'] != '')
-		{
-			$condition += array("Prisoner.state_id IN (".$this->params['named']['region_id'].")");
-			$region_id = $this->params['named']['region_id'];
-		}
-		if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '')
-		{
-			$condition += array('Prisoner.country_id'=>$this->params['named']['country_id']);
-			$country_id = $this->params['named']['country_id'];
-		}
-		
-		if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '')
-		{
-			$condition += array('Prisoner.doa >'=> date('Y-m-d',strtotime($this->params['named']['from_date'])));
-			$from_date = date('Y-m-d',strtotime($this->params['named']['from_date']));
-		}
-		if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '')
-		{
-			$condition += array('Prisoner.doa <'=> date('Y-m-d',strtotime($this->params['named']['to_date'])));
-			$to_date = date('Y-m-d',strtotime($this->params['named']['to_date']));
-		}
-		
+        $condition = array();
+        
+        if(isset($this->params['named']['station_id']) && $this->params['named']['station_id'] != '')
+        {
+            $condition += array("Prisoner.prison_id IN (".$this->params['named']['station_id'].")");
+            $station_id = $this->params['named']['station_id'];
+        }
+        
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '')
+        {
+            $condition += array("Prisoner.district_id IN (".$this->params['named']['district_id'].")");
+            $district_id = $this->params['named']['district_id'];
+        }
+        
+        if(isset($this->params['named']['region_id']) && $this->params['named']['region_id'] != '')
+        {
+            $condition += array("Prisoner.state_id IN (".$this->params['named']['region_id'].")");
+            $region_id = $this->params['named']['region_id'];
+        }
+        if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '')
+        {
+            $condition += array('Prisoner.country_id'=>$this->params['named']['country_id']);
+            $country_id = $this->params['named']['country_id'];
+        }
+        
+        if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '')
+        {
+            $condition += array('Prisoner.doa >'=> date('Y-m-d',strtotime($this->params['named']['from_date'])));
+            $from_date = date('Y-m-d',strtotime($this->params['named']['from_date']));
+        }
+        if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '')
+        {
+            $condition += array('Prisoner.doa <'=> date('Y-m-d',strtotime($this->params['named']['to_date'])));
+            $to_date = date('Y-m-d',strtotime($this->params['named']['to_date']));
+        }
+        
         $condition     += array('AND' => array( 
                 'Prisoner.is_trash'         => 0,
                 'Prisoner.present_status'         => 1,
@@ -4362,9 +4378,9 @@ class CourtattendancesController  extends AppController {
             $limit = array('limit'  => 20);
         } 
 
-		
-		
-		 $this->paginate = array(
+        
+        
+         $this->paginate = array(
            'conditions' => $condition,
            'recursive'=>  -1,
              'joins' => array(
@@ -4375,12 +4391,12 @@ class CourtattendancesController  extends AppController {
                     'type'          => 'inner',
                     'conditions'    => array('Prisoner.id = PrisonerCaseFile.prisoner_id ')
                 ),
-				array(
+                array(
                    'table' => 'prisoner_offences',
                    'alias' => 'PrisonerOffence',
                    'type' => 'LEFT',
                    'conditions' => array('PrisonerCaseFile.id = PrisonerOffence.prisoner_case_file_id')
-				),
+                ),
                 array(
                     'table'         => 'courtlevels',
                     'alias'         => 'Courtlevel',
@@ -4394,10 +4410,10 @@ class CourtattendancesController  extends AppController {
                     'conditions'    => array('PrisonerCaseFile.court_id = Court.id')
                 ),
                 array(
-					'table' => 'prisons',
-					'alias' => 'Prison',
-					'type' => 'inner',
-					array('Prisoner.prison_id = Prison.id')
+                    'table' => 'prisons',
+                    'alias' => 'Prison',
+                    'type' => 'inner',
+                    array('Prisoner.prison_id = Prison.id')
                 ),  
                
             ),  
@@ -4408,24 +4424,24 @@ class CourtattendancesController  extends AppController {
                /*  'Prisoner.age_on_admission',*/
                  'Prisoner.doa',              
                  'Prisoner.first_name',
-				 'Prisoner.middle_name',
-				 'Prisoner.last_name',
-				 'Court.name',
+                 'Prisoner.middle_name',
+                 'Prisoner.last_name',
+                 'Court.name',
                  'Prisoner.prisoner_no',
                  'Prison.name',
                  'Prison.district_id',
                  'Prison.state_id',
-				 'Prison.geographical_id',
+                 'Prison.geographical_id',
                  'PrisonerOffence.offence',
-				 'PrisonerOffence.offence_category_id'
+                 'PrisonerOffence.offence_category_id'
                )
         )+$limit;
-		
-		
+        
+        
         $datas = $this->paginate('Prisoner');
-		
-		//debug($datas); exit;
-		
+        
+        //debug($datas); exit;
+        
         $this->set(array(
             'datas'             => $datas,
             'prisoner_id'       => $prisoner_id,
@@ -4435,62 +4451,62 @@ class CourtattendancesController  extends AppController {
             'status'            => $status
         ));
     }
-	
-	public function caseBackLogReport()
+    
+    public function caseBackLogReport()
     {
         $this->set('funcall',$this);
         $status = 'Saved'; 
         $remark = '';
-		$usertype = array(1,2);
-		$district_condition = array();
-		$station_condition = array();
-		$region_condition = array();
-		if(!in_array($this->Auth->user('usertype_id'),$usertype))
-		{
-			$district_condition +=  array('District.id' => $this->Auth->user('district_id'));
-			$station_condition += array('Prison.district_id' => $this->Auth->user('district_id'));
-			$region_condition += array('State.id' => $this->Auth->user('state_id'));
-		}
-		
-		$this->loadModel('District');
-		$this->loadModel('State');
-		$this->loadModel('Country');
-		$this->loadModel('Prison');
-		
+        $usertype = array(1,2);
+        $district_condition = array();
+        $station_condition = array();
+        $region_condition = array();
+        if(!in_array($this->Auth->user('usertype_id'),$usertype))
+        {
+            $district_condition +=  array('District.id' => $this->Auth->user('district_id'));
+            $station_condition += array('Prison.district_id' => $this->Auth->user('district_id'));
+            $region_condition += array('State.id' => $this->Auth->user('state_id'));
+        }
+        
+        $this->loadModel('District');
+        $this->loadModel('State');
+        $this->loadModel('Country');
+        $this->loadModel('Prison');
+        
         $prisonListData = $this->Prison->find('list', array(
-				'joins'=>array(
-								array(
-									'table' => 'users',
-									'alias'=> 'User',
-									'type'=> 'inner',
-									'conditions'=>array('User.district_id=Prison.district_id'),
-								),
-				),
+                'joins'=>array(
+                                array(
+                                    'table' => 'users',
+                                    'alias'=> 'User',
+                                    'type'=> 'inner',
+                                    'conditions'=>array('User.district_id=Prison.district_id'),
+                                ),
+                ),
                 'fields'        => array(
                     'Prison.id',
                     'Prison.name',
                 ),
                 'conditions'    => $station_condition,
             ));
-			
-		 $districtListData = $this->District->find('list', array(
+            
+         $districtListData = $this->District->find('list', array(
                 'fields'        => array(
                     'District.id',
                     'District.name',
                 ),
                 'conditions'    => $district_condition,
                
-            ));	
-			
-			$regionListData = $this->State->find('list', array(
+            )); 
+            
+            $regionListData = $this->State->find('list', array(
                 'fields'        => array(
                     'State.id',
                     'State.name',
                 ),
                 'conditions'    => $region_condition,
                
-            ));	
-			
+            )); 
+            
         $countryList = $this->Country->find('list', array(
                     'fields'        => array(
                         'Country.id',
@@ -4508,54 +4524,54 @@ class CourtattendancesController  extends AppController {
         $this->set(array(
                     'prisonListData'  => $prisonListData,
                     'districtListData' => $districtListData,
-					'regionListData' => $regionListData,
-					'countryList' => $countryList,
+                    'regionListData' => $regionListData,
+                    'countryList' => $countryList,
                 ));
     }
-	
-	public function caseBackLogReportAjax(){
+    
+    public function caseBackLogReportAjax(){
         $this->layout   = 'ajax';
         $prisoner_id    = '';
         $magisterial_id    = '';
         $court_id    = '';
         $attendance_date    = '';
         $status = '';
-		$condition = array();
-		
-		if(isset($this->params['named']['station_id']) && $this->params['named']['station_id'] != '')
-		{
-			$condition += array("Prisoner.prison_id IN (".$this->params['named']['station_id'].")");
-			$station_id = $this->params['named']['station_id'];
-		}
-		
-		if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '')
-		{
-			$condition += array("Prisoner.district_id IN (".$this->params['named']['district_id'].")");
-			$district_id = $this->params['named']['district_id'];
-		}
-		
-		if(isset($this->params['named']['region_id']) && $this->params['named']['region_id'] != '')
-		{
-			$condition += array("Prisoner.state_id IN (".$this->params['named']['region_id'].")");
-			$region_id = $this->params['named']['region_id'];
-		}
-		if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '')
-		{
-			$condition += array('Prisoner.country_id'=>$this->params['named']['country_id']);
-			$country_id = $this->params['named']['country_id'];
-		}
-		
-		if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '')
-		{
-			$condition += array('Prisoner.doa >'=> date('Y-m-d',strtotime($this->params['named']['from_date'])));
-			$from_date = date('Y-m-d',strtotime($this->params['named']['from_date']));
-		}
-		if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '')
-		{
-			$condition += array('Prisoner.doa <'=> date('Y-m-d',strtotime($this->params['named']['to_date'])));
-			$to_date = date('Y-m-d',strtotime($this->params['named']['to_date']));
-		}
-		
+        $condition = array();
+        
+        if(isset($this->params['named']['station_id']) && $this->params['named']['station_id'] != '')
+        {
+            $condition += array("Prisoner.prison_id IN (".$this->params['named']['station_id'].")");
+            $station_id = $this->params['named']['station_id'];
+        }
+        
+        if(isset($this->params['named']['district_id']) && $this->params['named']['district_id'] != '')
+        {
+            $condition += array("Prisoner.district_id IN (".$this->params['named']['district_id'].")");
+            $district_id = $this->params['named']['district_id'];
+        }
+        
+        if(isset($this->params['named']['region_id']) && $this->params['named']['region_id'] != '')
+        {
+            $condition += array("Prisoner.state_id IN (".$this->params['named']['region_id'].")");
+            $region_id = $this->params['named']['region_id'];
+        }
+        if(isset($this->params['named']['country_id']) && $this->params['named']['country_id'] != '')
+        {
+            $condition += array('Prisoner.country_id'=>$this->params['named']['country_id']);
+            $country_id = $this->params['named']['country_id'];
+        }
+        
+        if(isset($this->params['named']['from_date']) && $this->params['named']['from_date'] != '')
+        {
+            $condition += array('Prisoner.doa >'=> date('Y-m-d',strtotime($this->params['named']['from_date'])));
+            $from_date = date('Y-m-d',strtotime($this->params['named']['from_date']));
+        }
+        if(isset($this->params['named']['to_date']) && $this->params['named']['to_date'] != '')
+        {
+            $condition += array('Prisoner.doa <'=> date('Y-m-d',strtotime($this->params['named']['to_date'])));
+            $to_date = date('Y-m-d',strtotime($this->params['named']['to_date']));
+        }
+        
         $condition     += array('AND' => array( 
                 'Prisoner.is_trash'         => 0,
                 'Prisoner.present_status'         => 1,
@@ -4591,14 +4607,14 @@ class CourtattendancesController  extends AppController {
             $limit = array('limit'  => 20);
         } 
 
-		
-		
-		 $this->paginate = array(
+        
+        
+         $this->paginate = array(
            'conditions' => $condition,
            'recursive'=>  -1,
              'joins' => array(
                
-				array(
+                array(
                     "table" => "prisoner_sentences",
                     "alias" => "PrisonerSentence",
                     "type" => "left",
@@ -4610,12 +4626,12 @@ class CourtattendancesController  extends AppController {
                     'type'          => 'inner',
                     'conditions'    => array('Prisoner.id = PrisonerCaseFile.prisoner_id ')
                 ),
-				array(
+                array(
                    'table' => 'prisoner_offences',
                    'alias' => 'PrisonerOffence',
                    'type' => 'LEFT',
                    'conditions' => array('PrisonerCaseFile.id = PrisonerOffence.prisoner_case_file_id')
-				),
+                ),
                 array(
                     'table'         => 'courtlevels',
                     'alias'         => 'Courtlevel',
@@ -4629,10 +4645,10 @@ class CourtattendancesController  extends AppController {
                     'conditions'    => array('PrisonerCaseFile.court_id = Court.id')
                 ),
                 array(
-					'table' => 'prisons',
-					'alias' => 'Prison',
-					'type' => 'inner',
-					array('Prisoner.prison_id = Prison.id')
+                    'table' => 'prisons',
+                    'alias' => 'Prison',
+                    'type' => 'inner',
+                    array('Prisoner.prison_id = Prison.id')
                 ),  
                
             ),  
@@ -4643,25 +4659,25 @@ class CourtattendancesController  extends AppController {
                /*  'Prisoner.age_on_admission',*/
                  'Prisoner.doa',              
                  'Prisoner.first_name',
-				 'Prisoner.middle_name',
-				 'Prisoner.last_name',
-				 'Court.name',
+                 'Prisoner.middle_name',
+                 'Prisoner.last_name',
+                 'Court.name',
                  'Prisoner.prisoner_no',
                  'Prison.name',
                  'Prison.district_id',
                  'Prison.state_id',
-				 'Prison.geographical_id',
+                 'Prison.geographical_id',
                  'PrisonerOffence.offence',
-				 'PrisonerOffence.offence_category_id',
-				 'PrisonerSentence.date_of_committal',
+                 'PrisonerOffence.offence_category_id',
+                 'PrisonerSentence.date_of_committal',
                )
         )+$limit;
-		
-		
+        
+        
         $datas = $this->paginate('Prisoner');
-		
-		//debug($datas); exit;
-		
+        
+        //debug($datas); exit;
+        
         $this->set(array(
             'datas'             => $datas,
             'prisoner_id'       => $prisoner_id,
@@ -4671,88 +4687,88 @@ class CourtattendancesController  extends AppController {
             'status'            => $status
         ));
     }
-	
-	public function showAppCourtFile($prisoner_id = '', $value = '')
-	{
-		$this->autoRender = false;
-		$this->loadModel('PrisonerSentence');
-		
-		if($prisoner_id != '')
-		{
-			
-			$case_id=$this->PrisonerSentence->find('all',array(
-				  "recursive" => -1,
+    
+    public function showAppCourtFile($prisoner_id = '', $value = '')
+    {
+        $this->autoRender = false;
+        $this->loadModel('PrisonerSentence');
+        
+        if($prisoner_id != '')
+        {
+            
+            $case_id=$this->PrisonerSentence->find('all',array(
+                  "recursive" => -1,
                   'conditions'=>array(
                    'PrisonerSentence.wish_to_appeal'=>1,
-				   'PrisonerSentence.prisoner_id'=>$prisoner_id,
+                   'PrisonerSentence.prisoner_id'=>$prisoner_id,
                   ),
-				  'fields'=>array('PrisonerSentence.case_id'),
+                  'fields'=>array('PrisonerSentence.case_id'),
                   'order'=>array(
                     'PrisonerSentence.id'
                   )
             ));
-			
-			$caseFile = '';
-			if(count($case_id) > 0)
-			{
-				
-				foreach($case_id as $case_key => $case_val)
-				{
-					$caseFile .= $case_val['PrisonerSentence']['case_id'].',';
-				}
-			}
-			
-			$caseFile = rtrim($caseFile,',');
-			$caseFilearr = explode(',',$caseFile);
-			
-			if($value==1)
-			{
-				$caseFileno=$this->PrisonerCaseFile->find('list',array(
-						  "recursive" => -1,
-						  'conditions'=>array(
-						   'PrisonerCaseFile.is_trash'=>0,
-						   'PrisonerCaseFile.prisoner_id'=>$prisoner_id,
-						   'PrisonerCaseFile.id'=>$caseFilearr,
-						  ),
-						  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
-						  'order'=>array(
-							'PrisonerCaseFile.case_file_no'
-						  )
-					));
-			}
-			else
-			{
-				$caseFileno=$this->PrisonerCaseFile->find('list',array(
-						  "recursive" => -1,
-						  'conditions'=>array(
-						   'PrisonerCaseFile.is_trash'=>0,
-						   'PrisonerCaseFile.prisoner_id'=>$prisoner_id,
-						),
-						  'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
-						  'order'=>array(
-							'PrisonerCaseFile.case_file_no'
-						  )
-					));
-			}	
-			
-			
-			
-			$options = '';
-			if(count($caseFileno) > 0)
-			{
-				foreach($caseFileno as $filekey => $fileval)
-				{
-					$options .= '<option value='.$filekey.'>'.$fileval.'</option>';
-				}
-			}
-			else
-			{
-				$options .= '<option value=""></option>';
-			}
-		}
-		 
-		echo $options;
-	}
+            
+            $caseFile = '';
+            if(count($case_id) > 0)
+            {
+                
+                foreach($case_id as $case_key => $case_val)
+                {
+                    $caseFile .= $case_val['PrisonerSentence']['case_id'].',';
+                }
+            }
+            
+            $caseFile = rtrim($caseFile,',');
+            $caseFilearr = explode(',',$caseFile);
+            
+            if($value==1)
+            {
+                $caseFileno=$this->PrisonerCaseFile->find('list',array(
+                          "recursive" => -1,
+                          'conditions'=>array(
+                           'PrisonerCaseFile.is_trash'=>0,
+                           'PrisonerCaseFile.prisoner_id'=>$prisoner_id,
+                           'PrisonerCaseFile.id'=>$caseFilearr,
+                          ),
+                          'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
+                          'order'=>array(
+                            'PrisonerCaseFile.case_file_no'
+                          )
+                    ));
+            }
+            else
+            {
+                $caseFileno=$this->PrisonerCaseFile->find('list',array(
+                          "recursive" => -1,
+                          'conditions'=>array(
+                           'PrisonerCaseFile.is_trash'=>0,
+                           'PrisonerCaseFile.prisoner_id'=>$prisoner_id,
+                        ),
+                          'fields'=>array('PrisonerCaseFile.id','PrisonerCaseFile.file_no'),
+                          'order'=>array(
+                            'PrisonerCaseFile.case_file_no'
+                          )
+                    ));
+            }   
+            
+            
+            
+            $options = '';
+            if(count($caseFileno) > 0)
+            {
+                foreach($caseFileno as $filekey => $fileval)
+                {
+                    $options .= '<option value='.$filekey.'>'.$fileval.'</option>';
+                }
+            }
+            else
+            {
+                $options .= '<option value=""></option>';
+            }
+        }
+         
+        echo $options;
+    }
     //PARTHA CODE START PETETION IN COURT ATTENDANCE
      function isPetition($prisoner_id)
     {
@@ -4776,7 +4792,7 @@ class CourtattendancesController  extends AppController {
         return $count;
     }
 
-     function prisonerPetition(){
+      function prisonerPetition(){
         //debug($this->request->data);
         if(isset($this->request->data["PrisonerPetition"]) && count($this->request->data["PrisonerPetition"])>0)
                         {
@@ -4789,20 +4805,20 @@ class CourtattendancesController  extends AppController {
                             // $appealData['PrisonerPetition'] = $this->request->data['PrisonerPetition'];
                             
 
-                            //debug($this->request->data['PrisonerPetition']);exit;
+                            // debug($this->request->data['PrisonerPetition']);exit;
                             $this->loadModel('PrisonerPetition');
                                 if($this->PrisonerPetition->saveAll($this->request->data))
                                 {   //echo '1';exit;
                                     $this->Session->write('message_type','success');
                                     $this->Session->write('message','Petition Saved Successfully !');
 
-                                    $this->redirect(array('action'=>'/index/'.$this->request->data['PrisonerPetition']['uuid'].'#petition_tab')); 
+                                    $this->redirect(array('action'=>'/index/'.$this->request->data['PrisonerPetition']['uuid'].'#petiontab')); 
                                 }
                                 else 
                                 {   //echo '2';exit;
                                     $this->Session->write('message_type','error');
                                     $this->Session->write('message','Petition Saving Failed !');
-                                    $this->redirect(array('action'=>'/index'.$this->request->data['PrisonerPetition']['uuid'].'#petition_tab')); 
+                                    $this->redirect(array('action'=>'/index/',$this->request->data['PrisonerPetition']['uuid'].'#petiontab')); 
                                 }
 
                                     
@@ -4813,33 +4829,27 @@ class CourtattendancesController  extends AppController {
     function petitionAjax(){
         $this->layout   = 'ajax';
         $prisoner_id      = '';
-        $editPrisoner = 0;
         $this->loadModel('PrisonerPetition');
         $condition      = array(
-            'PrisonerPetition.is_trash'         => 0,
+            'PrisonerPetition.is_trash' => 0
         );
         // Display result as per status and user type --START--
-        // if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
-        // {
-        //     $condition      += array('PrisonerSentence.status !='=>'Draft');
-        // }
-        // else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
-        // { 
-        //     $condition      += array('PrisonerSentence.status not in ("Draft","Saved","Review-Rejected")');
-        // }
-        // else if($this->Session->read('Auth.User.usertype_id') != Configure::read('RECEPTIONIST_USERTYPE'))
-        // {
-        //     $condition      += array('PrisonerSentence.status'=>'Approved');
-        // }
-        // Display result as per status and user type --END--
-        $editPrisoner = 0;
-        
-        if(isset($this->params['named']['prisoner_id']) && $this->params['named']['prisoner_id'] != ''){
-            $prisoner_id = $this->params['named']['prisoner_id'];
-            $condition += array('PrisonerPetition.prisoner_id' => $prisoner_id );
+        if($this->Session->read('Auth.User.usertype_id')==Configure::read('PRINCIPALOFFICER_USERTYPE'))
+        {
+            $condition      += array('PrisonerSentence.status !='=>'Draft');
         }
-        if(isset($this->params['named']['editPrisoner']) && $this->params['named']['editPrisoner'] != ''){
-            $editPrisoner = $this->params['named']['editPrisoner'];
+        else if($this->Session->read('Auth.User.usertype_id')==Configure::read('OFFICERINCHARGE_USERTYPE'))
+        { 
+            $condition      += array('PrisonerSentence.status not in ("Draft","Saved","Review-Rejected")');
+        }
+        else if($this->Session->read('Auth.User.usertype_id') != Configure::read('RECEPTIONIST_USERTYPE'))
+        {
+            $condition      += array('PrisonerSentence.status'=>'Approved');
+        }
+        // Display result as per status and user type --END--
+        if(isset($this->params['data']['prisoner_id']) && $this->params['data']['prisoner_id'] != ''){
+            $prisoner_id = $this->params['data']['prisoner_id'];
+            $condition += array('PrisonerPetition.prisoner_id' => $prisoner_id );
         }
         if(isset($this->params['named']['reqType']) && $this->params['named']['reqType'] != ''){
             if($this->params['named']['reqType']=='XLS'){
@@ -4861,7 +4871,8 @@ class CourtattendancesController  extends AppController {
             $limit = array('limit' => 2000,'maxLimit'   => 2000);
         }else{
             $limit = array('limit'  => 20);
-        }               
+        }              
+        //debug($condition); exit;
         $this->paginate = array(
             'conditions'    => $condition,
             'order'         => array(
@@ -4869,17 +4880,13 @@ class CourtattendancesController  extends AppController {
             ),
             'limit'         => 20,
         );
-        $petetionresult = array("Petetion Discharge"=>"Petetion Discharge","Commutation of Sentence"=>"Commutation of Sentence");
+      
         $datas = $this->paginate('PrisonerPetition');
+        // debug($datas); exit;
         $this->set(array(
             'datas'         =>  $datas,  
-            'prisoner_id'   =>  $prisoner_id,
-            'editPrisoner'  =>  $editPrisoner,
-            'funcall'       =>  $this,
-            'editPrisoner'  =>  $editPrisoner,
-            'login_user_id' => $this->Session->read('Auth.User.id'),
-            'login_user_type_id' => $this->Session->read('Auth.User.usertype_id'),
-            'petetionresult' => $petetionresult
+            'prisoner_id'         =>  $prisoner_id,  
+            
         ));
     }
 
@@ -5065,5 +5072,5 @@ class CourtattendancesController  extends AppController {
        //  return $prisonerCaseFile['PrisonerCaseFile']['file_no'];
      }
     //PARTHA CODE END PETETION IN COURT ATTENDANCE
-	
+    
 }

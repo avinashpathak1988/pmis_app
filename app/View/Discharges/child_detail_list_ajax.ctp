@@ -115,7 +115,7 @@ echo $this->Form->create('ApprovalProcessForm',array('class'=>'form-horizontal',
             <th>Prisoner No</th>
             <th>Prisoner Name</th>
             <th>Child Name</th>
-            <th>Father Number</th>
+            <th>Father Name</th>
             <th>Gender</th>
             <th>Place Of Birth</th>
             <th>View Details</th>

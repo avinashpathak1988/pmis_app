@@ -49,7 +49,7 @@ $highCourtfileNo = $funcall->getPrisonerHighCourtFileNo($this->data['Prisoner'][
                 <label class="control-label">Court Level:</label>
                 <div class="controls">
                     <?php $cid = "'petition'";
-                    echo $this->Form->input('courtlevel_id',array('div'=>false,'label'=>false,'onChange'=>'getCourtList(this.value,'.$cid.')','class'=>'form-control span11 pmis_select','type'=>'select','options'=>$courtLevelList, 'empty'=>'','required','id'=>'petition_courtlevel_id', 'title'=>'Select Court Level'));?>
+                    echo $this->Form->input('courtlevel_id',array('div'=>false,'label'=>false,'onChange'=>'getCourtList(this.value,'.$cid.')','class'=>'form-control span11 pmis_select','type'=>'select','options'=>$courtLevelList, 'empty'=>'','required'=>false,'id'=>'petition_courtlevel_id', 'title'=>'Select Court Level'));?>
                 </div>
             </div>
         </div>
